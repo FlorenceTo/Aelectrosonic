@@ -29,7 +29,7 @@ export default function Header() {
   const navItems = [
     { label: "About", path: "/about" },
     { label: "Home", path: "/" },
-    { label: "Ecosemiotics", path: "/ecosemiotics" },
+    //{ label: "Ecosemiotics", path: "/ecosemiotics" },
     { label: "Vulture Map", path: "/birdmap" },
     { label: "Signal Loss", path: "/interference" },
     { label: "Sonic Dispossession", path: "/archive-map" },
@@ -267,7 +267,7 @@ export default function Header() {
           <div className="nav-right" style={{ display: "flex", gap: "1.5rem", alignItems: "center", position: "relative" }}>
         <Link to="/about">About</Link>
         <Link to="/">Home</Link>
-        <Link to="/ecosemiotics">Ecosemiotics</Link>
+        {/* <Link to="/ecosemiotics">Ecosemiotics</Link> */}
         <Link to="/birdmap">Vulture Map</Link>
         <Link to="/interference">Signal Loss</Link>
         <Link to="/archive-map">Sonic Dispossession</Link>
