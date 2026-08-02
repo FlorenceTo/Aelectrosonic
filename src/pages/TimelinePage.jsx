@@ -704,6 +704,9 @@ export default function TimelinePage() {
               margin-bottom: 0 !important;
             }
             .plot-wrapper > div {
+              width: 100% !important;
+              min-width: auto !important;
+              height: 350px !important;
               margin-bottom: 0.2rem !important;
             }
             .timeline-slider-label {
