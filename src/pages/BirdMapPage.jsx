@@ -18,50 +18,52 @@ export default function BirdMapPage() {
         <div className="info-section">
           <h3 className="section-title">About the data</h3>
           <p>
-            This dataset records the GPS movements of nine adult vultures from three species. Backpack-mounted
-            GPS–accelerometer tags documented successive locations over time, allowing the birds' movements to
-            be read in relation to distance, terrain, roosting areas and the places they repeatedly returned to.
-            The tracks do not simply show where the vultures travelled; they also reveal how movement is shaped
-            by the landscapes and systems through which they navigate.
+            This map shows the recorded movements of nine adult vultures from three species. Each bird carried
+            a small GPS device worn like a backpack, which recorded its position at regular intervals. The
+            tracks help us understand how vultures move across different kinds of terrain, where they stop or
+            return, and how they travel between feeding and roosting areas and possible breeding sites. They
+            can also show how roads, settlements, borders and other forms of infrastructure relate to their
+            movement.
           </p>
           <p>
-            In Israel, the vultures were tracked within an intensively managed conservation system that included
-            artificial feeding stations. These sites provide reliable food and can attract birds back towards
-            particular areas, meaning that the recorded paths reflect both avian navigation and human intervention.
-            The map therefore makes visible a relationship between animal movement, topography and the
-            infrastructures established to manage vulnerable populations.
+            The map also marks the positions of active radar sites in relation to the recorded flight paths.
+            This additional layer allows the vultures' movements to be viewed alongside technological and
+            military infrastructure. Proximity does not prove that radar affected the birds or altered their
+            navigation, but it reveals where animal routes and radar systems occupy the same landscape. These
+            routes are not shaped by topography alone. In some areas, conservation organisations provide
+            carcasses at artificial feeding stations. These sites can attract vultures to particular locations
+            and influence where they remain or return. The map therefore records both bird navigation and the
+            human systems that manage, monitor and occupy the areas through which vultures move.
           </p>
         </div>
 
-        {/* --- What the tracks expose section --- */}
+        {/* --- What the map can reveal section --- */}
         <div className="info-section">
-          <h3 className="section-title">What the tracks expose</h3>
+          <h3 className="section-title">What the map can reveal</h3>
           <p>
-            Movebank archives observations of animal movement that cannot be reproduced, allowing completed
-            datasets to be preserved, cited and reused. Public access enables these records to be interpreted
-            beyond the original questions of the study.
+            The dataset is held by Movebank, an online repository where researchers preserve and share
+            animal-tracking information. Each recorded journey is unique and cannot be reproduced, so storing
+            the data allows it to be studied again and used to explore questions beyond those asked in the
+            original research. Detailed tracking data can reveal colonies, regular roosting places, feeding
+            sites, conservation areas and the movements of vulnerable animals. It can also show routes through
+            politically or militarily sensitive territories, as well as relationships between wildlife, radar
+            sites, roads, settlements, borders and other infrastructure.
           </p>
           <p>
-            Detailed wildlife tracking can, however, reveal more than movement alone. It may expose colonies
-            and habitual roosts, feeding sites, vulnerable individuals, routes through ecologically, politically
-            or militarily sensitive territories, and relationships between wildlife and human infrastructure.
-            At the same time, the routes should not be understood as entirely spontaneous or unaffected by
-            intervention. Managed feeding sites, conservation areas and other infrastructures may actively
-            influence where birds travel, remain or return.
+            Making precise locations public can create risks. Sensitive habitats, vulnerable animals and
+            important feeding or breeding sites may become easier to identify. The tracks can also reveal
+            conservation interventions, such as artificial feeding stations, that actively influence where
+            vultures travel and gather. When viewed alongside radar sites, the tracks raise further questions
+            about how animal navigation passes through landscapes organised by surveillance, communications
+            and military infrastructure. The map does not establish that radar caused a particular movement,
+            but it makes these spatial relationships visible.
           </p>
           <p>
-            The map can therefore be read both as a record of vulture navigation and as evidence of the
-            conditions that organise that navigation. It shows how animal movement crosses topographic and
-            political boundaries while also being redirected by conservation practices, food provision and
-            systems of monitoring.
-          </p>
-          <p>
-            These are potential ethical risks of publishing precise movement data rather than documented harms
-            caused by this particular dataset. Movebank places responsibility on data owners to establish
-            appropriate access permissions for threatened or at-risk populations and cautions that archived
-            records may be incomplete or contain location outliers. This dataset is released under a CC0
-            public-domain licence, but its creators and associated publication should still be credited
-            according to academic and professional standards.
+            The map should therefore be read as both a record of vulture movement and a record of the conditions
+            surrounding and shaping that movement. These conditions include terrain, food availability,
+            conservation practices, technological infrastructure and political borders. The movement records
+            used in this map come from the dataset <em>Long-range adult movements of 3 vulture species
+            (data from Spiegel et al. 2015)</em>, published through the Movebank Data Repository.
           </p>
         </div>
 
