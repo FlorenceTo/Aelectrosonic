@@ -92,17 +92,10 @@ const PLOT_START = new Date("1920-01-01").getTime();
 const PLOT_END = new Date("2028-01-01").getTime();
 const STEP_MS = 3600000; // 1 hour
 
-const orderedThemes = [
-  "Energy", "Military", "Heritage & Archaeology",
-  "Conservation & Environment", "Governance & Territory",
-  "Infrastructure & Technology", "Resistance"
-];
-
 export default function TimelinePage() {
   const plotRef = useRef(null);
   const plotReady = useRef(false);
   const [theme, setTheme] = useState("dark");
-  const [bgColor, setBgColor] = useState("#adadad"); // Track background color
   const [mapCenter, setMapCenter] = useState([31.7683, 35.2137]);
   const [mapZoom, setMapZoom] = useState(6);
   const [error, setError] = useState(null);
@@ -153,17 +146,6 @@ export default function TimelinePage() {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     return `${year}-${month}`;
   };
-
-  // Track background color changes
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      const bodyBg = window.getComputedStyle(document.body).backgroundColor;
-      setBgColor(bodyBg);
-    });
-    observer.observe(document.body, { attributes: true, attributeFilter: ["style", "class"] });
-    setBgColor(window.getComputedStyle(document.body).backgroundColor);
-    return () => observer.disconnect();
-  }, []);
 
   // ------------------------------------------------------------
   // Radar CSV loading – starts at earliest radar date
@@ -295,6 +277,12 @@ export default function TimelinePage() {
   useEffect(() => {
     if (!plotRef.current) return;
 
+    const convertDate = (dmy) => {
+      if (!dmy) return null;
+      const [day, month, year] = dmy.split('/');
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    };
+
     const parseDateMain = (dmy) => {
       if (!dmy) return null;
       const parts = dmy.split('/');
@@ -302,6 +290,12 @@ export default function TimelinePage() {
       const [day, month, year] = parts;
       return new Date(`${year}-${month}-${day}`);
     };
+
+    const orderedThemes = [
+      "Energy", "Military", "Heritage & Archaeology",
+      "Conservation & Environment", "Governance & Territory",
+      "Infrastructure & Technology", "Resistance"
+    ];
 
     const addHorizontalJitter = (events, windowDays = 10) => {
       if (events.length === 0) return events;
@@ -453,7 +447,7 @@ export default function TimelinePage() {
               { type: "line", x0: "2023-10-07", x1: "2023-10-07", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } }
             ];
 
-            // Mobile detection – only for layout adjustments
+            // Mobile detection – adjust layout for small screens
             const isMobile = window.innerWidth < 768;
 
             const layout = {
@@ -488,6 +482,7 @@ export default function TimelinePage() {
                 { x: "2023-10-07", y: 1.03, yref: "paper", text: "2023", showarrow: false, font: { color: "#9afc97", size: isMobile ? 8 : 10 }, xanchor: "center" }
               ]
             };
+
             const config = { 
               displayModeBar: false,       
               responsive: true, 
@@ -526,7 +521,7 @@ export default function TimelinePage() {
     return () => { if (plotRef.current) Plotly.purge(plotRef.current); plotReady.current = false; };
   }, [theme]);
 
-  // Update map markers
+  // Update map markers based on animation date (NO JITTER – markers stack)
   useEffect(() => {
     if (!animationDate || allPoints.length === 0) {
       setVisibleMarkers([]);
@@ -535,6 +530,7 @@ export default function TimelinePage() {
     }
     const filtered = allPoints.filter(p => p.date <= animationDate);
     setVisibleMarkers(filtered);
+    
     if (filtered.length > 0) {
       const latest = filtered.reduce((prev, curr) => (curr.date > prev.date ? curr : prev));
       const description = `<strong>${latest.label}</strong><br>
@@ -621,129 +617,15 @@ export default function TimelinePage() {
           }
 
           @media (max-width: 768px) {
-            /* --- Fix header on mobile --- */
-            .site-header {
-              background-color: ${bgColor} !important;
-              border-bottom: 1px solid ${borderColor};
-              position: sticky;
-              top: 0;
-              z-index: 100;
-            }
-
-            /* --- Add top padding to container --- */
+            /* --- Add padding-top to avoid header overlap --- */
             .container {
-              padding-top: 4rem !important;
+              padding-top: 3.5rem !important;
             }
 
-            /* --- Mobile legend --- */
-            .mobile-legend-container {
-              display: block;
-              margin-bottom: 0.5rem;
-              width: 100%;
-            }
-
-            .mobile-legend-details {
-              border: 1px solid ${borderColor};
-              padding: 0.3rem 0.5rem;
-              background: rgba(0, 0, 0, 0.3);
-              cursor: pointer;
-              font-family: monospace;
-              font-size: 0.8rem;
-            }
-
-            body.light-bg .mobile-legend-details {
-              background: rgba(255, 255, 255, 0.8);
-            }
-
-            .mobile-legend-summary {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              list-style: none;
-              user-select: none;
-            }
-
-            .mobile-legend-summary::-webkit-details-marker {
-              display: none;
-            }
-
-            .legend-arrow {
-              transition: transform 0.2s ease;
-              font-size: 0.7rem;
-            }
-
-            .mobile-legend-details[open] .legend-arrow {
-              transform: rotate(180deg);
-            }
-
-            .mobile-legend-items {
-              display: flex;
-              flex-wrap: wrap;
-              gap: 0.3rem 0.8rem;
-              padding: 0.5rem 0 0.2rem 0;
-              border-top: 1px solid rgba(154, 252, 151, 0.2);
-              margin-top: 0.3rem;
-            }
-
-            body.light-bg .mobile-legend-items {
-              border-top-color: rgba(44, 110, 44, 0.2);
-            }
-
-            .legend-item {
-              display: flex;
-              align-items: center;
-              gap: 0.3rem;
-              font-size: 0.7rem;
-              font-family: monospace;
-            }
-
-            .legend-color-swatch {
-              display: inline-block;
-              width: 12px;
-              height: 12px;
-              border-radius: 50%;
-              flex-shrink: 0;
-              border: 1px solid rgba(255, 255, 255, 0.2);
-            }
-
-            body.light-bg .legend-color-swatch {
-              border-color: rgba(0, 0, 0, 0.2);
-            }
-
-            .legend-label {
-              opacity: 0.85;
-            }
-
-            /* --- Hide Plotly legend on mobile --- */
-            .plot-wrapper .legend {
-              display: none !important;
-            }
-
-            /* --- Full‑width sliders on mobile --- */
-            .slider-container {
-              width: 100% !important;
-              margin-left: 0 !important;
-            }
-
-            /* --- Reduce gaps --- */
-            .plot-wrapper {
-              margin-bottom: 0 !important;
-            }
-            .plot-wrapper > div {
-              width: 100% !important;
-              min-width: auto !important;
-              height: 350px !important;
-              margin-bottom: 0.2rem !important;
-            }
-            .timeline-slider-label {
-              margin-top: -0.8rem !important;
-            }
-            .radar-slider {
-              margin-top: 0.2rem !important;
-            }
-
-            /* --- Map height on mobile --- */
+            /* --- Left column: full width, auto height --- */
             .timeline-left-col {
+              flex: 1 1 100% !important;
+              width: 100% !important;
               margin-top: 0 !important;
             }
             .timeline-left-col > div:first-child {
@@ -752,6 +634,110 @@ export default function TimelinePage() {
             .timeline-left-col > div:last-child {
               width: 100% !important;
               margin-top: 0.5rem !important;
+            }
+
+            /* --- Middle column: full width, remove min-width --- */
+            .timeline-middle-col {
+              flex: 1 1 100% !important;
+              min-width: 0 !important;
+              width: 100% !important;
+            }
+
+            /* --- Plot container: allow shrink, keep horizontal scroll as fallback --- */
+            .plot-wrapper {
+              overflow-x: auto !important;
+            }
+            .plot-wrapper > div {
+              min-width: 0 !important;
+              width: 100% !important;
+              height: 350px !important;
+              margin-bottom: 0.2rem !important;
+            }
+
+            /* --- Sliders: full width --- */
+            .slider-container {
+              width: 100% !important;
+              margin-left: 0 !important;
+            }
+
+            /* --- Reduce gaps --- */
+            .timeline-slider-label {
+              margin-top: -0.8rem !important;
+            }
+            .radar-slider {
+              margin-top: 0.2rem !important;
+            }
+
+            /* --- Mobile legend --- */
+            .mobile-legend-container {
+              display: block;
+              margin-bottom: 0.5rem;
+              width: 100%;
+            }
+            .mobile-legend-details {
+              border: 1px solid ${borderColor};
+              padding: 0.3rem 0.5rem;
+              background: rgba(0, 0, 0, 0.3);
+              cursor: pointer;
+              font-family: monospace;
+              font-size: 0.8rem;
+            }
+            body.light-bg .mobile-legend-details {
+              background: rgba(255, 255, 255, 0.8);
+            }
+            .mobile-legend-summary {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              list-style: none;
+              user-select: none;
+            }
+            .mobile-legend-summary::-webkit-details-marker {
+              display: none;
+            }
+            .legend-arrow {
+              transition: transform 0.2s ease;
+              font-size: 0.7rem;
+            }
+            .mobile-legend-details[open] .legend-arrow {
+              transform: rotate(180deg);
+            }
+            .mobile-legend-items {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 0.3rem 0.8rem;
+              padding: 0.5rem 0 0.2rem 0;
+              border-top: 1px solid rgba(154, 252, 151, 0.2);
+              margin-top: 0.3rem;
+            }
+            body.light-bg .mobile-legend-items {
+              border-top-color: rgba(44, 110, 44, 0.2);
+            }
+            .legend-item {
+              display: flex;
+              align-items: center;
+              gap: 0.3rem;
+              font-size: 0.7rem;
+              font-family: monospace;
+            }
+            .legend-color-swatch {
+              display: inline-block;
+              width: 12px;
+              height: 12px;
+              border-radius: 50%;
+              flex-shrink: 0;
+              border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            body.light-bg .legend-color-swatch {
+              border-color: rgba(0, 0, 0, 0.2);
+            }
+            .legend-label {
+              opacity: 0.85;
+            }
+
+            /* --- Hide Plotly legend on mobile --- */
+            .plot-wrapper .legend {
+              display: none !important;
             }
           }
 
@@ -763,7 +749,7 @@ export default function TimelinePage() {
         `}</style>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-          {/* LEFT COLUMN */}
+          {/* LEFT COLUMN: Map and timeline info panel */}
           <div className="timeline-left-col" style={{ flex: "0 0 500px", width: "500px", marginTop: "10px" }}>
             <div style={{ width: "100%", height: "400px", border: `1px solid ${borderColor}`, background: "#30342f" }}>
               <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: "100%", width: "100%" }} attributionControl={false} zoomControl={false} key={mapCenter.toString() + mapZoom}>
@@ -833,8 +819,8 @@ export default function TimelinePage() {
             </div>
           </div>
 
-          {/* MIDDLE COLUMN */}
-          <div style={{ flex: "1", minWidth: "400px", position: "relative" }}>
+          {/* MIDDLE COLUMN: Plot + sliders + radar overlay + OSM overlay controls */}
+          <div className="timeline-middle-col" style={{ flex: "1", minWidth: "400px", position: "relative" }}>
             {/* Mobile legend */}
             <div className="mobile-legend-container">
               <details className="mobile-legend-details">
@@ -901,7 +887,7 @@ export default function TimelinePage() {
               </div>
             )}
 
-            {/* OSM overlay controls */}
+            {/* OSM raster overlay controls – placed under radar slider */}
             <div className="slider-container" style={{ ...sliderContainerStyle, marginTop: "0.5rem" }}>
               <label style={{ fontFamily: "monospace", fontSize: "0.8rem", fontWeight: "normal", display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.2rem" }}>
                 <input
@@ -933,7 +919,7 @@ export default function TimelinePage() {
               )}
             </div>
 
-            {/* Radar info panel */}
+            {/* Radar info overlay */}
             {radarInfo && (
               <div
                 style={{
