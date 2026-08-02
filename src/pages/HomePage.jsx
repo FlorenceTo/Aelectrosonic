@@ -10,41 +10,71 @@ export default function HomePage() {
   const [infoTarget, setInfoTarget] = useState(null);
   const bandRefs = useRef({});
 
-  // Knowledge base for each band
+  // --- FULL Knowledge base for ALL 12 bands ---
   const bandKnowledge = {
+    "HF": {
+      fullName: "HF (3–30 MHz)",
+      functions: "Long‑range radio communications, amateur radio, maritime and aviation voice, and over‑the‑horizon radar. Relies on ionospheric reflection (skywave) to reach across continents.",
+      atmosphere: "Highly dependent on solar activity and ionospheric conditions. Signals reflect off the F‑layer, enabling global propagation. Sensitive to day/night cycles and geomagnetic storms."
+    },
+    "VHF": {
+      fullName: "VHF (30–300 MHz)",
+      functions: "FM radio, television broadcasting, air traffic control, marine and land mobile communications, and early warning radar.",
+      atmosphere: "Primarily line‑of‑sight, but can occasionally propagate via tropospheric ducting. Affected by weather conditions and terrain; less ionospheric reflection than HF."
+    },
     "UHF": {
-      fullName: "UHF (300 MHz - 1 GHz)",
-      functions: "Terrestrial TV broadcasting, two-way radios, mobile phones, and early warning radar systems. Used heavily for ground-to-ground and ground-to-air communications.",
-      atmosphere: "Penetrates the ionosphere effectively. Signals travel via ground waves and tropospheric scatter. Very resilient to rain and fog, making it ideal for reliable, short-to-medium range terrestrial links."
+      fullName: "UHF (300 MHz – 1 GHz)",
+      functions: "Terrestrial TV broadcasting, two‑way radios, mobile phones, and early warning radar systems. Used heavily for ground‑to‑ground and ground‑to‑air communications.",
+      atmosphere: "Penetrates the ionosphere effectively. Signals travel via ground waves and tropospheric scatter. Very resilient to rain and fog, making it ideal for reliable, short‑to‑medium range terrestrial links."
     },
     "L": {
-      fullName: "L-Band (1-2 GHz)",
+      fullName: "L‑Band (1–2 GHz)",
       functions: "Global navigation (GPS/Galileo), satellite telemetry, maritime distress beacons, and weather monitoring from space.",
-      atmosphere: "Passes easily through clouds, light rain, and vegetation with very low attenuation. Long wavelengths provide excellent foliage penetration, making it the backbone for global space-to-ground communications."
+      atmosphere: "Passes easily through clouds, light rain, and vegetation with very low attenuation. Long wavelengths provide excellent foliage penetration, making it the backbone for global space‑to‑ground communications."
     },
     "S": {
-      fullName: "S-Band (2-4 GHz)",
-      functions: "Weather surveillance radars (Doppler), airport surveillance (ASR), and some deep-space satellite communications (e.g., Artemis).",
+      fullName: "S‑Band (2–4 GHz)",
+      functions: "Weather surveillance radars (Doppler), airport surveillance (ASR), and some deep‑space satellite communications (e.g., Artemis).",
       atmosphere: "Moderate rain fade begins here. Highly sensitive to atmospheric moisture, which makes it perfect for detecting precipitation intensity and wind shear in storm systems."
     },
     "C": {
-      fullName: "C-Band (4-8 GHz)",
-      functions: "Long-haul satellite communications (downlinks), Wi-Fi, and weather radar. Often used for transcontinental broadcast distribution.",
+      fullName: "C‑Band (4–8 GHz)",
+      functions: "Long‑haul satellite communications (downlinks), Wi‑Fi, and weather radar. Often used for transcontinental broadcast distribution.",
       atmosphere: "Encountering increasing attenuation due to heavy rainfall (rain fade). Used with larger satellite dishes to overcome path losses in humid, tropical climates."
     },
     "X": {
-      fullName: "X-Band (8-12 GHz)",
-      functions: "Military radar, high-resolution synthetic aperture radar (SAR) satellite imaging, radar altimeters, and speed detection.",
-      atmosphere: "Highly absorbed by atmospheric water vapor and oxygen (oxygen absorption peak near 60 GHz, but affects this band). Used in dual-polarization radars to precisely measure raindrop size and shape."
+      fullName: "X‑Band (8–12 GHz)",
+      functions: "Military radar, high‑resolution synthetic aperture radar (SAR) satellite imaging, radar altimeters, and speed detection.",
+      atmosphere: "Highly absorbed by atmospheric water vapor and oxygen (oxygen absorption peak near 60 GHz, but affects this band). Used in dual‑polarization radars to precisely measure raindrop size and shape."
     },
     "Ku": {
-      fullName: "Ku-Band (12-18 GHz)",
+      fullName: "Ku‑Band (12–18 GHz)",
       functions: "Satellite TV broadcasting (e.g., DirecTV, Sky), VSAT internet, and radar for ship navigation.",
       atmosphere: "Highly susceptible to heavy rain fade (attenuation). Requires adaptive power control or larger antenna margins to maintain link stability during thunderstorms."
+    },
+    "K": {
+      fullName: "K‑Band (18–27 GHz)",
+      functions: "Radar, satellite communications, and radio astronomy. Often used for military radar and high‑speed data links.",
+      atmosphere: "Strong attenuation from water vapor and oxygen (absorption peaks). Typically used in short‑range or dry‑climate applications where atmospheric losses are manageable."
+    },
+    "Ka": {
+      fullName: "Ka‑Band (27–40 GHz)",
+      functions: "High‑throughput satellite communications (Starlink, OneWeb), radar, and remote sensing. Supports very high data rates.",
+      atmosphere: "Severe rain fade and atmospheric absorption; requires robust link budgets and adaptive coding. Often used with small aperture terminals and high‑gain antennas."
+    },
+    "V": {
+      fullName: "V‑Band (40–75 GHz)",
+      functions: "High‑capacity point‑to‑point microwave links, research radars, and emerging 5G backhaul. Used in security scanners and atmospheric sensing.",
+      atmosphere: "Extreme attenuation from oxygen and water vapor. Limited to short‑range (<1 km) terrestrial applications or satellite cross‑links in low‑loss windows."
+    },
+    "W": {
+      fullName: "W‑Band (75–110 GHz)",
+      functions: "Advanced radar imaging, security scanners, and scientific research. Used in automotive radar (76–81 GHz) and atmospheric profiling.",
+      atmosphere: "Heavy attenuation by atmospheric gases, but some window bands exist. Often used in dry air or at high altitudes; requires highly sensitive receivers."
     }
   };
 
-  // Detect theme
+  // --- Theme detection (unchanged) ---
   useEffect(() => {
     const observer = new MutationObserver(() => {
       const isLight = document.body.classList.contains("light-bg");
@@ -55,7 +85,7 @@ export default function HomePage() {
     return () => observer.disconnect();
   }, []);
 
-  // Radar bands with full names and short names for matching
+  // --- The six bands that have visible waveform cards ---
   const bands = [
     { name: "UHF (300 MHz - 1 GHz)", fullName: "UHF", color: "#ff9706" },
     { name: "L-Band (1-2 GHz)", fullName: "L", color: "#cdfa05" },
@@ -65,28 +95,33 @@ export default function HomePage() {
     { name: "Ku-Band (12-18 GHz)", fullName: "Ku", color: "#6200ff" },
   ];
 
-  // Filtered bands for the SpectrumBar (only the ones that exist on this page)
-  const barBands = bands.map(b => ({
-    name: b.fullName,
-    start: { UHF: 0.16, L: 0.24, S: 0.32, C: 0.42, X: 0.52, Ku: 0.62 }[b.fullName],
-    color: b.color
-  }));
-
+  // --- Bar click handler (works for ALL bands) ---
   const handleBandSelect = (shortName) => {
+    // Find if this band has a card on the page
     const matchedBand = bands.find(band => band.fullName === shortName);
-    if (matchedBand) {
+    const hasCard = !!matchedBand;
+
+    if (hasCard) {
+      // Highlight and scroll to the card
       setSelectedBand(matchedBand.name);
       const cardElement = bandRefs.current[matchedBand.name];
       if (cardElement) {
         cardElement.scrollIntoView({ behavior: "smooth", block: "center" });
       }
-      
-      const info = bandKnowledge[shortName];
-      if (info) {
-        setInfoTarget({ ...info, shortName, fullName: matchedBand.name });
-      }
-
       setTimeout(() => setSelectedBand(null), 2000);
+    }
+
+    // Show the popup with knowledge (if we have it)
+    const info = bandKnowledge[shortName];
+    if (info) {
+      // If there's no card, we still show the popup, but we can add a note
+      const displayName = hasCard ? matchedBand.name : info.fullName;
+      setInfoTarget({
+        ...info,
+        shortName,
+        fullName: displayName,
+        hasCard // pass this flag to optionally show a note
+      });
     }
   };
 
@@ -94,10 +129,11 @@ export default function HomePage() {
     setInfoTarget(null);
   };
 
+  // --- Card click handler (only for the six that exist) ---
   const handleCardClick = (band) => {
     const info = bandKnowledge[band.fullName];
     if (info) {
-      setInfoTarget({ ...info, shortName: band.fullName, fullName: band.name });
+      setInfoTarget({ ...info, shortName: band.fullName, fullName: band.name, hasCard: true });
       setSelectedBand(band.name);
       const cardElement = bandRefs.current[band.name];
       if (cardElement) {
@@ -112,12 +148,18 @@ export default function HomePage() {
       <Header />
       <div className="container">
         <h1>Spectral Ecologies</h1>
-        <p>Spectral: relating to spectra, frequencies, and forms of presence beyond immediate perception, from the electromagnetic spectrum to spectral traces and resonances. The animated bands correspond to frequencies within the electromagnetic spectrum, including L, S, and X bands commonly associated with radar, satellite, and sensing systems. The project investigates the ecological and atmospheric conditions produced through electromagnetic transmission, acoustic sensing, and migratory environments.</p>
-        
+        <p>
+          Spectral: relating to spectra, frequencies, and forms of presence beyond immediate perception,
+          from the electromagnetic spectrum to spectral traces and resonances. The animated bands correspond
+          to frequencies within the electromagnetic spectrum, including L, S, and X bands commonly associated
+          with radar, satellite, and sensing systems. The project investigates the ecological and atmospheric
+          conditions produced through electromagnetic transmission, acoustic sensing, and migratory environments.
+        </p>
+
         <div className="wave-grid">
           {bands.map((band) => (
-            <div 
-              key={band.name} 
+            <div
+              key={band.name}
               className={`wave-card ${selectedBand === band.name ? "highlight" : ""}`}
               ref={(el) => (bandRefs.current[band.name] = el)}
               onClick={() => handleCardClick(band)}
@@ -125,10 +167,10 @@ export default function HomePage() {
             >
               <h3>{band.name}</h3>
               <div className="wave-canvas-container">
-                <FrequencyWave 
-                  bandName={band.name} 
-                  primaryColor={band.color} 
-                  theme={theme} 
+                <FrequencyWave
+                  bandName={band.name}
+                  primaryColor={band.color}
+                  theme={theme}
                 />
               </div>
             </div>
@@ -136,13 +178,23 @@ export default function HomePage() {
         </div>
       </div>
 
-      <SpectrumBar onBandSelect={handleBandSelect} bands={barBands} />
+      {/* --- Spectrum Bar – now uses the FULL default list (12 bands) --- */}
+      <SpectrumBar onBandSelect={handleBandSelect} />
 
+      {/* --- Floating Info Panel --- */}
       {infoTarget && (
         <div className="info-overlay" onClick={closeInfoPanel}>
           <div className="info-panel" onClick={(e) => e.stopPropagation()}>
             <button className="close-btn" onClick={closeInfoPanel}>✕</button>
             <h2>{infoTarget.fullName}</h2>
+
+            {/* If the band has no card on this page, show a subtle note */}
+            {!infoTarget.hasCard && (
+              <div className="note-missing">
+                ⚡ This band is not displayed in the grid above, but you can still explore its properties.
+              </div>
+            )}
+
             <div className="info-section">
               <h4>📡 Function & Use</h4>
               <p>{infoTarget.functions}</p>
@@ -237,7 +289,7 @@ export default function HomePage() {
           border-color: #2c6e2c;
         }
         body.light-bg .info-panel p {
-          color: #222; /* Better readability on light mode */
+          color: #222;
         }
         .info-panel h2 {
           margin-top: 0;
@@ -284,6 +336,20 @@ export default function HomePage() {
         body.light-bg .info-footer {
           border-top: 1px solid rgba(0,0,0,0.1);
           color: #666;
+        }
+        .note-missing {
+          background: rgba(154, 252, 151, 0.1);
+          border-left: 3px solid #9afc97;
+          padding: 0.5rem 0.8rem;
+          font-size: 0.8rem;
+          color: #9afc97;
+          margin-bottom: 1rem;
+          border-radius: 2px;
+        }
+        body.light-bg .note-missing {
+          background: rgba(44, 110, 44, 0.1);
+          border-left-color: #2c6e2c;
+          color: #1a4a1a;
         }
         .close-btn {
           position: absolute;
