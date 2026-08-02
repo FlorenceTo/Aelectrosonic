@@ -92,7 +92,6 @@ const PLOT_START = new Date("1920-01-01").getTime();
 const PLOT_END = new Date("2028-01-01").getTime();
 const STEP_MS = 3600000; // 1 hour
 
-// Ordered themes – used for legend and traces
 const orderedThemes = [
   "Energy", "Military", "Heritage & Archaeology",
   "Conservation & Environment", "Governance & Territory",
@@ -125,7 +124,7 @@ export default function TimelinePage() {
   const [maxRadarDate, setMaxRadarDate] = useState(null);
   const [radarInfo, setRadarInfo] = useState("");
 
-  // OSM raster overlay
+  // OSM raster overlay (Stamen Toner – roads & labels)
   const [showOSMOverlay, setShowOSMOverlay] = useState(false);
   const [osmOverlayOpacity, setOsmOverlayOpacity] = useState(0.6);
 
@@ -155,7 +154,7 @@ export default function TimelinePage() {
   };
 
   // ------------------------------------------------------------
-  // Radar CSV loading
+  // Radar CSV loading – starts at earliest radar date
   // ------------------------------------------------------------
   useEffect(() => {
     const fetchRadarData = async () => {
@@ -236,7 +235,7 @@ export default function TimelinePage() {
     fetchRadarData();
   }, []);
 
-  // Update radar markers and info
+  // Update radar markers and info (with multi-band support)
   useEffect(() => {
     if (!radarDate || radarPoints.length === 0) {
       setVisibleRadarMarkers([]);
@@ -247,6 +246,7 @@ export default function TimelinePage() {
     setVisibleRadarMarkers(filtered);
     if (filtered.length > 0) {
       const latest = filtered.reduce((prev, curr) => (curr.date > prev.date ? curr : prev));
+      
       let bandDisplay = latest.bandType;
       if (latest.bandType && latest.bandType !== "Not Publicly Specified") {
         if (latest.bandType.includes("&")) {
@@ -262,6 +262,7 @@ export default function TimelinePage() {
           if (freq) bandDisplay = `${latest.bandType} (${freq})`;
         }
       }
+      
       const infoHtml = `<strong>${latest.name}</strong><br>
                         <strong>Year installed:</strong> ${latest.date.getUTCFullYear()}<br>
                         <strong>Band Type:</strong> ${bandDisplay}<br>
@@ -277,7 +278,7 @@ export default function TimelinePage() {
   }, [radarDate, radarPoints]);
 
   // ------------------------------------------------------------
-  // Main timeline loading
+  // Main timeline loading (with lane assignment + horizontal jitter)
   // ------------------------------------------------------------
   useEffect(() => {
     if (!plotRef.current) return;
@@ -440,32 +441,32 @@ export default function TimelinePage() {
               { type: "line", x0: "2023-10-07", x1: "2023-10-07", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } }
             ];
 
-            // Responsive layout
+            // Mobile detection – only for layout adjustments
             const isMobile = window.innerWidth < 768;
+
             const layout = {
-              xaxis: {
-                type: "date",
-                range: ["1920-01-01", "2028-01-01"],
-                rangemode: "normal",
-                showgrid: false,
-                linecolor: theme === "light" ? "#333333" : "#aaaaaa",
+              xaxis: { 
+                type: "date", 
+                range: ["1920-01-01", "2028-01-01"], 
+                rangemode: "normal", 
+                showgrid: false, 
+                linecolor: theme === "light" ? "#333333" : "#aaaaaa", 
                 tickfont: { size: isMobile ? 8 : 10 },
               },
               yaxis: { visible: false, range: yRange },
-              paper_bgcolor: "transparent",
-              plot_bgcolor: "transparent",
+              paper_bgcolor: "transparent", plot_bgcolor: "transparent",
               font: { color: theme === "light" ? "#1a1a1a" : "#f0f0f0", family: "Inter, sans-serif" },
-              legend: {
-                orientation: isMobile ? "h" : "v",
-                y: isMobile ? -0.25 : undefined,
-                x: isMobile ? 0.5 : 1.02,
+              legend: { 
+                orientation: isMobile ? "h" : "v", 
+                traceorder: "normal", 
+                font: { color: theme === "light" ? "#1a1a1a" : "#f0f0f0" }, 
+                x: isMobile ? 0.5 : 1.02, 
                 xanchor: isMobile ? "center" : "left",
-                font: { size: isMobile ? 7 : 10 },
-                traceorder: "normal",
+                y: isMobile ? -0.25 : undefined,
                 itemclick: false,
                 itemdoubleclick: false,
               },
-              margin: { l: 0, r: isMobile ? 10 : 80, t: 10, b: 50 }, // l: 0 aligns with sliders
+              margin: { l: isMobile ? 0 : 20, r: isMobile ? 10 : 80, t: 10, b: 50 },
               hoverlabel: { bgcolor: theme === "light" ? "rgba(220,220,220,0.7)" : "rgba(30,30,30,0.7)", bordercolor: "#9afc97", font: { size: 10 }, align: "left", namelength: -1 },
               shapes: fixedShapes,
               annotations: [
@@ -475,11 +476,12 @@ export default function TimelinePage() {
                 { x: "2023-10-07", y: 1.03, yref: "paper", text: "2023", showarrow: false, font: { color: "#9afc97", size: isMobile ? 8 : 10 }, xanchor: "center" }
               ]
             };
-            const config = {
-              displayModeBar: false,
-              responsive: true,
-              scrollZoom: true,
-              dragmode: 'pan',
+
+            const config = { 
+              displayModeBar: false,       
+              responsive: true, 
+              scrollZoom: true,            
+              dragmode: 'pan',             
               doubleClick: 'reset+autosize'
             };
 
@@ -513,7 +515,7 @@ export default function TimelinePage() {
     return () => { if (plotRef.current) Plotly.purge(plotRef.current); plotReady.current = false; };
   }, [theme]);
 
-  // Update map markers
+  // Update map markers based on animation date (NO JITTER – markers stack)
   useEffect(() => {
     if (!animationDate || allPoints.length === 0) {
       setVisibleMarkers([]);
@@ -522,6 +524,7 @@ export default function TimelinePage() {
     }
     const filtered = allPoints.filter(p => p.date <= animationDate);
     setVisibleMarkers(filtered);
+    
     if (filtered.length > 0) {
       const latest = filtered.reduce((prev, curr) => (curr.date > prev.date ? curr : prev));
       const description = `<strong>${latest.label}</strong><br>
@@ -589,6 +592,11 @@ export default function TimelinePage() {
     padding: "10px",
     borderRadius: "0",
   };
+  const sliderContainerStyle = {
+    marginTop: "0",
+    marginLeft: "20px",
+    width: "71%",
+  };
 
   if (error) return <div><Header /><div className="container" style={{ color: "red" }}>Error: {error}</div></div>;
 
@@ -597,73 +605,36 @@ export default function TimelinePage() {
       <Header />
       <div className="container" style={{ maxWidth: "1400px", margin: "0 auto", padding: "1rem" }}>
         <style>{`
-          .slider-container {
-            width: 71%;
-            margin-left: 20px;
-          }
-
-          .plot-wrapper {
-            width: 100%;
-            overflow: visible;
-            position: relative;
-            margin-bottom: 0.5rem;
-          }
-
-          .radar-info-panel {
-            border: 1px solid ${borderColor};
-            padding: 10px;
-            border-radius: 0;
-            background-color: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(4px);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            max-height: 70%;
-            overflow-y: auto;
-            font-size: 0.8rem;
-          }
-
-          body.light-bg .radar-info-panel {
-            background-color: rgba(245, 243, 239, 0.95);
-          }
-
+          /* Mobile-only styles */
           .mobile-legend-container {
             display: none;
           }
 
           @media (max-width: 768px) {
-            .slider-container {
-              width: 100%;
-              margin-left: 0;
-            }
-
-            .timeline-left-col {
-              flex: 1 1 100% !important;
-              width: 100% !important;
-              margin: 0 auto;
-            }
-
-            .timeline-middle-col {
-              flex: 1 1 100% !important;
-              min-width: 0 !important;
-              width: 100%;
-            }
-
-            .timeline-left-col > div:first-child {
-              width: 100% !important;
-              height: 300px !important;
-            }
-
-            .timeline-left-col > div:last-child {
-              width: 100% !important;
-            }
-
-            .plot-wrapper .plotly-plot {
-              height: 350px !important;
-            }
-
             .mobile-legend-container {
               display: block;
               margin-bottom: 0.5rem;
               width: 100%;
+            }
+
+            /* Reduce gap between plot and sliders */
+            .plot-wrapper {
+              margin-bottom: 0 !important;
+            }
+            .plot-wrapper > div {
+              margin-bottom: 0.2rem !important;
+            }
+            .timeline-slider-label {
+              margin-top: -0.8rem !important;
+            }
+
+            .mobile-legend-details {
+              border: 1px solid ${borderColor};
+              padding: 0.3rem 0.5rem;
+              background: rgba(0, 0, 0, 0.3);
+              cursor: pointer;
+              font-family: monospace;
+              font-size: 0.8rem;
             }
 
             .mobile-legend-details {
@@ -738,29 +709,29 @@ export default function TimelinePage() {
               opacity: 0.85;
             }
 
+            /* Hide Plotly legend on mobile */
             .plot-wrapper .legend {
               display: none !important;
             }
 
-            .radar-info-panel {
-              position: relative !important;
-              bottom: auto !important;
-              right: auto !important;
+            /* Full‑width sliders on mobile */
+            .slider-container {
               width: 100% !important;
-              max-height: 200px !important;
-              margin-top: 0.5rem;
+              margin-left: 0 !important;
             }
 
-            .radar-info-panel-inline {
-              width: 100% !important;
-              max-height: 200px !important;
-              margin-top: 0.5rem;
-              position: relative !important;
-              bottom: auto !important;
-              right: auto !important;
+            /* Reduce gap between sliders on mobile */
+            .radar-slider {
+              margin-top: 0.2rem !important;
+            }
+
+            /* Adjust map height on mobile */
+            .timeline-left-col > div:first-child {
+              height: 300px !important;
             }
           }
 
+          /* Show mobile legend only on mobile – desktop stays unchanged */
           @media (min-width: 769px) {
             .mobile-legend-container {
               display: none !important;
@@ -769,7 +740,7 @@ export default function TimelinePage() {
         `}</style>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-          {/* LEFT COLUMN */}
+          {/* LEFT COLUMN: Map and timeline info panel */}
           <div className="timeline-left-col" style={{ flex: "0 0 500px", width: "500px", marginTop: "10px" }}>
             <div style={{ width: "100%", height: "400px", border: `1px solid ${borderColor}`, background: "#30342f" }}>
               <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: "100%", width: "100%" }} attributionControl={false} zoomControl={false} key={mapCenter.toString() + mapZoom}>
@@ -839,9 +810,9 @@ export default function TimelinePage() {
             </div>
           </div>
 
-          {/* MIDDLE COLUMN */}
-          <div className="timeline-middle-col" style={{ flex: "1", minWidth: "400px", position: "relative" }}>
-            {/* Mobile legend */}
+          {/* MIDDLE COLUMN: Plot + sliders + radar overlay + OSM overlay controls */}
+          <div style={{ flex: "1", minWidth: "400px", position: "relative" }}>
+            {/* Mobile legend dropdown */}
             <div className="mobile-legend-container">
               <details className="mobile-legend-details">
                 <summary className="mobile-legend-summary">
@@ -863,15 +834,14 @@ export default function TimelinePage() {
             </div>
 
             {/* Plot */}
-            <div className="plot-wrapper">
-              <div ref={plotRef} style={{ width: "100%", height: "500px" }} />
+            <div className="plot-wrapper" style={{ width: "100%", overflowX: "auto" }}>
+              <div ref={plotRef} style={{ minWidth: "800px", height: "500px", marginBottom: "0.5rem" }} />
             </div>
 
             {/* Timeline slider */}
-            <div className="slider-container">
-              <div style={{ marginBottom: "0.4rem", marginTop: "-1.20rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
-                Timeline: {animationDate ? formatDateForSlider(animationDate) : "—"}
-              </div>
+            <div className="timeline-slider-label" style={{ marginBottom: "0.4rem", marginTop: "-1.20rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
+              Timeline: {animationDate ? formatDateForSlider(animationDate) : "—"}
+            </div>
               <input
                 type="range"
                 min={PLOT_START}
@@ -886,9 +856,9 @@ export default function TimelinePage() {
               </div>
             </div>
 
-            {/* Radar slider - reduced gap */}
+            {/* Radar slider */}
             {minRadarDate && maxRadarDate && (
-              <div className="slider-container" style={{ marginTop: "0.2rem" }}>
+              <div className="slider-container radar-slider" style={{ ...sliderContainerStyle, marginTop: "0.8rem" }}>
                 <div style={{ marginBottom: "0.1rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
                   Radar: {radarDate ? formatDateForSlider(radarDate) : "—"}
                 </div>
@@ -908,7 +878,7 @@ export default function TimelinePage() {
             )}
 
             {/* OSM overlay controls */}
-            <div className="slider-container" style={{ marginTop: "0.5rem" }}>
+            <div className="slider-container" style={{ ...sliderContainerStyle, marginTop: "0.5rem" }}>
               <label style={{ fontFamily: "monospace", fontSize: "0.8rem", fontWeight: "normal", display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.2rem" }}>
                 <input
                   type="checkbox"
@@ -941,17 +911,21 @@ export default function TimelinePage() {
 
             {/* Radar info panel */}
             {radarInfo && (
-              <div className="radar-info-panel-inline" style={{
-                width: "280px",
-                maxHeight: "70%",
-                overflowY: "auto",
-                ...containerStyle,
-                backgroundColor: "rgba(0, 0, 0, 0.85)",
-                backdropFilter: "blur(4px)",
-                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.3)",
-                marginTop: "0.5rem",
-                fontSize: "0.8rem",
-              }}>
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: "30px",
+                  right: "-66px",
+                  width: "280px",
+                  maxHeight: "70%",
+                  overflowY: "auto",
+                  ...containerStyle,
+                  backgroundColor: "rgba(0, 0, 0, 0)",
+                  backdropFilter: "blur(4px)",
+                  zIndex: 1000,
+                  boxShadow: "0 2px 10px rgba(0, 0, 0, 0)",
+                }}
+              >
                 <div dangerouslySetInnerHTML={{ __html: radarInfo }} />
               </div>
             )}
