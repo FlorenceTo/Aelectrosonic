@@ -645,7 +645,7 @@ export default function TimelinePage() {
             .plot-wrapper > div {
               min-width: 0 !important;
               width: 100% !important;
-              height: 350px !important;
+              height: 600px !important;   /* <-- Increased from 350px to 600px */
               margin-bottom: 0.2rem !important;
             }
 
