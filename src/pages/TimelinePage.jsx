@@ -241,7 +241,6 @@ export default function TimelinePage() {
     if (filtered.length > 0) {
       const latest = filtered.reduce((prev, curr) => (curr.date > prev.date ? curr : prev));
       
-      // Build frequency display for single or multiple bands (e.g., "UHF & S-Band")
       let bandDisplay = latest.bandType;
       if (latest.bandType && latest.bandType !== "Not Publicly Specified") {
         if (latest.bandType.includes("&")) {
@@ -461,7 +460,7 @@ export default function TimelinePage() {
               paper_bgcolor: "transparent", plot_bgcolor: "transparent",
               font: { color: theme === "light" ? "#1a1a1a" : "#f0f0f0", family: "Inter, sans-serif" },
               legend: { orientation: "v", traceorder: "normal", font: { color: theme === "light" ? "#1a1a1a" : "#f0f0f0" }, x: 1.02, xanchor: "left" },
-              margin: { l: 20, r: 80, t: 10, b: 50 },
+              margin: { l: 20, r: 40, t: 10, b: 50 }, // reduced right margin
               hoverlabel: { bgcolor: theme === "light" ? "rgba(220,220,220,0.7)" : "rgba(30,30,30,0.7)", bordercolor: "#9afc97", font: { size: 10 }, align: "left", namelength: -1 },
               shapes: fixedShapes,
               annotations: [
@@ -482,14 +481,12 @@ export default function TimelinePage() {
             Plotly.purge(plotRef.current);
             Plotly.newPlot(plotRef.current, traces, layout, config);
             
-            // Disable right-click context menu on the plot
             const plotDiv = plotRef.current;
             plotDiv.oncontextmenu = (e) => e.preventDefault();
             
             plotReady.current = true;
             setError(null);
 
-            // Click on timeline dot: zoom map
             plotDiv.on("plotly_click", (data) => {
               const point = data.points[0];
               if (point && point.customdata) {
@@ -589,11 +586,6 @@ export default function TimelinePage() {
     padding: "10px",
     borderRadius: "0",
   };
-  const sliderContainerStyle = {
-    marginTop: "0",
-    marginLeft: "20px",
-    width: "71%",
-  };
 
   if (error) return <div><Header /><div className="container" style={{ color: "red" }}>Error: {error}</div></div>;
 
@@ -607,19 +599,15 @@ export default function TimelinePage() {
             margin-left: 20px;
           }
 
-          /* Timeline plot container */
+          /* Plot wrapper – no fixed width, allows plot to resize */
           .plot-wrapper {
             width: 100%;
-            overflow-x: auto;
-            overflow-y: visible;
-            -webkit-overflow-scrolling: touch;
+            overflow: visible;
+            position: relative;
+            margin-bottom: 0.5rem;
           }
 
-          .plot-wrapper .plotly-plot {
-            min-width: 800px;
-          }
-
-          /* Radar info panel – always visible, but we control its position */
+          /* Radar info panel – desktop style */
           .radar-info-panel {
             border: 1px solid ${borderColor};
             padding: 10px;
@@ -636,6 +624,7 @@ export default function TimelinePage() {
             background-color: rgba(245, 243, 239, 0.95);
           }
 
+          /* Mobile adjustments */
           @media (max-width: 768px) {
             .slider-container {
               width: 100%;
@@ -663,11 +652,12 @@ export default function TimelinePage() {
               width: 100% !important;
             }
 
+            /* Plot height reduced on mobile */
             .plot-wrapper .plotly-plot {
-              min-width: 800px;
+              height: 350px !important;
             }
 
-            /* Radar info panel on mobile – positioned below the map */
+            /* Radar info panel on mobile – full width and below the map */
             .radar-info-panel {
               position: relative !important;
               bottom: auto !important;
@@ -677,12 +667,6 @@ export default function TimelinePage() {
               margin-top: 0.5rem;
             }
 
-            /* Middle column adjustments */
-            .timeline-middle-col {
-              margin-top: 1rem;
-            }
-
-            /* Radar info panel when it's inside the middle column on mobile */
             .radar-info-panel-inline {
               width: 100% !important;
               max-height: 200px !important;
@@ -699,10 +683,7 @@ export default function TimelinePage() {
           <div className="timeline-left-col" style={{ flex: "0 0 500px", width: "500px", marginTop: "10px" }}>
             <div style={{ width: "100%", height: "400px", border: `1px solid ${borderColor}`, background: "#30342f" }}>
               <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: "100%", width: "100%" }} attributionControl={false} zoomControl={false} key={mapCenter.toString() + mapZoom}>
-                {/* ESRI satellite base layer */}
                 <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="" />
-                
-                {/* Stamen Toner overlay (roads & labels) */}
                 {showOSMOverlay && (
                   <TileLayer
                     className="toner-blend-layer"
@@ -711,7 +692,6 @@ export default function TimelinePage() {
                     opacity={osmOverlayOpacity}
                   />
                 )}
-                
                 {visibleMarkers.map((point, idx) => {
                   const colorHex = colorToHex(getMarkerColor(point.theme));
                   const yearsSince = (animationDate - point.date) / (1000 * 60 * 60 * 24 * 365.25);
@@ -771,9 +751,9 @@ export default function TimelinePage() {
 
           {/* MIDDLE COLUMN: Plot + sliders + radar overlay + OSM overlay controls */}
           <div className="timeline-middle-col" style={{ flex: "1", minWidth: "400px", position: "relative" }}>
-            {/* Plot container with horizontal scroll */}
+            {/* Plot container – responsive width */}
             <div className="plot-wrapper">
-              <div ref={plotRef} style={{ minWidth: "800px", height: "500px", marginBottom: "0.5rem" }} />
+              <div ref={plotRef} style={{ width: "100%", height: "500px" }} />
             </div>
 
             {/* Timeline slider */}
@@ -848,7 +828,7 @@ export default function TimelinePage() {
               )}
             </div>
 
-            {/* Radar info panel – positioned relative to the middle column */}
+            {/* Radar info panel */}
             {radarInfo && (
               <div className="radar-info-panel-inline" style={{
                 width: "280px",
