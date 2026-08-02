@@ -1,3 +1,4 @@
+// components/Header.jsx
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
@@ -242,7 +243,14 @@ export default function Header() {
   };
 
   return (
-    <header className="site-header" ref={headerRef}>
+    <header
+      className="site-header"
+      ref={headerRef}
+      style={{
+        backgroundColor: bgColor,
+        transition: 'background-color 0.3s ease'
+      }}
+    >
       <div className="nav-links">
         {/* Left side: clock (desktop only) or dropdown (mobile) */}
         <div className="nav-left">
@@ -265,14 +273,14 @@ export default function Header() {
         {/* Right side: Navigation + Color buttons (desktop only) */}
         {!isMobile && (
           <div className="nav-right" style={{ display: "flex", gap: "1.5rem", alignItems: "center", position: "relative" }}>
-        <Link to="/about">About</Link>
-        <Link to="/">Home</Link>
-        {/* <Link to="/ecosemiotics">Ecosemiotics</Link> */}
-        <Link to="/birdmap">Vulture Map</Link>
-        <Link to="/interference">Signal Loss</Link>
-        <Link to="/archive-map">Sonic Dispossession</Link>
-        <Link to="/interviews">Interviews</Link>
-        <Link to="/timeline">Research Timeline</Link>
+            <Link to="/about">About</Link>
+            <Link to="/">Home</Link>
+            {/* <Link to="/ecosemiotics">Ecosemiotics</Link> */}
+            <Link to="/birdmap">Vulture Map</Link>
+            <Link to="/interference">Signal Loss</Link>
+            <Link to="/archive-map">Sonic Dispossession</Link>
+            <Link to="/interviews">Interviews</Link>
+            <Link to="/timeline">Research Timeline</Link>
             <button className="color-btn" onClick={cyclePreset}>
               {presets[presetIndex].name}
             </button>

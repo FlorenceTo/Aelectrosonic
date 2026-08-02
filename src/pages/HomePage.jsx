@@ -45,7 +45,7 @@ export default function HomePage() {
     "X": {
       fullName: "X‑Band (8–12 GHz)",
       functions: "Military radar, high‑resolution synthetic aperture radar (SAR) satellite imaging, radar altimeters, and speed detection.",
-      atmosphere: "Highly absorbed by atmospheric water vapor and oxygen (oxygen absorption peak near 60 GHz, but affects this band). Used in dual‑polarization radars to precisely measure raindrop size and shape."
+      atmosphere: "Highly absorbed by atmospheric water vapour and oxygen (oxygen absorption peak near 60 GHz, but affects this band). Used in dual‑polarisation radars to precisely measure raindrop size and shape."
     },
     "Ku": {
       fullName: "Ku‑Band (12–18 GHz)",
@@ -55,7 +55,7 @@ export default function HomePage() {
     "K": {
       fullName: "K‑Band (18–27 GHz)",
       functions: "Radar, satellite communications, and radio astronomy. Often used for military radar and high‑speed data links.",
-      atmosphere: "Strong attenuation from water vapor and oxygen (absorption peaks). Typically used in short‑range or dry‑climate applications where atmospheric losses are manageable."
+      atmosphere: "Strong attenuation from water vapour and oxygen (absorption peaks). Typically used in short‑range or dry‑climate applications where atmospheric losses are manageable."
     },
     "Ka": {
       fullName: "Ka‑Band (27–40 GHz)",
@@ -65,7 +65,7 @@ export default function HomePage() {
     "V": {
       fullName: "V‑Band (40–75 GHz)",
       functions: "High‑capacity point‑to‑point microwave links, research radars, and emerging 5G backhaul. Used in security scanners and atmospheric sensing.",
-      atmosphere: "Extreme attenuation from oxygen and water vapor. Limited to short‑range (<1 km) terrestrial applications or satellite cross‑links in low‑loss windows."
+      atmosphere: "Extreme attenuation from oxygen and water vapour. Limited to short‑range (<1 km) terrestrial applications or satellite cross‑links in low‑loss windows."
     },
     "W": {
       fullName: "W‑Band (75–110 GHz)",
@@ -200,7 +200,7 @@ export default function HomePage() {
               <p>{infoTarget.functions}</p>
             </div>
             <div className="info-section">
-              <h4>Atmospheric & Ecological Behavior</h4>
+              <h4>Atmospheric & Ecological Behaviour</h4>
               <p>{infoTarget.atmosphere}</p>
             </div>
             <div className="info-footer">

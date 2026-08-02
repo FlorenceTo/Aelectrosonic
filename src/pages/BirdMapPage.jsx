@@ -6,7 +6,7 @@ export default function BirdMapPage() {
   return (
     <div>
       <Header />
-      <div className="container" style={{ marginTop: "0.5rem", paddingBottom: "2rem" }}>
+      <div className="container" style={{ marginTop: "0.5rem", paddingBottom: "4rem" }}>
         <h2 style={{ borderBottom: "none", marginBottom: "0.25rem", paddingBottom: 0 }}>
           Bird Movement Tracker
         </h2>
@@ -107,6 +107,9 @@ export default function BirdMapPage() {
           border: 1px solid #9afc97;
           padding: 1rem;
           background: rgba(0, 0, 0, 0.2);
+          /* Allow the container to grow with its content */
+          overflow: visible;
+          min-height: 600px;
         }
         body.light-bg .map-container {
           border-color: #2c6e2c;
@@ -118,6 +121,7 @@ export default function BirdMapPage() {
           }
           .map-container {
             padding: 0.5rem;
+            min-height: 400px;
           }
         }
       `}</style>
