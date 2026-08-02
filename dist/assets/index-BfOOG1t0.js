@@ -101,7 +101,7 @@ Please change the parent <Route path="${e}"> to <Route path="${e===`/`?`*`:`${e}
           max-width: 550px;
           width: 90%;
           padding: 2rem;
-          border-radius: 4px;
+          border-radius: 0; /* removed rounding */
           position: relative;
           box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
           max-height: 80vh;
@@ -163,16 +163,15 @@ Please change the parent <Route path="${e}"> to <Route path="${e===`/`?`*`:`${e}
         }
         .note-missing {
           background: rgba(154, 252, 151, 0.1);
-          border-left: 3px solid #9afc97;
           padding: 0.5rem 0.8rem;
           font-size: 0.8rem;
           color: #9afc97;
           margin-bottom: 1rem;
-          border-radius: 2px;
+          border-radius: 0; /* no rounding */
+          border-left: none; /* removed vertical line */
         }
         body.light-bg .note-missing {
           background: rgba(44, 110, 44, 0.1);
-          border-left-color: #2c6e2c;
           color: #1a4a1a;
         }
         .close-btn {
