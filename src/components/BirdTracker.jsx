@@ -393,6 +393,19 @@ export default function BirdTracker() {
           cursor: pointer;
           border: none;
         }
+        .bird-select {
+          padding: 0.2rem 0.5rem;
+          font-family: monospace;
+          max-width: 100%;
+          width: auto;
+          min-width: 120px;
+          word-break: break-word;
+        }
+        .bird-select option {
+          white-space: normal;
+          word-break: break-word;
+          padding: 0.2rem 0.5rem;
+        }
       `}</style>
 
       {/* Mode toggle, radar toggle, year slider */}
@@ -486,9 +499,9 @@ export default function BirdTracker() {
             </label>
             <select
               id="bird-select"
+              className="bird-select"
               value={selectedBirdId || ""}
               onChange={(e) => setSelectedBirdId(parseInt(e.target.value))}
-              style={{ padding: "0.2rem 0.5rem", fontFamily: "monospace" }}
             >
               {birdList.map((bird) => (
                 <option key={bird.id} value={bird.id}>
