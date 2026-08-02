@@ -601,6 +601,19 @@ export default function TimelinePage() {
     <div>
       <Header />
       <div className="container" style={{ maxWidth: "1400px", margin: "0 auto", padding: "1rem" }}>
+        <style>{`
+          .slider-container {
+            width: 71%;
+            margin-left: 20px;
+          }
+          @media (max-width: 768px) {
+            .slider-container {
+              width: 100%;
+              margin-left: 0;
+            }
+          }
+        `}</style>
+
         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
           {/* LEFT COLUMN: Map and timeline info panel */}
           <div style={{ flex: "0 0 500px", width: "500px", marginTop: "10px" }}>
@@ -683,7 +696,7 @@ export default function TimelinePage() {
             </div>
 
             {/* Timeline slider */}
-            <div style={sliderContainerStyle}>
+            <div className="slider-container">
               <div style={{ marginBottom: "0.4rem", marginTop: "-1.20rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
                 Timeline: {animationDate ? formatDateForSlider(animationDate) : "—"}
               </div>
@@ -703,7 +716,7 @@ export default function TimelinePage() {
 
             {/* Radar slider */}
             {minRadarDate && maxRadarDate && (
-              <div style={{ ...sliderContainerStyle, marginTop: "0.8rem" }}>
+              <div className="slider-container" style={{ marginTop: "0.8rem" }}>
                 <div style={{ marginBottom: "0.1rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
                   Radar: {radarDate ? formatDateForSlider(radarDate) : "—"}
                 </div>
@@ -723,7 +736,7 @@ export default function TimelinePage() {
             )}
 
             {/* OSM raster overlay controls – placed under radar slider */}
-            <div style={{ ...sliderContainerStyle, marginTop: "0.5rem" }}>
+            <div className="slider-container" style={{ marginTop: "0.5rem" }}>
               <label style={{ fontFamily: "monospace", fontSize: "0.8rem", fontWeight: "normal", display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.2rem" }}>
                 <input
                   type="checkbox"
