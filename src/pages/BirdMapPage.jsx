@@ -6,7 +6,7 @@ export default function BirdMapPage() {
   return (
     <div>
       <Header />
-      <div className="container" style={{ marginTop: "0.5rem", paddingBottom: "4rem" }}>
+      <div className="container" style={{ marginTop: "2rem", paddingBottom: "4rem" }}>
         <h2 style={{ borderBottom: "none", marginBottom: "0.25rem", paddingBottom: 0 }}>
           Bird Movement Tracker
         </h2>
