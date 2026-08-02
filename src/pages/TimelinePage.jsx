@@ -616,10 +616,7 @@ export default function TimelinePage() {
           }
 
           @media (max-width: 768px) {
-            .container {
-              padding-top: 3.5rem !important;
-            }
-
+            /* Make columns full width */
             .timeline-left-col {
               flex: 1 1 100% !important;
               width: 100% !important;
@@ -639,28 +636,24 @@ export default function TimelinePage() {
               width: 100% !important;
             }
 
+            /* Plot: shrink to fit, increase height */
             .plot-wrapper {
               overflow-x: auto !important;
             }
             .plot-wrapper > div {
               min-width: 0 !important;
               width: 100% !important;
-              height: 600px !important;   /* <-- Increased from 350px to 600px */
-              margin-bottom: 0.2rem !important;
+              height: 600px !important;
+              /* keep original margin-bottom (0.5rem) */
             }
 
+            /* Sliders: full width, keep original top margins */
             .slider-container {
               width: 100% !important;
               margin-left: 0 !important;
             }
 
-            .timeline-slider-label {
-              margin-top: -0.8rem !important;
-            }
-            .radar-slider {
-              margin-top: 0.2rem !important;
-            }
-
+            /* Mobile legend */
             .mobile-legend-container {
               display: block;
               margin-bottom: 0.5rem;
@@ -727,6 +720,7 @@ export default function TimelinePage() {
               opacity: 0.85;
             }
 
+            /* Hide Plotly legend on mobile */
             .plot-wrapper .legend {
               display: none !important;
             }
