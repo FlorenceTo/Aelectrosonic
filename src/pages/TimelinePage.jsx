@@ -607,26 +607,33 @@ export default function TimelinePage() {
             margin-left: 20px;
           }
 
-          /* Radar info overlay - default positioning */
-          .radar-info-overlay {
-            position: absolute;
-            bottom: 30px;
-            right: -66px;
-            width: 280px;
-            max-height: 70%;
-            overflow-y: auto;
-            z-index: 1000;
-            border: 1px solid ${borderColor};
-            background-color: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(4px);
-            padding: 10px;
-            border-radius: 0;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+          /* Timeline plot container */
+          .plot-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: visible;
+            -webkit-overflow-scrolling: touch;
           }
 
-          body.light-bg .radar-info-overlay {
+          .plot-wrapper .plotly-plot {
+            min-width: 800px;
+          }
+
+          /* Radar info panel – always visible, but we control its position */
+          .radar-info-panel {
+            border: 1px solid ${borderColor};
+            padding: 10px;
+            border-radius: 0;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            max-height: 70%;
+            overflow-y: auto;
+            font-size: 0.8rem;
+          }
+
+          body.light-bg .radar-info-panel {
             background-color: rgba(245, 243, 239, 0.95);
-            border-color: #2c6e2c;
           }
 
           @media (max-width: 768px) {
@@ -649,21 +656,40 @@ export default function TimelinePage() {
 
             .timeline-left-col > div:first-child {
               width: 100% !important;
+              height: 300px !important;
             }
 
             .timeline-left-col > div:last-child {
               width: 100% !important;
             }
 
-            /* Radar info overlay - mobile friendly */
-            .radar-info-overlay {
-              position: relative;
-              bottom: auto;
-              right: auto;
-              width: 100%;
-              max-height: 200px;
+            .plot-wrapper .plotly-plot {
+              min-width: 800px;
+            }
+
+            /* Radar info panel on mobile – positioned below the map */
+            .radar-info-panel {
+              position: relative !important;
+              bottom: auto !important;
+              right: auto !important;
+              width: 100% !important;
+              max-height: 200px !important;
               margin-top: 0.5rem;
-              margin-bottom: 0.5rem;
+            }
+
+            /* Middle column adjustments */
+            .timeline-middle-col {
+              margin-top: 1rem;
+            }
+
+            /* Radar info panel when it's inside the middle column on mobile */
+            .radar-info-panel-inline {
+              width: 100% !important;
+              max-height: 200px !important;
+              margin-top: 0.5rem;
+              position: relative !important;
+              bottom: auto !important;
+              right: auto !important;
             }
           }
         `}</style>
@@ -745,16 +771,10 @@ export default function TimelinePage() {
 
           {/* MIDDLE COLUMN: Plot + sliders + radar overlay + OSM overlay controls */}
           <div className="timeline-middle-col" style={{ flex: "1", minWidth: "400px", position: "relative" }}>
-            <div style={{ width: "100%", overflowX: "auto" }}>
+            {/* Plot container with horizontal scroll */}
+            <div className="plot-wrapper">
               <div ref={plotRef} style={{ minWidth: "800px", height: "500px", marginBottom: "0.5rem" }} />
             </div>
-
-            {/* Radar info overlay - moved BEFORE the sliders so it doesn't overlap on mobile */}
-            {radarInfo && (
-              <div className="radar-info-overlay">
-                <div dangerouslySetInnerHTML={{ __html: radarInfo }} />
-              </div>
-            )}
 
             {/* Timeline slider */}
             <div className="slider-container">
@@ -796,7 +816,7 @@ export default function TimelinePage() {
               </div>
             )}
 
-            {/* OSM raster overlay controls – placed under radar slider */}
+            {/* OSM raster overlay controls */}
             <div className="slider-container" style={{ marginTop: "0.5rem" }}>
               <label style={{ fontFamily: "monospace", fontSize: "0.8rem", fontWeight: "normal", display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.2rem" }}>
                 <input
@@ -827,6 +847,23 @@ export default function TimelinePage() {
                 </div>
               )}
             </div>
+
+            {/* Radar info panel – positioned relative to the middle column */}
+            {radarInfo && (
+              <div className="radar-info-panel-inline" style={{
+                width: "280px",
+                maxHeight: "70%",
+                overflowY: "auto",
+                ...containerStyle,
+                backgroundColor: "rgba(0, 0, 0, 0.85)",
+                backdropFilter: "blur(4px)",
+                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.3)",
+                marginTop: "0.5rem",
+                fontSize: "0.8rem",
+              }}>
+                <div dangerouslySetInnerHTML={{ __html: radarInfo }} />
+              </div>
+            )}
           </div>
         </div>
       </div>
