@@ -61,7 +61,7 @@ export default function BirdTracker() {
   const [minRadarYear, setMinRadarYear] = useState(1998);
   const [maxRadarYear, setMaxRadarYear] = useState(2025);
 
-  // --- NEW: Feeding sites and cameras state ---
+  // Feeding sites and cameras state
   const [feedingSites, setFeedingSites] = useState([]);
   const [cameras, setCameras] = useState([]);
   const [showFeedingSites, setShowFeedingSites] = useState(false);
@@ -181,9 +181,9 @@ export default function BirdTracker() {
       .catch((err) => console.error("Radar data error:", err));
   }, []);
 
-  // --- NEW: Load feeding sites and cameras data ---
+  // Load feeding sites and cameras data
   useEffect(() => {
-    fetch("/data/feedingsites.csv")
+    fetch("/data/feedsite.csv")
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.text();
@@ -236,6 +236,9 @@ export default function BirdTracker() {
 
         setFeedingSites(feeding);
         setCameras(camera);
+
+        console.log("Feeding sites loaded:", feeding.length);
+        console.log("Cameras loaded:", camera.length);
       })
       .catch((err) => console.error("Feeding sites data error:", err));
   }, []);
@@ -300,7 +303,7 @@ export default function BirdTracker() {
     ? radarPoints.filter((p) => p.year <= radarYear)
     : [];
 
-  // --- NEW: Filter feeding sites and cameras ---
+  // Filter feeding sites and cameras
   const visibleFeedingSites = showFeedingSites ? feedingSites : [];
   const visibleCameras = showCameras ? cameras : [];
 
@@ -350,7 +353,7 @@ export default function BirdTracker() {
   const firstPoint = points[0];
   const currentColor = birdColorMap[selectedBirdId] || "#f39c12";
 
-  // --- Dynamic map height based on mode ---
+  // Dynamic map height based on mode
   const mapHeight = compareMode ? 320 : 400;
 
   return (
@@ -447,7 +450,7 @@ export default function BirdTracker() {
           </div>
         )}
 
-        {/* --- NEW: Feeding sites and cameras toggles --- */}
+        {/* Feeding sites and cameras toggles */}
         <label style={{ fontFamily: "monospace" }}>
           <input
             type="checkbox"
@@ -511,10 +514,8 @@ export default function BirdTracker() {
               attributionControl={false}
               zoomControl={true}
             >
-              {/* Base satellite layer */}
               <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
 
-              {/* Soft, Arabic‑friendly label layer */}
               <TileLayer
                 attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
                 url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png"
@@ -522,7 +523,7 @@ export default function BirdTracker() {
                 ref={labelLayerRef}
               />
 
-              {/* Radar markers (unchanged) */}
+              {/* Radar markers */}
               {visibleRadarPoints.map((radar, idx) => (
                 <CircleMarker
                   key={`radar-${idx}`}
@@ -558,17 +559,17 @@ export default function BirdTracker() {
                 </CircleMarker>
               ))}
 
-              {/* --- NEW: Feeding sites markers --- */}
+              {/* Feeding sites markers - green */}
               {visibleFeedingSites.map((site, idx) => (
                 <CircleMarker
                   key={`feeding-${idx}`}
                   center={[site.lat, site.lng]}
-                  radius={7}
-                  fillColor="#ff7800"
+                  radius={5}
+                  fillColor="#00ff00"
                   color="#ffffff"
                   weight={1.5}
                   opacity={0.9}
-                  fillOpacity={0.8}
+                  fillOpacity={0.7}
                 >
                   <Popup>
                     <strong>{site.name}</strong>
@@ -592,17 +593,17 @@ export default function BirdTracker() {
                 </CircleMarker>
               ))}
 
-              {/* --- NEW: Camera markers --- */}
+              {/* Camera markers - white */}
               {visibleCameras.map((site, idx) => (
                 <CircleMarker
                   key={`camera-${idx}`}
                   center={[site.lat, site.lng]}
-                  radius={6}
-                  fillColor="#ff0000"
+                  radius={5}
+                  fillColor="#ffffff"
                   color="#ffffff"
                   weight={1.5}
                   opacity={0.9}
-                  fillOpacity={0.8}
+                  fillOpacity={0.7}
                 >
                   <Popup>
                     <strong>{site.name}</strong>
@@ -791,10 +792,8 @@ export default function BirdTracker() {
               attributionControl={false}
               zoomControl={true}
             >
-              {/* Base satellite layer */}
               <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
 
-              {/* Soft, Arabic‑friendly label layer */}
               <TileLayer
                 attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
                 url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png"
@@ -802,7 +801,7 @@ export default function BirdTracker() {
                 ref={labelLayerRef}
               />
 
-              {/* Radar markers (unchanged) */}
+              {/* Radar markers */}
               {visibleRadarPoints.map((radar, idx) => (
                 <CircleMarker
                   key={`radar-${idx}`}
@@ -838,17 +837,17 @@ export default function BirdTracker() {
                 </CircleMarker>
               ))}
 
-              {/* --- NEW: Feeding sites markers (Compare mode) --- */}
+              {/* Feeding sites markers - green (Compare mode) */}
               {visibleFeedingSites.map((site, idx) => (
                 <CircleMarker
                   key={`feeding-${idx}`}
                   center={[site.lat, site.lng]}
-                  radius={7}
-                  fillColor="#ff7800"
+                  radius={5}
+                  fillColor="#00ff00"
                   color="#ffffff"
                   weight={1.5}
                   opacity={0.9}
-                  fillOpacity={0.8}
+                  fillOpacity={0.7}
                 >
                   <Popup>
                     <strong>{site.name}</strong>
@@ -872,17 +871,17 @@ export default function BirdTracker() {
                 </CircleMarker>
               ))}
 
-              {/* --- NEW: Camera markers (Compare mode) --- */}
+              {/* Camera markers - white (Compare mode) */}
               {visibleCameras.map((site, idx) => (
                 <CircleMarker
                   key={`camera-${idx}`}
                   center={[site.lat, site.lng]}
-                  radius={6}
-                  fillColor="#ff0000"
+                  radius={5}
+                  fillColor="#ffffff"
                   color="#ffffff"
                   weight={1.5}
                   opacity={0.9}
-                  fillOpacity={0.8}
+                  fillOpacity={0.7}
                 >
                   <Popup>
                     <strong>{site.name}</strong>
