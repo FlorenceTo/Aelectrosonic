@@ -102,6 +102,7 @@ export default function TimelinePage() {
   const plotRef = useRef(null);
   const plotReady = useRef(false);
   const [theme, setTheme] = useState("dark");
+  const [bgColor, setBgColor] = useState("#adadad"); // Track background color
   const [mapCenter, setMapCenter] = useState([31.7683, 35.2137]);
   const [mapZoom, setMapZoom] = useState(6);
   const [error, setError] = useState(null);
@@ -152,6 +153,17 @@ export default function TimelinePage() {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     return `${year}-${month}`;
   };
+
+  // Track background color changes
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const bodyBg = window.getComputedStyle(document.body).backgroundColor;
+      setBgColor(bodyBg);
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ["style", "class"] });
+    setBgColor(window.getComputedStyle(document.body).backgroundColor);
+    return () => observer.disconnect();
+  }, []);
 
   // ------------------------------------------------------------
   // Radar CSV loading – starts at earliest radar date
@@ -609,6 +621,20 @@ export default function TimelinePage() {
           }
 
           @media (max-width: 768px) {
+            /* --- Fix header on mobile --- */
+            .site-header {
+              background-color: ${bgColor} !important;
+              border-bottom: 1px solid ${borderColor};
+              position: sticky;
+              top: 0;
+              z-index: 100;
+            }
+
+            /* --- Add top padding to container --- */
+            .container {
+              padding-top: 4rem !important;
+            }
+
             /* --- Mobile legend --- */
             .mobile-legend-container {
               display: block;
@@ -717,8 +743,15 @@ export default function TimelinePage() {
             }
 
             /* --- Map height on mobile --- */
+            .timeline-left-col {
+              margin-top: 0 !important;
+            }
             .timeline-left-col > div:first-child {
               height: 300px !important;
+            }
+            .timeline-left-col > div:last-child {
+              width: 100% !important;
+              margin-top: 0.5rem !important;
             }
           }
 
