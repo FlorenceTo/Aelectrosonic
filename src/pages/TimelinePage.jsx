@@ -92,6 +92,13 @@ const PLOT_START = new Date("1920-01-01").getTime();
 const PLOT_END = new Date("2028-01-01").getTime();
 const STEP_MS = 3600000; // 1 hour
 
+// Ordered themes – used for both the plot AND the mobile legend
+const orderedThemes = [
+  "Energy", "Military", "Heritage & Archaeology",
+  "Conservation & Environment", "Governance & Territory",
+  "Infrastructure & Technology", "Resistance"
+];
+
 export default function TimelinePage() {
   const plotRef = useRef(null);
   const plotReady = useRef(false);
@@ -291,12 +298,6 @@ export default function TimelinePage() {
       return new Date(`${year}-${month}-${day}`);
     };
 
-    const orderedThemes = [
-      "Energy", "Military", "Heritage & Archaeology",
-      "Conservation & Environment", "Governance & Territory",
-      "Infrastructure & Technology", "Resistance"
-    ];
-
     const addHorizontalJitter = (events, windowDays = 10) => {
       if (events.length === 0) return events;
       const sorted = [...events].sort((a, b) => a.date - b.date);
@@ -447,7 +448,7 @@ export default function TimelinePage() {
               { type: "line", x0: "2023-10-07", x1: "2023-10-07", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } }
             ];
 
-            // Mobile detection – adjust layout for small screens
+            // Mobile detection – only for layout adjustments
             const isMobile = window.innerWidth < 768;
 
             const layout = {
@@ -482,7 +483,6 @@ export default function TimelinePage() {
                 { x: "2023-10-07", y: 1.03, yref: "paper", text: "2023", showarrow: false, font: { color: "#9afc97", size: isMobile ? 8 : 10 }, xanchor: "center" }
               ]
             };
-
             const config = { 
               displayModeBar: false,       
               responsive: true, 
@@ -611,18 +611,15 @@ export default function TimelinePage() {
       <Header />
       <div className="container" style={{ maxWidth: "1400px", margin: "0 auto", padding: "1rem" }}>
         <style>{`
-          /* Mobile-only styles */
           .mobile-legend-container {
             display: none;
           }
 
           @media (max-width: 768px) {
-            /* --- Add padding-top to avoid header overlap --- */
             .container {
               padding-top: 3.5rem !important;
             }
 
-            /* --- Left column: full width, auto height --- */
             .timeline-left-col {
               flex: 1 1 100% !important;
               width: 100% !important;
@@ -636,14 +633,12 @@ export default function TimelinePage() {
               margin-top: 0.5rem !important;
             }
 
-            /* --- Middle column: full width, remove min-width --- */
             .timeline-middle-col {
               flex: 1 1 100% !important;
               min-width: 0 !important;
               width: 100% !important;
             }
 
-            /* --- Plot container: allow shrink, keep horizontal scroll as fallback --- */
             .plot-wrapper {
               overflow-x: auto !important;
             }
@@ -654,13 +649,11 @@ export default function TimelinePage() {
               margin-bottom: 0.2rem !important;
             }
 
-            /* --- Sliders: full width --- */
             .slider-container {
               width: 100% !important;
               margin-left: 0 !important;
             }
 
-            /* --- Reduce gaps --- */
             .timeline-slider-label {
               margin-top: -0.8rem !important;
             }
@@ -668,7 +661,6 @@ export default function TimelinePage() {
               margin-top: 0.2rem !important;
             }
 
-            /* --- Mobile legend --- */
             .mobile-legend-container {
               display: block;
               margin-bottom: 0.5rem;
@@ -735,7 +727,6 @@ export default function TimelinePage() {
               opacity: 0.85;
             }
 
-            /* --- Hide Plotly legend on mobile --- */
             .plot-wrapper .legend {
               display: none !important;
             }
