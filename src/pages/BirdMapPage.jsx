@@ -121,7 +121,7 @@ export default function BirdMapPage() {
           }
           .map-container {
             padding: 0.5rem;
-            min-height: 400px;
+            min-height: 500px;
           }
         }
       `}</style>

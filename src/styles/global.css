@@ -103,17 +103,6 @@ a:hover {
   margin-top: 1.5rem;
 }
 
-// pages/BirdMapPage.jsx – ensure these styles are applied
-.map-container {
-  margin-top: 2rem;
-  border: 1px solid #9afc97;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.2);
-  overflow: visible;    /* critical */
-  height: auto;         /* allow it to grow */
-  min-height: 600px;
-}
-
 /* Back link */
 .back-link { display: inline-block; margin-bottom: 1.5rem; font-size: 0.85rem; }
 

@@ -4109,8 +4109,8 @@ uniform ${n} ${r} u_${i};
           border: 1px solid #9afc97;
           padding: 1rem;
           background: rgba(0, 0, 0, 0.2);
-          /* Allow the container to grow with its content */
           overflow: visible;
+          height: auto;
           min-height: 600px;
         }
         body.light-bg .map-container {
