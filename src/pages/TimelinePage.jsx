@@ -606,17 +606,38 @@ export default function TimelinePage() {
             width: 71%;
             margin-left: 20px;
           }
+
           @media (max-width: 768px) {
             .slider-container {
               width: 100%;
               margin-left: 0;
+            }
+
+            .timeline-left-col {
+              flex: 1 1 100% !important;
+              width: 100% !important;
+              margin: 0 auto;
+            }
+
+            .timeline-middle-col {
+              flex: 1 1 100% !important;
+              min-width: 0 !important;
+              width: 100%;
+            }
+
+            .timeline-left-col > div:first-child {
+              width: 100% !important;
+            }
+
+            .timeline-left-col > div:last-child {
+              width: 100% !important;
             }
           }
         `}</style>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
           {/* LEFT COLUMN: Map and timeline info panel */}
-          <div style={{ flex: "0 0 500px", width: "500px", marginTop: "10px" }}>
+          <div className="timeline-left-col" style={{ flex: "0 0 500px", width: "500px", marginTop: "10px" }}>
             <div style={{ width: "100%", height: "400px", border: `1px solid ${borderColor}`, background: "#30342f" }}>
               <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: "100%", width: "100%" }} attributionControl={false} zoomControl={false} key={mapCenter.toString() + mapZoom}>
                 {/* ESRI satellite base layer */}
@@ -690,7 +711,7 @@ export default function TimelinePage() {
           </div>
 
           {/* MIDDLE COLUMN: Plot + sliders + radar overlay + OSM overlay controls */}
-          <div style={{ flex: "1", minWidth: "400px", position: "relative" }}>
+          <div className="timeline-middle-col" style={{ flex: "1", minWidth: "400px", position: "relative" }}>
             <div style={{ width: "100%", overflowX: "auto" }}>
               <div ref={plotRef} style={{ minWidth: "800px", height: "500px", marginBottom: "0.5rem" }} />
             </div>
