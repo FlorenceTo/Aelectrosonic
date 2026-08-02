@@ -465,7 +465,7 @@ export default function TimelinePage() {
                 itemclick: false,
                 itemdoubleclick: false,
               },
-              margin: { l: 10, r: isMobile ? 10 : 80, t: 10, b: 50 },
+              margin: { l: 0, r: isMobile ? 10 : 80, t: 10, b: 50 }, // l: 0 aligns with sliders
               hoverlabel: { bgcolor: theme === "light" ? "rgba(220,220,220,0.7)" : "rgba(30,30,30,0.7)", bordercolor: "#9afc97", font: { size: 10 }, align: "left", namelength: -1 },
               shapes: fixedShapes,
               annotations: [
@@ -845,7 +845,7 @@ export default function TimelinePage() {
             <div className="mobile-legend-container">
               <details className="mobile-legend-details">
                 <summary className="mobile-legend-summary">
-                  <span>📊 Timeline Legend</span>
+                  <span>Timeline Legend</span>
                   <span className="legend-arrow">▾</span>
                 </summary>
                 <div className="mobile-legend-items">
@@ -886,9 +886,9 @@ export default function TimelinePage() {
               </div>
             </div>
 
-            {/* Radar slider */}
+            {/* Radar slider - reduced gap */}
             {minRadarDate && maxRadarDate && (
-              <div className="slider-container" style={{ marginTop: "0.8rem" }}>
+              <div className="slider-container" style={{ marginTop: "0.2rem" }}>
                 <div style={{ marginBottom: "0.1rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
                   Radar: {radarDate ? formatDateForSlider(radarDate) : "—"}
                 </div>
