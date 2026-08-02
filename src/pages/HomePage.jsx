@@ -1,3 +1,4 @@
+// pages/HomePage.jsx
 import Header from "../components/Header";
 import FrequencyWave from "../components/FrequencyWave";
 import SpectrumBar from "../components/SpectrumBar";
@@ -6,7 +7,42 @@ import { useState, useEffect, useRef } from "react";
 export default function HomePage() {
   const [theme, setTheme] = useState("dark");
   const [selectedBand, setSelectedBand] = useState(null);
+  const [infoTarget, setInfoTarget] = useState(null);
   const bandRefs = useRef({});
+
+  // Knowledge base for each band
+  const bandKnowledge = {
+    "UHF": {
+      fullName: "UHF (300 MHz - 1 GHz)",
+      functions: "Terrestrial TV broadcasting, two-way radios, mobile phones, and early warning radar systems. Used heavily for ground-to-ground and ground-to-air communications.",
+      atmosphere: "Penetrates the ionosphere effectively. Signals travel via ground waves and tropospheric scatter. Very resilient to rain and fog, making it ideal for reliable, short-to-medium range terrestrial links."
+    },
+    "L": {
+      fullName: "L-Band (1-2 GHz)",
+      functions: "Global navigation (GPS/Galileo), satellite telemetry, maritime distress beacons, and weather monitoring from space.",
+      atmosphere: "Passes easily through clouds, light rain, and vegetation with very low attenuation. Long wavelengths provide excellent foliage penetration, making it the backbone for global space-to-ground communications."
+    },
+    "S": {
+      fullName: "S-Band (2-4 GHz)",
+      functions: "Weather surveillance radars (Doppler), airport surveillance (ASR), and some deep-space satellite communications (e.g., Artemis).",
+      atmosphere: "Moderate rain fade begins here. Highly sensitive to atmospheric moisture, which makes it perfect for detecting precipitation intensity and wind shear in storm systems."
+    },
+    "C": {
+      fullName: "C-Band (4-8 GHz)",
+      functions: "Long-haul satellite communications (downlinks), Wi-Fi, and weather radar. Often used for transcontinental broadcast distribution.",
+      atmosphere: "Encountering increasing attenuation due to heavy rainfall (rain fade). Used with larger satellite dishes to overcome path losses in humid, tropical climates."
+    },
+    "X": {
+      fullName: "X-Band (8-12 GHz)",
+      functions: "Military radar, high-resolution synthetic aperture radar (SAR) satellite imaging, radar altimeters, and speed detection.",
+      atmosphere: "Highly absorbed by atmospheric water vapor and oxygen (oxygen absorption peak near 60 GHz, but affects this band). Used in dual-polarization radars to precisely measure raindrop size and shape."
+    },
+    "Ku": {
+      fullName: "Ku-Band (12-18 GHz)",
+      functions: "Satellite TV broadcasting (e.g., DirecTV, Sky), VSAT internet, and radar for ship navigation.",
+      atmosphere: "Highly susceptible to heavy rain fade (attenuation). Requires adaptive power control or larger antenna margins to maintain link stability during thunderstorms."
+    }
+  };
 
   // Detect theme
   useEffect(() => {
@@ -29,17 +65,44 @@ export default function HomePage() {
     { name: "Ku-Band (12-18 GHz)", fullName: "Ku", color: "#6200ff" },
   ];
 
+  // Filtered bands for the SpectrumBar (only the ones that exist on this page)
+  const barBands = bands.map(b => ({
+    name: b.fullName,
+    start: { UHF: 0.16, L: 0.24, S: 0.32, C: 0.42, X: 0.52, Ku: 0.62 }[b.fullName],
+    color: b.color
+  }));
+
   const handleBandSelect = (shortName) => {
-    // Find the band that matches the short name (e.g., "UHF", "L", "X")
     const matchedBand = bands.find(band => band.fullName === shortName);
     if (matchedBand) {
       setSelectedBand(matchedBand.name);
-      // Scroll to the card
       const cardElement = bandRefs.current[matchedBand.name];
       if (cardElement) {
         cardElement.scrollIntoView({ behavior: "smooth", block: "center" });
       }
-      // Remove highlight after 2 seconds
+      
+      const info = bandKnowledge[shortName];
+      if (info) {
+        setInfoTarget({ ...info, shortName, fullName: matchedBand.name });
+      }
+
+      setTimeout(() => setSelectedBand(null), 2000);
+    }
+  };
+
+  const closeInfoPanel = () => {
+    setInfoTarget(null);
+  };
+
+  const handleCardClick = (band) => {
+    const info = bandKnowledge[band.fullName];
+    if (info) {
+      setInfoTarget({ ...info, shortName: band.fullName, fullName: band.name });
+      setSelectedBand(band.name);
+      const cardElement = bandRefs.current[band.name];
+      if (cardElement) {
+        cardElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       setTimeout(() => setSelectedBand(null), 2000);
     }
   };
@@ -57,6 +120,8 @@ export default function HomePage() {
               key={band.name} 
               className={`wave-card ${selectedBand === band.name ? "highlight" : ""}`}
               ref={(el) => (bandRefs.current[band.name] = el)}
+              onClick={() => handleCardClick(band)}
+              style={{ cursor: "pointer" }}
             >
               <h3>{band.name}</h3>
               <div className="wave-canvas-container">
@@ -71,7 +136,27 @@ export default function HomePage() {
         </div>
       </div>
 
-      <SpectrumBar onBandSelect={handleBandSelect} />
+      <SpectrumBar onBandSelect={handleBandSelect} bands={barBands} />
+
+      {infoTarget && (
+        <div className="info-overlay" onClick={closeInfoPanel}>
+          <div className="info-panel" onClick={(e) => e.stopPropagation()}>
+            <button className="close-btn" onClick={closeInfoPanel}>✕</button>
+            <h2>{infoTarget.fullName}</h2>
+            <div className="info-section">
+              <h4>📡 Function & Use</h4>
+              <p>{infoTarget.functions}</p>
+            </div>
+            <div className="info-section">
+              <h4>🌍 Atmospheric & Ecological Behavior</h4>
+              <p>{infoTarget.atmosphere}</p>
+            </div>
+            <div className="info-footer">
+              <span>Click the background or ✕ to close</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style jsx>{`
         .container {
@@ -79,7 +164,7 @@ export default function HomePage() {
         }
         .wave-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr); /* exactly 3 columns on desktop */
+          grid-template-columns: repeat(3, 1fr);
           gap: 1.5rem;
           margin-top: 2rem;
         }
@@ -89,13 +174,17 @@ export default function HomePage() {
           padding: 1rem;
           border-radius: 0px;
           transition: all 0.2s ease;
-          /* Ensure all cards have same height */
           display: flex;
           flex-direction: column;
+          cursor: pointer;
+        }
+        .wave-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 15px rgba(154, 252, 151, 0.15);
         }
         .wave-card.highlight {
           border: 2px solid #ffd700;
-          box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+          box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
         }
         .wave-card h3 {
           margin-bottom: 1rem;
@@ -112,20 +201,130 @@ export default function HomePage() {
         }
         body.light-bg .wave-card.highlight {
           border-color: #ff8c00;
-          box-shadow: 0 0 10px rgba(255, 140, 0, 0.5);
+          box-shadow: 0 0 20px rgba(255, 140, 0, 0.4);
         }
 
-        /* Tablet: 2 columns */
+        /* Info Panel Styles */
+        .info-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.75);
+          backdrop-filter: blur(6px);
+          z-index: 1000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: fadeIn 0.3s ease;
+        }
+        .info-panel {
+          background: #111;
+          border: 1px solid #9afc97;
+          max-width: 550px;
+          width: 90%;
+          padding: 2rem;
+          border-radius: 4px;
+          position: relative;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+          max-height: 80vh;
+          overflow-y: auto;
+          animation: slideUp 0.3s ease;
+        }
+        body.light-bg .info-panel {
+          background: #f5f5f5;
+          border-color: #2c6e2c;
+        }
+        body.light-bg .info-panel p {
+          color: #222; /* Better readability on light mode */
+        }
+        .info-panel h2 {
+          margin-top: 0;
+          color: #9afc97;
+          font-size: 1.4rem;
+          border-bottom: 1px solid rgba(154, 252, 151, 0.2);
+          padding-bottom: 0.5rem;
+        }
+        body.light-bg .info-panel h2 {
+          color: #1a4a1a;
+        }
+        .info-section {
+          margin: 1.2rem 0;
+        }
+        .info-section h4 {
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          opacity: 0.7;
+          margin-bottom: 0.3rem;
+          color: #9afc97;
+        }
+        body.light-bg .info-section h4 {
+          color: #2c6e2c;
+        }
+        .info-section p {
+          font-size: 0.9rem;
+          line-height: 1.6;
+          margin: 0;
+          color: #ddd;
+        }
+        body.light-bg .info-section p {
+          color: #222;
+        }
+        .info-footer {
+          margin-top: 1.5rem;
+          font-size: 0.65rem;
+          opacity: 0.5;
+          text-align: center;
+          border-top: 1px solid rgba(255,255,255,0.05);
+          padding-top: 1rem;
+          color: #999;
+        }
+        body.light-bg .info-footer {
+          border-top: 1px solid rgba(0,0,0,0.1);
+          color: #666;
+        }
+        .close-btn {
+          position: absolute;
+          top: 10px;
+          right: 15px;
+          background: none;
+          border: none;
+          color: #9afc97;
+          font-size: 1.5rem;
+          cursor: pointer;
+          opacity: 0.6;
+          transition: 0.2s;
+        }
+        .close-btn:hover {
+          opacity: 1;
+          transform: rotate(90deg);
+        }
+        body.light-bg .close-btn {
+          color: #1a4a1a;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from { transform: translateY(20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+
         @media (max-width: 900px) {
           .wave-grid {
             grid-template-columns: repeat(2, 1fr);
           }
         }
-
-        /* Mobile: 1 column */
         @media (max-width: 600px) {
           .wave-grid {
             grid-template-columns: 1fr;
+          }
+          .info-panel {
+            padding: 1.5rem;
           }
         }
       `}</style>
