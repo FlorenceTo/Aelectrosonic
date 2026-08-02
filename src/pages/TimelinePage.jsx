@@ -476,7 +476,6 @@ export default function TimelinePage() {
                 { x: "2023-10-07", y: 1.03, yref: "paper", text: "2023", showarrow: false, font: { color: "#9afc97", size: isMobile ? 8 : 10 }, xanchor: "center" }
               ]
             };
-
             const config = { 
               displayModeBar: false,       
               responsive: true, 
@@ -515,7 +514,7 @@ export default function TimelinePage() {
     return () => { if (plotRef.current) Plotly.purge(plotRef.current); plotReady.current = false; };
   }, [theme]);
 
-  // Update map markers based on animation date (NO JITTER – markers stack)
+  // Update map markers
   useEffect(() => {
     if (!animationDate || allPoints.length === 0) {
       setVisibleMarkers([]);
@@ -524,7 +523,6 @@ export default function TimelinePage() {
     }
     const filtered = allPoints.filter(p => p.date <= animationDate);
     setVisibleMarkers(filtered);
-    
     if (filtered.length > 0) {
       const latest = filtered.reduce((prev, curr) => (curr.date > prev.date ? curr : prev));
       const description = `<strong>${latest.label}</strong><br>
@@ -611,30 +609,11 @@ export default function TimelinePage() {
           }
 
           @media (max-width: 768px) {
+            /* --- Mobile legend --- */
             .mobile-legend-container {
               display: block;
               margin-bottom: 0.5rem;
               width: 100%;
-            }
-
-            /* Reduce gap between plot and sliders */
-            .plot-wrapper {
-              margin-bottom: 0 !important;
-            }
-            .plot-wrapper > div {
-              margin-bottom: 0.2rem !important;
-            }
-            .timeline-slider-label {
-              margin-top: -0.8rem !important;
-            }
-
-            .mobile-legend-details {
-              border: 1px solid ${borderColor};
-              padding: 0.3rem 0.5rem;
-              background: rgba(0, 0, 0, 0.3);
-              cursor: pointer;
-              font-family: monospace;
-              font-size: 0.8rem;
             }
 
             .mobile-legend-details {
@@ -709,29 +688,37 @@ export default function TimelinePage() {
               opacity: 0.85;
             }
 
-            /* Hide Plotly legend on mobile */
+            /* --- Hide Plotly legend on mobile --- */
             .plot-wrapper .legend {
               display: none !important;
             }
 
-            /* Full‑width sliders on mobile */
+            /* --- Full‑width sliders on mobile --- */
             .slider-container {
               width: 100% !important;
               margin-left: 0 !important;
             }
 
-            /* Reduce gap between sliders on mobile */
+            /* --- Reduce gaps --- */
+            .plot-wrapper {
+              margin-bottom: 0 !important;
+            }
+            .plot-wrapper > div {
+              margin-bottom: 0.2rem !important;
+            }
+            .timeline-slider-label {
+              margin-top: -0.8rem !important;
+            }
             .radar-slider {
               margin-top: 0.2rem !important;
             }
 
-            /* Adjust map height on mobile */
+            /* --- Map height on mobile --- */
             .timeline-left-col > div:first-child {
               height: 300px !important;
             }
           }
 
-          /* Show mobile legend only on mobile – desktop stays unchanged */
           @media (min-width: 769px) {
             .mobile-legend-container {
               display: none !important;
@@ -740,7 +727,7 @@ export default function TimelinePage() {
         `}</style>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-          {/* LEFT COLUMN: Map and timeline info panel */}
+          {/* LEFT COLUMN */}
           <div className="timeline-left-col" style={{ flex: "0 0 500px", width: "500px", marginTop: "10px" }}>
             <div style={{ width: "100%", height: "400px", border: `1px solid ${borderColor}`, background: "#30342f" }}>
               <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: "100%", width: "100%" }} attributionControl={false} zoomControl={false} key={mapCenter.toString() + mapZoom}>
@@ -810,9 +797,9 @@ export default function TimelinePage() {
             </div>
           </div>
 
-          {/* MIDDLE COLUMN: Plot + sliders + radar overlay + OSM overlay controls */}
+          {/* MIDDLE COLUMN */}
           <div style={{ flex: "1", minWidth: "400px", position: "relative" }}>
-            {/* Mobile legend dropdown */}
+            {/* Mobile legend */}
             <div className="mobile-legend-container">
               <details className="mobile-legend-details">
                 <summary className="mobile-legend-summary">
@@ -833,15 +820,16 @@ export default function TimelinePage() {
               </details>
             </div>
 
-            {/* Plot */}
+            {/* Plot wrapper with class */}
             <div className="plot-wrapper" style={{ width: "100%", overflowX: "auto" }}>
               <div ref={plotRef} style={{ minWidth: "800px", height: "500px", marginBottom: "0.5rem" }} />
             </div>
 
             {/* Timeline slider */}
-            <div className="timeline-slider-label" style={{ marginBottom: "0.4rem", marginTop: "-1.20rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
-              Timeline: {animationDate ? formatDateForSlider(animationDate) : "—"}
-            </div>
+            <div className="slider-container" style={sliderContainerStyle}>
+              <div className="timeline-slider-label" style={{ marginBottom: "0.4rem", marginTop: "-1.20rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
+                Timeline: {animationDate ? formatDateForSlider(animationDate) : "—"}
+              </div>
               <input
                 type="range"
                 min={PLOT_START}
