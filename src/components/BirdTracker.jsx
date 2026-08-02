@@ -61,6 +61,12 @@ export default function BirdTracker() {
   const [minRadarYear, setMinRadarYear] = useState(1998);
   const [maxRadarYear, setMaxRadarYear] = useState(2025);
 
+  // --- NEW: Feeding sites and cameras state ---
+  const [feedingSites, setFeedingSites] = useState([]);
+  const [cameras, setCameras] = useState([]);
+  const [showFeedingSites, setShowFeedingSites] = useState(false);
+  const [showCameras, setShowCameras] = useState(false);
+
   // Label overlay – ref to avoid re-rendering
   const labelLayerRef = useRef(null);
   const labelOpacityRef = useRef(0.0);
@@ -175,6 +181,65 @@ export default function BirdTracker() {
       .catch((err) => console.error("Radar data error:", err));
   }, []);
 
+  // --- NEW: Load feeding sites and cameras data ---
+  useEffect(() => {
+    fetch("/data/feedsite.csv")
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
+      })
+      .then((csvText) => {
+        const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+        const rows = parsed.data.filter(
+          (row) => row.Latitude && row.Longitude
+        );
+
+        const feeding = [];
+        const camera = [];
+
+        rows.forEach((row) => {
+          const lat = parseFloat(row.Latitude);
+          const lng = parseFloat(row.Longitude);
+          if (isNaN(lat) || isNaN(lng)) return;
+
+          const type = row.Type || "";
+          const name = row.Name || "Unnamed Site";
+          const description = row["Description of Purpose"] || "";
+          const operator = row.Operator || "";
+          const status = row.Status || "";
+          const jurisdiction = row.Jurisdiction || "";
+          const dateInstalled = row["Date Installed"] || "";
+
+          const item = {
+            lat,
+            lng,
+            name,
+            description,
+            operator,
+            status,
+            jurisdiction,
+            dateInstalled,
+            type,
+          };
+
+          // Classify based on Type column
+          const isCamera = type.toLowerCase().includes("camera") ||
+                           type.toLowerCase().includes("cam") ||
+                           type.toLowerCase().includes("nest");
+
+          if (isCamera) {
+            camera.push(item);
+          } else {
+            feeding.push(item);
+          }
+        });
+
+        setFeedingSites(feeding);
+        setCameras(camera);
+      })
+      .catch((err) => console.error("Feeding sites data error:", err));
+  }, []);
+
   // Colour map for birds
   const birdColorMap = {};
   birdList.forEach((bird, idx) => {
@@ -235,6 +300,10 @@ export default function BirdTracker() {
     ? radarPoints.filter((p) => p.year <= radarYear)
     : [];
 
+  // --- NEW: Filter feeding sites and cameras ---
+  const visibleFeedingSites = showFeedingSites ? feedingSites : [];
+  const visibleCameras = showCameras ? cameras : [];
+
   if (Object.keys(allPointsByBird).length === 0)
     return <div style={{ padding: "1rem" }}>Loading bird tracking data...</div>;
 
@@ -275,7 +344,7 @@ export default function BirdTracker() {
     }
   }
 
-    // Single mode data
+  // Single mode data
   const currentPoint = points[currentIdx];
   const trail = points.slice(0, currentIdx + 1).map((p) => [p.lat, p.lng]);
   const firstPoint = points[0];
@@ -285,7 +354,7 @@ export default function BirdTracker() {
   const mapHeight = compareMode ? 320 : 400;
 
   return (
-    <div className="bird-tracker" style={{ marginTop: "2rem" }}>
+    <div className="bird-tracker" style={{ marginTop: "1rem" }}>
       <style>{`
         .bird-tracker input[type="range"] {
           -webkit-appearance: none;
@@ -377,6 +446,25 @@ export default function BirdTracker() {
             <span>{radarYear}</span>
           </div>
         )}
+
+        {/* --- NEW: Feeding sites and cameras toggles --- */}
+        <label style={{ fontFamily: "monospace" }}>
+          <input
+            type="checkbox"
+            checked={showFeedingSites}
+            onChange={(e) => setShowFeedingSites(e.target.checked)}
+          />{" "}
+          Show Feeding Sites
+        </label>
+
+        <label style={{ fontFamily: "monospace" }}>
+          <input
+            type="checkbox"
+            checked={showCameras}
+            onChange={(e) => setShowCameras(e.target.checked)}
+          />{" "}
+          Show Live Vulture Cams
+        </label>
       </div>
 
       {!compareMode ? (
@@ -416,18 +504,17 @@ export default function BirdTracker() {
           </div>
 
           <div className="map-wrapper" style={{ border: "1px solid #9afc97" }}>
-            {/* SAME MAP CONTAINER – no key, stable across modes */}
             <MapContainer
               center={mapCenter}
               zoom={mapZoom}
-              style={{ height: mapHeight + "px", width: "100%" }}   // ← CHANGED
+              style={{ height: mapHeight + "px", width: "100%" }}
               attributionControl={false}
               zoomControl={true}
             >
               {/* Base satellite layer */}
               <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
 
-              {/* Soft, Arabic‑friendly label layer (CartoDB Positron labels only) – open source */}
+              {/* Soft, Arabic‑friendly label layer */}
               <TileLayer
                 attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
                 url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png"
@@ -435,7 +522,7 @@ export default function BirdTracker() {
                 ref={labelLayerRef}
               />
 
-              {/* Radar markers */}
+              {/* Radar markers (unchanged) */}
               {visibleRadarPoints.map((radar, idx) => (
                 <CircleMarker
                   key={`radar-${idx}`}
@@ -466,6 +553,74 @@ export default function BirdTracker() {
                       <a href={radar.source} target="_blank" rel="noopener noreferrer">
                         Source
                       </a>
+                    )}
+                  </Popup>
+                </CircleMarker>
+              ))}
+
+              {/* --- NEW: Feeding sites markers --- */}
+              {visibleFeedingSites.map((site, idx) => (
+                <CircleMarker
+                  key={`feeding-${idx}`}
+                  center={[site.lat, site.lng]}
+                  radius={7}
+                  fillColor="#ff7800"
+                  color="#ffffff"
+                  weight={1.5}
+                  opacity={0.9}
+                  fillOpacity={0.8}
+                >
+                  <Popup>
+                    <strong>{site.name}</strong>
+                    <br />
+                    {site.dateInstalled && (
+                      <><strong>Year installed:</strong> {site.dateInstalled}<br /></>
+                    )}
+                    {site.description && (
+                      <><strong>Purpose:</strong> {site.description}<br /></>
+                    )}
+                    {site.jurisdiction && (
+                      <><strong>Jurisdiction:</strong> {site.jurisdiction}<br /></>
+                    )}
+                    {site.operator && (
+                      <><strong>Operator:</strong> {site.operator}<br /></>
+                    )}
+                    {site.status && (
+                      <><strong>Status:</strong> {site.status}<br /></>
+                    )}
+                  </Popup>
+                </CircleMarker>
+              ))}
+
+              {/* --- NEW: Camera markers --- */}
+              {visibleCameras.map((site, idx) => (
+                <CircleMarker
+                  key={`camera-${idx}`}
+                  center={[site.lat, site.lng]}
+                  radius={6}
+                  fillColor="#ff0000"
+                  color="#ffffff"
+                  weight={1.5}
+                  opacity={0.9}
+                  fillOpacity={0.8}
+                >
+                  <Popup>
+                    <strong>{site.name}</strong>
+                    <br />
+                    {site.dateInstalled && (
+                      <><strong>Year installed:</strong> {site.dateInstalled}<br /></>
+                    )}
+                    {site.description && (
+                      <><strong>Purpose:</strong> {site.description}<br /></>
+                    )}
+                    {site.jurisdiction && (
+                      <><strong>Jurisdiction:</strong> {site.jurisdiction}<br /></>
+                    )}
+                    {site.operator && (
+                      <><strong>Operator:</strong> {site.operator}<br /></>
+                    )}
+                    {site.status && (
+                      <><strong>Status:</strong> {site.status}<br /></>
                     )}
                   </Popup>
                 </CircleMarker>
@@ -629,7 +784,6 @@ export default function BirdTracker() {
           </div>
 
           <div className="map-wrapper" style={{ border: "1px solid #9afc97" }}>
-            {/* SAME MAP CONTAINER – no key, stable across modes */}
             <MapContainer
               center={mapCenter}
               zoom={mapZoom}
@@ -640,7 +794,7 @@ export default function BirdTracker() {
               {/* Base satellite layer */}
               <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
 
-              {/* Soft, Arabic‑friendly label layer (same as single mode) */}
+              {/* Soft, Arabic‑friendly label layer */}
               <TileLayer
                 attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
                 url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png"
@@ -648,7 +802,7 @@ export default function BirdTracker() {
                 ref={labelLayerRef}
               />
 
-              {/* Radar markers */}
+              {/* Radar markers (unchanged) */}
               {visibleRadarPoints.map((radar, idx) => (
                 <CircleMarker
                   key={`radar-${idx}`}
@@ -684,13 +838,81 @@ export default function BirdTracker() {
                 </CircleMarker>
               ))}
 
+              {/* --- NEW: Feeding sites markers (Compare mode) --- */}
+              {visibleFeedingSites.map((site, idx) => (
+                <CircleMarker
+                  key={`feeding-${idx}`}
+                  center={[site.lat, site.lng]}
+                  radius={7}
+                  fillColor="#ff7800"
+                  color="#ffffff"
+                  weight={1.5}
+                  opacity={0.9}
+                  fillOpacity={0.8}
+                >
+                  <Popup>
+                    <strong>{site.name}</strong>
+                    <br />
+                    {site.dateInstalled && (
+                      <><strong>Year installed:</strong> {site.dateInstalled}<br /></>
+                    )}
+                    {site.description && (
+                      <><strong>Purpose:</strong> {site.description}<br /></>
+                    )}
+                    {site.jurisdiction && (
+                      <><strong>Jurisdiction:</strong> {site.jurisdiction}<br /></>
+                    )}
+                    {site.operator && (
+                      <><strong>Operator:</strong> {site.operator}<br /></>
+                    )}
+                    {site.status && (
+                      <><strong>Status:</strong> {site.status}<br /></>
+                    )}
+                  </Popup>
+                </CircleMarker>
+              ))}
+
+              {/* --- NEW: Camera markers (Compare mode) --- */}
+              {visibleCameras.map((site, idx) => (
+                <CircleMarker
+                  key={`camera-${idx}`}
+                  center={[site.lat, site.lng]}
+                  radius={6}
+                  fillColor="#ff0000"
+                  color="#ffffff"
+                  weight={1.5}
+                  opacity={0.9}
+                  fillOpacity={0.8}
+                >
+                  <Popup>
+                    <strong>{site.name}</strong>
+                    <br />
+                    {site.dateInstalled && (
+                      <><strong>Year installed:</strong> {site.dateInstalled}<br /></>
+                    )}
+                    {site.description && (
+                      <><strong>Purpose:</strong> {site.description}<br /></>
+                    )}
+                    {site.jurisdiction && (
+                      <><strong>Jurisdiction:</strong> {site.jurisdiction}<br /></>
+                    )}
+                    {site.operator && (
+                      <><strong>Operator:</strong> {site.operator}<br /></>
+                    )}
+                    {site.status && (
+                      <><strong>Status:</strong> {site.status}<br /></>
+                    )}
+                  </Popup>
+                </CircleMarker>
+              ))}
+
               {/* Compare mode overlays */}
               {comparePolylines}
               {compareStartMarkers}
             </MapContainer>
           </div>
 
-          {/* Label opacity slider (same as single mode) */}
+          {/* Label opacity slider */}
           <div
             style={{
               marginTop: "0.5rem",

@@ -74,6 +74,22 @@ export default function HomePage() {
     }
   };
 
+  // --- Colour mapping for all 12 bands (matches SpectrumBar DEFAULT_BANDS) ---
+  const bandColors = {
+    "HF": "#ff0000",
+    "VHF": "#ff5500",
+    "UHF": "#ff9706",
+    "L": "#cdfa05",
+    "S": "#0ceb00",
+    "C": "#00ffd9",
+    "X": "#3044de",
+    "Ku": "#6200ff",
+    "K": "#7014c6",
+    "Ka": "#ba55d3",
+    "V": "#ee82ee",
+    "W": "#ffffff"
+  };
+
   // --- Theme detection (unchanged) ---
   useEffect(() => {
     const observer = new MutationObserver(() => {
@@ -120,7 +136,8 @@ export default function HomePage() {
         ...info,
         shortName,
         fullName: displayName,
-        hasCard // pass this flag to optionally show a note
+        hasCard, // pass this flag to optionally show a note
+        color: bandColors[shortName] || "#9afc97" // fallback to default green
       });
     }
   };
@@ -133,7 +150,13 @@ export default function HomePage() {
   const handleCardClick = (band) => {
     const info = bandKnowledge[band.fullName];
     if (info) {
-      setInfoTarget({ ...info, shortName: band.fullName, fullName: band.name, hasCard: true });
+      setInfoTarget({ 
+        ...info, 
+        shortName: band.fullName, 
+        fullName: band.name, 
+        hasCard: true,
+        color: band.color // use the color from the bands array
+      });
       setSelectedBand(band.name);
       const cardElement = bandRefs.current[band.name];
       if (cardElement) {
@@ -186,7 +209,10 @@ export default function HomePage() {
         <div className="info-overlay" onClick={closeInfoPanel}>
           <div className="info-panel" onClick={(e) => e.stopPropagation()}>
             <button className="close-btn" onClick={closeInfoPanel}>✕</button>
-            <h2>{infoTarget.fullName}</h2>
+            <h2>
+              <span className="color-swatch" style={{ backgroundColor: infoTarget.color }} />
+              {infoTarget.fullName}
+            </h2>
 
             {/* If the band has no card on this page, show a subtle note */}
             {!infoTarget.hasCard && (
@@ -277,7 +303,7 @@ export default function HomePage() {
           max-width: 550px;
           width: 90%;
           padding: 2rem;
-          border-radius: 0; /* removed rounding */
+          border-radius: 0;
           position: relative;
           box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
           max-height: 80vh;
@@ -297,9 +323,22 @@ export default function HomePage() {
           font-size: 1.4rem;
           border-bottom: 1px solid rgba(154, 252, 151, 0.2);
           padding-bottom: 0.5rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
         }
         body.light-bg .info-panel h2 {
           color: #1a4a1a;
+        }
+        .color-swatch {
+          display: inline-block;
+          width: 18px;
+          height: 18px;
+          border: 1px solid rgba(255,255,255,0.2);
+          flex-shrink: 0;
+        }
+        body.light-bg .color-swatch {
+          border-color: rgba(0,0,0,0.2);
         }
         .info-section {
           margin: 1.2rem 0;
@@ -343,8 +382,8 @@ export default function HomePage() {
           font-size: 0.8rem;
           color: #9afc97;
           margin-bottom: 1rem;
-          border-radius: 0; /* no rounding */
-          border-left: none; /* removed vertical line */
+          border-radius: 0;
+          border-left: none;
         }
         body.light-bg .note-missing {
           background: rgba(44, 110, 44, 0.1);
