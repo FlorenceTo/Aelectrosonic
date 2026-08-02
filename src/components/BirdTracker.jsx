@@ -275,11 +275,14 @@ export default function BirdTracker() {
     }
   }
 
-  // Single mode data
+    // Single mode data
   const currentPoint = points[currentIdx];
   const trail = points.slice(0, currentIdx + 1).map((p) => [p.lat, p.lng]);
   const firstPoint = points[0];
   const currentColor = birdColorMap[selectedBirdId] || "#f39c12";
+
+  // --- Dynamic map height based on mode ---
+  const mapHeight = compareMode ? 320 : 400;
 
   return (
     <div className="bird-tracker" style={{ marginTop: "2rem" }}>
@@ -413,11 +416,11 @@ export default function BirdTracker() {
           </div>
 
           <div className="map-wrapper" style={{ border: "1px solid #9afc97" }}>
-            {/* SINGLE MAP CONTAINER – no key, stable across modes */}
+            {/* SAME MAP CONTAINER – no key, stable across modes */}
             <MapContainer
               center={mapCenter}
               zoom={mapZoom}
-              style={{ height: "400px", width: "100%" }}
+              style={{ height: mapHeight + "px", width: "100%" }}   // ← CHANGED
               attributionControl={false}
               zoomControl={true}
             >
@@ -630,7 +633,7 @@ export default function BirdTracker() {
             <MapContainer
               center={mapCenter}
               zoom={mapZoom}
-              style={{ height: "400px", width: "100%" }}
+              style={{ height: mapHeight + "px", width: "100%" }}
               attributionControl={false}
               zoomControl={true}
             >
