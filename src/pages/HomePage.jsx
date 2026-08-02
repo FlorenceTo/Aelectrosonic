@@ -191,16 +191,16 @@ export default function HomePage() {
             {/* If the band has no card on this page, show a subtle note */}
             {!infoTarget.hasCard && (
               <div className="note-missing">
-                ⚡ This band is not displayed in the grid above, but you can still explore its properties.
+                Note: This band is not displayed in the grid above, but you can still explore its properties.
               </div>
             )}
 
             <div className="info-section">
-              <h4>📡 Function & Use</h4>
+              <h4>Function & Use</h4>
               <p>{infoTarget.functions}</p>
             </div>
             <div className="info-section">
-              <h4>🌍 Atmospheric & Ecological Behavior</h4>
+              <h4>Atmospheric & Ecological Behavior</h4>
               <p>{infoTarget.atmosphere}</p>
             </div>
             <div className="info-footer">
