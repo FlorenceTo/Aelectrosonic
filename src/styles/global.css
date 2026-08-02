@@ -197,14 +197,12 @@ body.light-bg #timeline-info a {
   color: #2c6e2c;
 }
 
-/* Responsive */
 @media (max-width: 640px) {
   .container { padding: 0 0.8rem 0.8rem 0.8rem; }
   .site-header { padding: 0.6rem 0.8rem; }
   .archive-grid { gap: 1rem; }
 }
 
-ss
 /* Ultra‑compact custom color picker panel */
 .picker-panel {
   font-size: 0.6rem !important;       /* half of typical browser default */
