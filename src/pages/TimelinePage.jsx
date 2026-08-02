@@ -607,6 +607,28 @@ export default function TimelinePage() {
             margin-left: 20px;
           }
 
+          /* Radar info overlay - default positioning */
+          .radar-info-overlay {
+            position: absolute;
+            bottom: 30px;
+            right: -66px;
+            width: 280px;
+            max-height: 70%;
+            overflow-y: auto;
+            z-index: 1000;
+            border: 1px solid ${borderColor};
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+            padding: 10px;
+            border-radius: 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+          }
+
+          body.light-bg .radar-info-overlay {
+            background-color: rgba(245, 243, 239, 0.95);
+            border-color: #2c6e2c;
+          }
+
           @media (max-width: 768px) {
             .slider-container {
               width: 100%;
@@ -631,6 +653,17 @@ export default function TimelinePage() {
 
             .timeline-left-col > div:last-child {
               width: 100% !important;
+            }
+
+            /* Radar info overlay - mobile friendly */
+            .radar-info-overlay {
+              position: relative;
+              bottom: auto;
+              right: auto;
+              width: 100%;
+              max-height: 200px;
+              margin-top: 0.5rem;
+              margin-bottom: 0.5rem;
             }
           }
         `}</style>
@@ -716,6 +749,13 @@ export default function TimelinePage() {
               <div ref={plotRef} style={{ minWidth: "800px", height: "500px", marginBottom: "0.5rem" }} />
             </div>
 
+            {/* Radar info overlay - moved BEFORE the sliders so it doesn't overlap on mobile */}
+            {radarInfo && (
+              <div className="radar-info-overlay">
+                <div dangerouslySetInnerHTML={{ __html: radarInfo }} />
+              </div>
+            )}
+
             {/* Timeline slider */}
             <div className="slider-container">
               <div style={{ marginBottom: "0.4rem", marginTop: "-1.20rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
@@ -787,27 +827,6 @@ export default function TimelinePage() {
                 </div>
               )}
             </div>
-
-            {/* Radar info overlay */}
-            {radarInfo && (
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: "30px",
-                  right: "-66px",
-                  width: "280px",
-                  maxHeight: "70%",
-                  overflowY: "auto",
-                  ...containerStyle,
-                  backgroundColor: "rgba(0, 0, 0, 0)",
-                  backdropFilter: "blur(4px)",
-                  zIndex: 1000,
-                  boxShadow: "0 2px 10px rgba(0, 0, 0, 0)",
-                }}
-              >
-                <div dangerouslySetInnerHTML={{ __html: radarInfo }} />
-              </div>
-            )}
           </div>
         </div>
       </div>
