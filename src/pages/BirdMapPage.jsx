@@ -103,7 +103,7 @@ export default function BirdMapPage() {
           color: #222;
         }
         .map-container {
-          margin-top: 1rem;
+          margin-top: 2rem;
           border: 1px solid #9afc97;
           padding: 1rem;
           background: rgba(0, 0, 0, 0.2);

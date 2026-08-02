@@ -4105,7 +4105,7 @@ uniform ${n} ${r} u_${i};
           color: #222;
         }
         .map-container {
-          margin-top: 2rem;
+          margin-top: 1rem;
           border: 1px solid #9afc97;
           padding: 1rem;
           background: rgba(0, 0, 0, 0.2);
