@@ -92,6 +92,17 @@ const PLOT_START = new Date("1920-01-01").getTime();
 const PLOT_END = new Date("2028-01-01").getTime();
 const STEP_MS = 3600000; // 1 hour
 
+// Ordered themes list (used for traces and the mobile legend)
+const orderedThemes = [
+  "Energy",
+  "Military",
+  "Heritage & Archaeology",
+  "Conservation & Environment",
+  "Governance & Territory",
+  "Infrastructure & Technology",
+  "Resistance",
+];
+
 export default function TimelinePage() {
   const plotRef = useRef(null);
   const plotReady = useRef(false);
@@ -122,13 +133,24 @@ export default function TimelinePage() {
   const [showOSMOverlay, setShowOSMOverlay] = useState(false);
   const [osmOverlayOpacity, setOsmOverlayOpacity] = useState(0.6);
 
+  // Mobile detection
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Helper functions
   const getMarkerColor = (themeName) => {
     const colors = {
-      Energy: "rgb(250,15,5)", Military: "rgb(255,255,240)",
-      "Heritage & Archaeology": "rgb(255,255,0)", "Conservation & Environment": "rgb(0,245,10)",
-      "Governance & Territory": "rgb(0,10,245)", "Infrastructure & Technology": "rgb(128,128,128)",
-      Resistance: "rgb(143,0,207)"
+      Energy: "rgb(250,15,5)",
+      Military: "rgb(255,255,240)",
+      "Heritage & Archaeology": "rgb(255,255,0)",
+      "Conservation & Environment": "rgb(0,245,10)",
+      "Governance & Territory": "rgb(0,10,245)",
+      "Infrastructure & Technology": "rgb(128,128,128)",
+      Resistance: "rgb(143,0,207)",
     };
     return colors[themeName] || "rgb(200,200,200)";
   };
@@ -143,7 +165,7 @@ export default function TimelinePage() {
   const formatDateForSlider = (date) => {
     if (!date) return "";
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     return `${year}-${month}`;
   };
 
@@ -160,11 +182,14 @@ export default function TimelinePage() {
           header: true,
           skipEmptyLines: true,
           complete: (result) => {
-            const rows = result.data.filter(row => row["Date Installed"] && row.Latitude && row.Longitude);
+            const rows = result.data.filter(
+              (row) => row["Date Installed"] && row.Latitude && row.Longitude
+            );
             const points = [];
-            let min = null, max = null;
+            let min = null,
+              max = null;
             const tempPoints = [];
-            rows.forEach(row => {
+            rows.forEach((row) => {
               const dateStr = row["Date Installed"];
               const year = parseInt(dateStr);
               if (!isNaN(year)) {
@@ -173,7 +198,8 @@ export default function TimelinePage() {
                 const lng = parseFloat(row.Longitude);
                 if (!isNaN(lat) && !isNaN(lng)) {
                   tempPoints.push({
-                    lat, lng,
+                    lat,
+                    lng,
                     name: row.Name,
                     bandType: row["Band Type"],
                     purpose: row["Description of Purpose"],
@@ -220,7 +246,7 @@ export default function TimelinePage() {
               setRadarDate(new Date(PLOT_START));
             }
           },
-          error: (err) => setError("Radar CSV parse error: " + err.message)
+          error: (err) => setError("Radar CSV parse error: " + err.message),
         });
       } catch (err) {
         setError("Failed to load radarlist.csv: " + err.message);
@@ -236,17 +262,19 @@ export default function TimelinePage() {
       setRadarInfo("");
       return;
     }
-    const filtered = radarPoints.filter(p => p.date <= radarDate);
+    const filtered = radarPoints.filter((p) => p.date <= radarDate);
     setVisibleRadarMarkers(filtered);
     if (filtered.length > 0) {
-      const latest = filtered.reduce((prev, curr) => (curr.date > prev.date ? curr : prev));
-      
+      const latest = filtered.reduce((prev, curr) =>
+        curr.date > prev.date ? curr : prev
+      );
+
       // Build frequency display for single or multiple bands (e.g., "UHF & S-Band")
       let bandDisplay = latest.bandType;
       if (latest.bandType && latest.bandType !== "Not Publicly Specified") {
         if (latest.bandType.includes("&")) {
           const bands = latest.bandType.split(/\s*&\s*/);
-          const freqParts = bands.map(b => {
+          const freqParts = bands.map((b) => {
             const trimmed = b.trim();
             const freq = bandFrequencyMap[trimmed];
             return freq ? `${trimmed} (${freq})` : trimmed;
@@ -257,7 +285,7 @@ export default function TimelinePage() {
           if (freq) bandDisplay = `${latest.bandType} (${freq})`;
         }
       }
-      
+
       const infoHtml = `<strong>${latest.name}</strong><br>
                         <strong>Year installed:</strong> ${latest.date.getUTCFullYear()}<br>
                         <strong>Band Type:</strong> ${bandDisplay}<br>
@@ -280,23 +308,17 @@ export default function TimelinePage() {
 
     const convertDate = (dmy) => {
       if (!dmy) return null;
-      const [day, month, year] = dmy.split('/');
-      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      const [day, month, year] = dmy.split("/");
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     };
 
     const parseDateMain = (dmy) => {
       if (!dmy) return null;
-      const parts = dmy.split('/');
+      const parts = dmy.split("/");
       if (parts.length !== 3) return null;
       const [day, month, year] = parts;
       return new Date(`${year}-${month}-${day}`);
     };
-
-    const orderedThemes = [
-      "Energy", "Military", "Heritage & Archaeology",
-      "Conservation & Environment", "Governance & Territory",
-      "Infrastructure & Technology", "Resistance"
-    ];
 
     const addHorizontalJitter = (events, windowDays = 10) => {
       if (events.length === 0) return events;
@@ -306,7 +328,10 @@ export default function TimelinePage() {
       while (i < sorted.length) {
         const cluster = [sorted[i]];
         let j = i + 1;
-        while (j < sorted.length && (sorted[j].date - sorted[i].date) / (1000 * 3600 * 24) <= windowDays) {
+        while (
+          j < sorted.length &&
+          (sorted[j].date - sorted[i].date) / (1000 * 3600 * 24) <= windowDays
+        ) {
           cluster.push(sorted[j]);
           j++;
         }
@@ -331,27 +356,34 @@ export default function TimelinePage() {
           header: true,
           skipEmptyLines: true,
           complete: (result) => {
-            const rows = result.data.filter(row => row.Date && row.Theme);
-            if (rows.length === 0) { setError("No valid rows"); return; }
+            const rows = result.data.filter((row) => row.Date && row.Theme);
+            if (rows.length === 0) {
+              setError("No valid rows");
+              return;
+            }
 
             const pointsList = [];
-            let globalMin = null, globalMax = null;
-            let minYear = Infinity, maxYear = -Infinity;
+            let globalMin = null,
+              globalMax = null;
+            let minYear = Infinity,
+              maxYear = -Infinity;
 
             const traces = [];
             for (const themeName of orderedThemes) {
-              const themeRows = rows.filter(r => r.Theme === themeName);
+              const themeRows = rows.filter((r) => r.Theme === themeName);
               if (themeRows.length === 0) continue;
 
-              let eventsForLanes = themeRows.map(row => ({
-                date: parseDateMain(row.Date),
-                row: row
-              })).filter(ev => ev.date !== null);
+              let eventsForLanes = themeRows
+                .map((row) => ({
+                  date: parseDateMain(row.Date),
+                  row: row,
+                }))
+                .filter((ev) => ev.date !== null);
               if (eventsForLanes.length === 0) continue;
 
               eventsForLanes = addHorizontalJitter(eventsForLanes, 10);
 
-              eventsForLanes.forEach(ev => {
+              eventsForLanes.forEach((ev) => {
                 const d = ev.date.getTime();
                 const year = ev.date.getFullYear();
                 if (globalMin === null || d < globalMin) globalMin = d;
@@ -373,21 +405,31 @@ export default function TimelinePage() {
               });
 
               const assignLanes = (events) => {
-                const lanes = Array(LANES_PER_THEME).fill().map(() => ({ lastDate: null }));
+                const lanes = Array(LANES_PER_THEME)
+                  .fill()
+                  .map(() => ({ lastDate: null }));
                 const assignments = [];
                 const sorted = events.map((ev, idx) => ({ ...ev, originalIndex: idx }));
                 sorted.sort((a, b) => a.date - b.date);
                 for (const ev of sorted) {
                   let selectedLane = -1;
                   for (let i = 0; i < LANES_PER_THEME; i++) {
-                    if (lanes[i].lastDate === null) { selectedLane = i; break; }
-                    const daysDiff = (ev.date - lanes[i].lastDate) / (1000 * 60 * 60 * 24);
-                    if (daysDiff >= DATE_THRESHOLD_DAYS) { selectedLane = i; break; }
+                    if (lanes[i].lastDate === null) {
+                      selectedLane = i;
+                      break;
+                    }
+                    const daysDiff =
+                      (ev.date - lanes[i].lastDate) / (1000 * 60 * 60 * 24);
+                    if (daysDiff >= DATE_THRESHOLD_DAYS) {
+                      selectedLane = i;
+                      break;
+                    }
                   }
                   if (selectedLane === -1) {
                     let oldestIdx = 0;
                     for (let i = 1; i < LANES_PER_THEME; i++) {
-                      if (lanes[i].lastDate < lanes[oldestIdx].lastDate) oldestIdx = i;
+                      if (lanes[i].lastDate < lanes[oldestIdx].lastDate)
+                        oldestIdx = i;
                     }
                     selectedLane = oldestIdx;
                   }
@@ -397,22 +439,29 @@ export default function TimelinePage() {
                 return assignments;
               };
 
-              const laneIndices = assignLanes(eventsForLanes.map(ev => ({ date: ev.date })));
-
-              const xDates = eventsForLanes.map(ev => ev.jitteredDate.toISOString().slice(0,10));
-              const baseY = themeBaseY[themeName];
-              const yValues = eventsForLanes.map((ev, idx) => baseY + laneIndices[idx] * LANE_SPACING);
-              const texts = eventsForLanes.map(ev =>
-                `Date: ${ev.row.Date}<br>Label: ${ev.row.Label}<br>Group: ${ev.row.Theme}<br>Jurisdiction: ${ev.row.Jurisdiction}<br>Area: ${ev.row.Area}`
+              const laneIndices = assignLanes(
+                eventsForLanes.map((ev) => ({ date: ev.date }))
               );
-              const customdata = eventsForLanes.map(ev => ({
+
+              const xDates = eventsForLanes.map((ev) =>
+                ev.jitteredDate.toISOString().slice(0, 10)
+              );
+              const baseY = themeBaseY[themeName];
+              const yValues = eventsForLanes.map(
+                (ev, idx) => baseY + laneIndices[idx] * LANE_SPACING
+              );
+              const texts = eventsForLanes.map(
+                (ev) =>
+                  `Date: ${ev.row.Date}<br>Label: ${ev.row.Label}<br>Group: ${ev.row.Theme}<br>Jurisdiction: ${ev.row.Jurisdiction}<br>Area: ${ev.row.Area}`
+              );
+              const customdata = eventsForLanes.map((ev) => ({
                 lat: parseFloat(ev.row.Latitude),
                 lng: parseFloat(ev.row.Longitude),
                 theme: ev.row.Theme,
                 jurisdiction: ev.row.Jurisdiction,
                 area: ev.row.Area,
                 date: ev.row.Date,
-                description: `<strong>${ev.row.Label}</strong><br><strong>Date:</strong> ${ev.row.Date}<br><strong>Jurisdiction:</strong> ${ev.row.Jurisdiction}<br><strong>Area:</strong> ${ev.row.Area}<br><strong>Coordinates:</strong> ${ev.row.Latitude}, ${ev.row.Longitude}<br>${ev.row.Description}<br><a href="${ev.row.Source}" target="_blank">Source</a>`
+                description: `<strong>${ev.row.Label}</strong><br><strong>Date:</strong> ${ev.row.Date}<br><strong>Jurisdiction:</strong> ${ev.row.Jurisdiction}<br><strong>Area:</strong> ${ev.row.Area}<br><strong>Coordinates:</strong> ${ev.row.Latitude}, ${ev.row.Longitude}<br>${ev.row.Description}<br><a href="${ev.row.Source}" target="_blank">Source</a>`,
               }));
 
               traces.push({
@@ -424,7 +473,8 @@ export default function TimelinePage() {
                 type: "scatter",
                 name: themeName,
                 marker: { size: 8, color: getMarkerColor(themeName) },
-                hovertemplate: "%{text}<extra></extra>"
+                hovertemplate: "%{text}<extra></extra>",
+                showlegend: !isMobile, // hide Plotly legend items on mobile
               });
             }
 
@@ -439,53 +489,147 @@ export default function TimelinePage() {
               setAnimationDate(minD);
             }
 
-            if (traces.length === 0) { setError("No traces generated"); return; }
+            if (traces.length === 0) {
+              setError("No traces generated");
+              return;
+            }
 
             const fixedShapes = [
-              { type: "line", x0: "1948-05-14", x1: "1948-05-14", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } },
-              { type: "line", x0: "1967-06-05", x1: "1967-06-05", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } },
-              { type: "line", x0: "1995-09-28", x1: "1995-09-28", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } },
-              { type: "line", x0: "2023-10-07", x1: "2023-10-07", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } }
+              {
+                type: "line",
+                x0: "1948-05-14",
+                x1: "1948-05-14",
+                y0: 0,
+                y1: 1,
+                yref: "paper",
+                line: { color: "#9afc97", width: 0.7, dash: "dash" },
+              },
+              {
+                type: "line",
+                x0: "1967-06-05",
+                x1: "1967-06-05",
+                y0: 0,
+                y1: 1,
+                yref: "paper",
+                line: { color: "#9afc97", width: 0.7, dash: "dash" },
+              },
+              {
+                type: "line",
+                x0: "1995-09-28",
+                x1: "1995-09-28",
+                y0: 0,
+                y1: 1,
+                yref: "paper",
+                line: { color: "#9afc97", width: 0.7, dash: "dash" },
+              },
+              {
+                type: "line",
+                x0: "2023-10-07",
+                x1: "2023-10-07",
+                y0: 0,
+                y1: 1,
+                yref: "paper",
+                line: { color: "#9afc97", width: 0.7, dash: "dash" },
+              },
             ];
 
             const layout = {
-              xaxis: { 
-                type: "date", 
-                range: ["1920-01-01", "2028-01-01"], 
-                rangemode: "normal", 
-                showgrid: false, 
-                linecolor: theme === "light" ? "#333333" : "#aaaaaa", 
+              xaxis: {
+                type: "date",
+                range: ["1920-01-01", "2028-01-01"],
+                rangemode: "normal",
+                showgrid: false,
+                linecolor: theme === "light" ? "#333333" : "#aaaaaa",
                 tickfont: { size: 10 },
               },
               yaxis: { visible: false, range: yRange },
-              paper_bgcolor: "transparent", plot_bgcolor: "transparent",
-              font: { color: theme === "light" ? "#1a1a1a" : "#f0f0f0", family: "Inter, sans-serif" },
-              legend: { orientation: "v", traceorder: "normal", font: { color: theme === "light" ? "#1a1a1a" : "#f0f0f0" }, x: 1.02, xanchor: "left" },
-              margin: { l: 20, r: 80, t: 10, b: 50 },
-              hoverlabel: { bgcolor: theme === "light" ? "rgba(220,220,220,0.7)" : "rgba(30,30,30,0.7)", bordercolor: "#9afc97", font: { size: 10 }, align: "left", namelength: -1 },
+              paper_bgcolor: "transparent",
+              plot_bgcolor: "transparent",
+              font: {
+                color: theme === "light" ? "#1a1a1a" : "#f0f0f0",
+                family: "Inter, sans-serif",
+              },
+              legend: {
+                orientation: "v",
+                traceorder: "normal",
+                font: {
+                  color: theme === "light" ? "#1a1a1a" : "#f0f0f0",
+                },
+                x: 1.02,
+                xanchor: "left",
+                ...(isMobile && { display: false }), // completely hide on mobile
+              },
+              margin: {
+                l: 20,
+                r: isMobile ? 20 : 80,
+                t: 10,
+                b: isMobile ? 60 : 50,
+              },
+              hoverlabel: {
+                bgcolor:
+                  theme === "light"
+                    ? "rgba(220,220,220,0.7)"
+                    : "rgba(30,30,30,0.7)",
+                bordercolor: "#9afc97",
+                font: { size: 10 },
+                align: "left",
+                namelength: -1,
+              },
               shapes: fixedShapes,
               annotations: [
-                { x: "1948-05-14", y: 1.03, yref: "paper", text: "1948", showarrow: false, font: { color: "#9afc97", size: 10 }, xanchor: "center" },
-                { x: "1967-06-05", y: 1.03, yref: "paper", text: "1967", showarrow: false, font: { color: "#9afc97", size: 10 }, xanchor: "center" },
-                { x: "1995-09-28", y: 1.03, yref: "paper", text: "1995", showarrow: false, font: { color: "#9afc97", size: 10 }, xanchor: "center" },
-                { x: "2023-10-07", y: 1.03, yref: "paper", text: "2023", showarrow: false, font: { color: "#9afc97", size: 10 }, xanchor: "center" }
-              ]
+                {
+                  x: "1948-05-14",
+                  y: 1.03,
+                  yref: "paper",
+                  text: "1948",
+                  showarrow: false,
+                  font: { color: "#9afc97", size: 10 },
+                  xanchor: "center",
+                },
+                {
+                  x: "1967-06-05",
+                  y: 1.03,
+                  yref: "paper",
+                  text: "1967",
+                  showarrow: false,
+                  font: { color: "#9afc97", size: 10 },
+                  xanchor: "center",
+                },
+                {
+                  x: "1995-09-28",
+                  y: 1.03,
+                  yref: "paper",
+                  text: "1995",
+                  showarrow: false,
+                  font: { color: "#9afc97", size: 10 },
+                  xanchor: "center",
+                },
+                {
+                  x: "2023-10-07",
+                  y: 1.03,
+                  yref: "paper",
+                  text: "2023",
+                  showarrow: false,
+                  font: { color: "#9afc97", size: 10 },
+                  xanchor: "center",
+                },
+              ],
             };
-            const config = { 
-              displayModeBar: false,       
-              responsive: true, 
-              scrollZoom: true,            
-              dragmode: 'pan',             
-              doubleClick: 'reset+autosize'
+            const config = {
+              displayModeBar: false,
+              responsive: true,
+              scrollZoom: true,
+              dragmode: "pan",
+              doubleClick: "reset+autosize",
             };
 
             Plotly.purge(plotRef.current);
             Plotly.newPlot(plotRef.current, traces, layout, config);
-            
+
             // Disable right-click context menu on the plot
             const plotDiv = plotRef.current;
             plotDiv.oncontextmenu = (e) => e.preventDefault();
-            
+
             plotReady.current = true;
             setError(null);
 
@@ -502,15 +646,18 @@ export default function TimelinePage() {
               }
             });
           },
-          error: (err) => setError("CSV parse error: " + err.message)
+          error: (err) => setError("CSV parse error: " + err.message),
         });
       } catch (err) {
         setError("Failed to load CSV: " + err.message);
       }
     };
     fetchData();
-    return () => { if (plotRef.current) Plotly.purge(plotRef.current); plotReady.current = false; };
-  }, [theme]);
+    return () => {
+      if (plotRef.current) Plotly.purge(plotRef.current);
+      plotReady.current = false;
+    };
+  }, [theme, isMobile]); // isMobile is added so layout re‑builds when screen size changes
 
   // Update map markers based on animation date (NO JITTER – markers stack)
   useEffect(() => {
@@ -519,11 +666,13 @@ export default function TimelinePage() {
       setClickedInfo("");
       return;
     }
-    const filtered = allPoints.filter(p => p.date <= animationDate);
+    const filtered = allPoints.filter((p) => p.date <= animationDate);
     setVisibleMarkers(filtered);
-    
+
     if (filtered.length > 0) {
-      const latest = filtered.reduce((prev, curr) => (curr.date > prev.date ? curr : prev));
+      const latest = filtered.reduce((prev, curr) =>
+        curr.date > prev.date ? curr : prev
+      );
       const description = `<strong>${latest.label}</strong><br>
                           <strong>Date:</strong> ${latest.date.toLocaleDateString()}<br>
                           <strong>Jurisdiction:</strong> ${latest.jurisdiction}<br>
@@ -542,18 +691,55 @@ export default function TimelinePage() {
     if (!plotReady.current || !plotRef.current) return;
     try {
       const fixedShapes = [
-        { type: "line", x0: "1948-05-14", x1: "1948-05-14", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } },
-        { type: "line", x0: "1967-06-05", x1: "1967-06-05", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } },
-        { type: "line", x0: "1995-09-28", x1: "1995-09-28", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } },
-        { type: "line", x0: "2023-10-07", x1: "2023-10-07", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } }
+        {
+          type: "line",
+          x0: "1948-05-14",
+          x1: "1948-05-14",
+          y0: 0,
+          y1: 1,
+          yref: "paper",
+          line: { color: "#9afc97", width: 0.7, dash: "dash" },
+        },
+        {
+          type: "line",
+          x0: "1967-06-05",
+          x1: "1967-06-05",
+          y0: 0,
+          y1: 1,
+          yref: "paper",
+          line: { color: "#9afc97", width: 0.7, dash: "dash" },
+        },
+        {
+          type: "line",
+          x0: "1995-09-28",
+          x1: "1995-09-28",
+          y0: 0,
+          y1: 1,
+          yref: "paper",
+          line: { color: "#9afc97", width: 0.7, dash: "dash" },
+        },
+        {
+          type: "line",
+          x0: "2023-10-07",
+          x1: "2023-10-07",
+          y0: 0,
+          y1: 1,
+          yref: "paper",
+          line: { color: "#9afc97", width: 0.7, dash: "dash" },
+        },
       ];
 
       if (animationDate) {
         const dateStr = formatDateForSlider(animationDate);
         const timelineColor = theme === "light" ? "#2c6e2c" : "#9afc97";
         fixedShapes.push({
-          type: "line", x0: dateStr, x1: dateStr, y0: 0, y1: 1, yref: "paper",
-          line: { color: timelineColor, width: 0.5, dash: "solid" }
+          type: "line",
+          x0: dateStr,
+          x1: dateStr,
+          y0: 0,
+          y1: 1,
+          yref: "paper",
+          line: { color: timelineColor, width: 0.5, dash: "solid" },
         });
       }
 
@@ -561,8 +747,13 @@ export default function TimelinePage() {
         const radarDateStr = formatDateForSlider(radarDate);
         const radarLineColor = theme === "light" ? "#000000" : "#ffffff";
         fixedShapes.push({
-          type: "line", x0: radarDateStr, x1: radarDateStr, y0: 0, y1: 1, yref: "paper",
-          line: { color: radarLineColor, width: 0.5, dash: "solid" }
+          type: "line",
+          x0: radarDateStr,
+          x1: radarDateStr,
+          y0: 0,
+          y1: 1,
+          yref: "paper",
+          line: { color: radarLineColor, width: 0.5, dash: "solid" },
         });
       }
 
@@ -589,26 +780,55 @@ export default function TimelinePage() {
     padding: "10px",
     borderRadius: "0",
   };
+  // Base slider container style – overridden on mobile to match plot width
   const sliderContainerStyle = {
     marginTop: "0",
     marginLeft: "20px",
     width: "71%",
   };
 
-  if (error) return <div><Header /><div className="container" style={{ color: "red" }}>Error: {error}</div></div>;
+  if (error)
+    return (
+      <div>
+        <Header />
+        <div className="container" style={{ color: "red" }}>
+          Error: {error}
+        </div>
+      </div>
+    );
 
   return (
     <div>
       <Header />
-      <div className="container" style={{ maxWidth: "1400px", margin: "0 auto", padding: "1rem" }}>
+      <div
+        className="container"
+        style={{ maxWidth: "1400px", margin: "0 auto", padding: "1rem" }}
+      >
         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
           {/* LEFT COLUMN: Map and timeline info panel */}
           <div style={{ flex: "0 0 500px", width: "500px", marginTop: "10px" }}>
-            <div style={{ width: "100%", height: "400px", border: `1px solid ${borderColor}`, background: "#30342f" }}>
-              <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: "100%", width: "100%" }} attributionControl={false} zoomControl={false} key={mapCenter.toString() + mapZoom}>
+            <div
+              style={{
+                width: "100%",
+                height: "400px",
+                border: `1px solid ${borderColor}`,
+                background: "#30342f",
+              }}
+            >
+              <MapContainer
+                center={mapCenter}
+                zoom={mapZoom}
+                style={{ height: "100%", width: "100%" }}
+                attributionControl={false}
+                zoomControl={false}
+                key={mapCenter.toString() + mapZoom}
+              >
                 {/* ESRI satellite base layer */}
-                <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="" />
-                
+                <TileLayer
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                  attribution=""
+                />
+
                 {/* Stamen Toner overlay (roads & labels) */}
                 {showOSMOverlay && (
                   <TileLayer
@@ -618,14 +838,22 @@ export default function TimelinePage() {
                     opacity={osmOverlayOpacity}
                   />
                 )}
-                
+
                 {visibleMarkers.map((point, idx) => {
                   const colorHex = colorToHex(getMarkerColor(point.theme));
-                  const yearsSince = (animationDate - point.date) / (1000 * 60 * 60 * 24 * 365.25);
+                  const yearsSince =
+                    (animationDate - point.date) /
+                    (1000 * 60 * 60 * 24 * 365.25);
                   let radius = MIN_RADIUS;
                   if (yearsSince > 0) {
-                    radius = MIN_RADIUS + (yearsSince / RADIUS_GROWTH_YEARS) * (MAX_RADIUS - MIN_RADIUS);
-                    radius = Math.min(MAX_RADIUS, Math.max(MIN_RADIUS, radius));
+                    radius =
+                      MIN_RADIUS +
+                      (yearsSince / RADIUS_GROWTH_YEARS) *
+                        (MAX_RADIUS - MIN_RADIUS);
+                    radius = Math.min(
+                      MAX_RADIUS,
+                      Math.max(MIN_RADIUS, radius)
+                    );
                   }
                   return (
                     <Marker
@@ -643,140 +871,339 @@ export default function TimelinePage() {
                           setClickedInfo(desc);
                           setMapCenter([point.lat, point.lng]);
                           setMapZoom(13);
-                        }
+                        },
                       }}
                     >
                       <Popup>
-                        <strong>{point.label}</strong><br />
-                        <strong>Date:</strong> {point.date.toLocaleDateString()}<br />
-                        <strong>Area:</strong> {point.area || "Not provided"}<br />
-                        {point.description}<br />
-                        <a href={point.source} target="_blank">Source</a>
+                        <strong>{point.label}</strong>
+                        <br />
+                        <strong>Date:</strong>{" "}
+                        {point.date.toLocaleDateString()}
+                        <br />
+                        <strong>Area:</strong> {point.area || "Not provided"}
+                        <br />
+                        {point.description}
+                        <br />
+                        <a href={point.source} target="_blank">
+                          Source
+                        </a>
                       </Popup>
                     </Marker>
                   );
                 })}
                 {visibleRadarMarkers.map((point, idx) => (
-                  <Marker key={`radar-${idx}`} position={[point.lat, point.lng]} icon={createRadarIcon(12)}>
+                  <Marker
+                    key={`radar-${idx}`}
+                    position={[point.lat, point.lng]}
+                    icon={createRadarIcon(12)}
+                  >
                     <Popup>
-                      <strong>{point.name}</strong><br />
-                      <strong>Type:</strong> {point.bandType}<br />
-                      <strong>Purpose:</strong> {point.purpose}<br />
-                      <strong>Jurisdiction:</strong> {point.jurisdiction}<br />
-                      <strong>Operator:</strong> {point.operator}<br />
-                      <strong>Status:</strong> {point.status}<br />
-                      <a href={point.source} target="_blank">Source</a>
+                      <strong>{point.name}</strong>
+                      <br />
+                      <strong>Type:</strong> {point.bandType}
+                      <br />
+                      <strong>Purpose:</strong> {point.purpose}
+                      <br />
+                      <strong>Jurisdiction:</strong> {point.jurisdiction}
+                      <br />
+                      <strong>Operator:</strong> {point.operator}
+                      <br />
+                      <strong>Status:</strong> {point.status}
+                      <br />
+                      <a href={point.source} target="_blank">
+                        Source
+                      </a>
                     </Popup>
                   </Marker>
                 ))}
               </MapContainer>
             </div>
-            <div style={{ ...containerStyle, marginTop: "0.5rem", width: "100%" }}>
-              {clickedInfo ? <div dangerouslySetInnerHTML={{ __html: clickedInfo }} /> : "Click a dot or drag the timeline slider to see details."}
-            </div>
-          </div>
 
-          {/* MIDDLE COLUMN: Plot + sliders + radar overlay + OSM overlay controls */}
-          <div style={{ flex: "1", minWidth: "400px", position: "relative" }}>
-            <div style={{ width: "100%", overflowX: "auto" }}>
-              <div ref={plotRef} style={{ minWidth: "800px", height: "500px", marginBottom: "0.5rem" }} />
-            </div>
-
-            {/* Timeline slider */}
-            <div style={sliderContainerStyle}>
-              <div style={{ marginBottom: "0.4rem", marginTop: "-1.20rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
-                Timeline: {animationDate ? formatDateForSlider(animationDate) : "—"}
-              </div>
-              <input
-                type="range"
-                min={PLOT_START}
-                max={PLOT_END}
-                step={STEP_MS}
-                value={animationDate ? animationDate.getTime() : PLOT_START}
-                onChange={handleTimelineSliderChange}
-                style={{ width: "100%", accentColor: "#555", height: "4px", borderRadius: "2px" }}
-              />
-              <div style={{ fontSize: "0.7rem", marginTop: "0.5rem", color: textColor }}>
-                Drag to reveal timeline events. Glow grows with years passed.
-              </div>
-            </div>
-
-            {/* Radar slider */}
-            {minRadarDate && maxRadarDate && (
-              <div style={{ ...sliderContainerStyle, marginTop: "0.8rem" }}>
-                <div style={{ marginBottom: "0.1rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
-                  Radar: {radarDate ? formatDateForSlider(radarDate) : "—"}
-                </div>
-                <input
-                  type="range"
-                  min={PLOT_START}
-                  max={PLOT_END}
-                  step={STEP_MS}
-                  value={radarDate ? radarDate.getTime() : PLOT_START}
-                  onChange={handleRadarSliderChange}
-                  style={{ width: "100%", accentColor: "#888", height: "4px", borderRadius: "2px" }}
-                />
-                <div style={{ fontSize: "0.7rem", marginTop: "0.5rem", color: textColor }}>
-                  Radar installations
-                </div>
-              </div>
-            )}
-
-            {/* OSM raster overlay controls – placed under radar slider */}
-            <div style={{ ...sliderContainerStyle, marginTop: "0.5rem" }}>
-              <label style={{ fontFamily: "monospace", fontSize: "0.8rem", fontWeight: "normal", display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.2rem" }}>
-                <input
-                  type="checkbox"
-                  checked={showOSMOverlay}
-                  onChange={(e) => setShowOSMOverlay(e.target.checked)}
-                  style={{ accentColor: borderColor }}
-                />
-                Place Names
-              </label>
-              {showOSMOverlay && (
-                <div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={osmOverlayOpacity}
-                    onChange={(e) => setOsmOverlayOpacity(parseFloat(e.target.value))}
-                    style={{
-                      width: "100%",
-                      accentColor: "#a7a5a5",
-                      height: "4px",
-                      borderRadius: "2px",
-                      marginTop: "4px"
-                    }}
-                  />
-                </div>
+            {/* Timeline info box – increased height + fixed on mobile */}
+            <div
+              style={{
+                ...containerStyle,
+                marginTop: "0.5rem",
+                width: "100%",
+                ...(isMobile && { height: "200px", overflowY: "auto" }),
+              }}
+            >
+              {clickedInfo ? (
+                <div dangerouslySetInnerHTML={{ __html: clickedInfo }} />
+              ) : (
+                "Click a dot or drag the timeline slider to see details."
               )}
             </div>
 
-            {/* Radar info overlay */}
-            {radarInfo && (
+            {/* Radar info – only on mobile, placed under the timeline info */}
+            {isMobile && radarInfo && (
               <div
                 style={{
-                  position: "absolute",
-                  bottom: "30px",
-                  right: "-66px",
-                  width: "280px",
-                  maxHeight: "70%",
-                  overflowY: "auto",
                   ...containerStyle,
-                  backgroundColor: "rgba(0, 0, 0, 0)",
-                  backdropFilter: "blur(4px)",
-                  zIndex: 1000,
-                  boxShadow: "0 2px 10px rgba(0, 0, 0, 0)",
+                  marginTop: "0.5rem",
+                  width: "100%",
+                  height: "150px",       // fixed height to prevent jitter
+                  overflowY: "auto",
+                  backgroundColor: "rgba(0, 0, 0, 0.1)",
                 }}
               >
                 <div dangerouslySetInnerHTML={{ __html: radarInfo }} />
               </div>
             )}
           </div>
+
+          {/* MIDDLE COLUMN: Plot + sliders + radar overlay (desktop) + OSM overlay controls */}
+          <div style={{ flex: "1", minWidth: "400px", position: "relative" }}>
+            {/* Single scrollable wrapper – makes plot & sliders share the same width */}
+            <div style={{ width: "100%", overflowX: "auto" }}>
+              <div style={{ minWidth: "800px" }}>
+                {/* The plot itself */}
+                <div
+                  ref={plotRef}
+                  style={{
+                    width: "100%",
+                    height: "500px",
+                    marginBottom: "0.5rem",
+                  }}
+                />
+
+                {/* Timeline slider */}
+                <div
+                  style={{
+                    ...sliderContainerStyle,
+                    marginLeft: isMobile ? 0 : sliderContainerStyle.marginLeft,
+                    width: isMobile ? "100%" : sliderContainerStyle.width,
+                    ...(isMobile && {
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "0.25rem",
+                    }),
+                  }}
+                >
+                  <div
+                    style={{
+                      marginBottom: "0.4rem",
+                      marginTop: "-1.20rem",
+                      fontFamily: "monospace",
+                      fontSize: isMobile ? "0.7rem" : "0.8rem",
+                    }}
+                  >
+                    Timeline:{" "}
+                    {animationDate ? formatDateForSlider(animationDate) : "—"}
+                  </div>
+                  <input
+                    type="range"
+                    min={PLOT_START}
+                    max={PLOT_END}
+                    step={STEP_MS}
+                    value={
+                      animationDate ? animationDate.getTime() : PLOT_START
+                    }
+                    onChange={handleTimelineSliderChange}
+                    style={{
+                      width: "100%",
+                      accentColor: "#555",
+                      height: "4px",
+                      borderRadius: "2px",
+                    }}
+                  />
+                  <div
+                    style={{
+                      fontSize: "0.7rem",
+                      marginTop: "0.5rem",
+                      color: textColor,
+                    }}
+                  >
+                    Drag to reveal timeline events. Glow grows with years passed.
+                  </div>
+                </div>
+
+                {/* Radar slider */}
+                {minRadarDate && maxRadarDate && (
+                  <div
+                    style={{
+                      ...sliderContainerStyle,
+                      marginTop: "0.8rem",
+                      marginLeft: isMobile
+                        ? 0
+                        : sliderContainerStyle.marginLeft,
+                      width: isMobile ? "100%" : sliderContainerStyle.width,
+                      ...(isMobile && {
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "0.25rem",
+                      }),
+                    }}
+                  >
+                    <div
+                      style={{
+                        marginBottom: "0.1rem",
+                        fontFamily: "monospace",
+                        fontSize: isMobile ? "0.7rem" : "0.8rem",
+                      }}
+                    >
+                      Radar:{" "}
+                      {radarDate ? formatDateForSlider(radarDate) : "—"}
+                    </div>
+                    <input
+                      type="range"
+                      min={PLOT_START}
+                      max={PLOT_END}
+                      step={STEP_MS}
+                      value={radarDate ? radarDate.getTime() : PLOT_START}
+                      onChange={handleRadarSliderChange}
+                      style={{
+                        width: "100%",
+                        accentColor: "#888",
+                        height: "4px",
+                        borderRadius: "2px",
+                      }}
+                    />
+                    <div
+                      style={{
+                        fontSize: "0.7rem",
+                        marginTop: "0.5rem",
+                        color: textColor,
+                      }}
+                    >
+                      Radar installations
+                    </div>
+                  </div>
+                )}
+
+                {/* OSM raster overlay controls */}
+                <div
+                  style={{
+                    ...sliderContainerStyle,
+                    marginTop: "0.5rem",
+                    marginLeft: isMobile ? 0 : sliderContainerStyle.marginLeft,
+                    width: isMobile ? "100%" : sliderContainerStyle.width,
+                    ...(isMobile && {
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "0.25rem",
+                    }),
+                  }}
+                >
+                  <label
+                    style={{
+                      fontFamily: "monospace",
+                      fontSize: isMobile ? "0.7rem" : "0.8rem",
+                      fontWeight: "normal",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      marginBottom: "0.2rem",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={showOSMOverlay}
+                      onChange={(e) => setShowOSMOverlay(e.target.checked)}
+                      style={{ accentColor: borderColor }}
+                    />
+                    Place Names
+                  </label>
+                  {showOSMOverlay && (
+                    <div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        value={osmOverlayOpacity}
+                        onChange={(e) =>
+                          setOsmOverlayOpacity(parseFloat(e.target.value))
+                        }
+                        style={{
+                          width: "100%",
+                          accentColor: "#a7a5a5",
+                          height: "4px",
+                          borderRadius: "2px",
+                          marginTop: "4px",
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Radar info overlay – only on DESKTOP (absolute positioned) */}
+                {!isMobile && radarInfo && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: "30px",
+                      right: "-66px",
+                      width: "280px",
+                      maxHeight: "70%",
+                      overflowY: "auto",
+                      ...containerStyle,
+                      backgroundColor: "rgba(0, 0, 0, 0)",
+                      backdropFilter: "blur(4px)",
+                      zIndex: 1000,
+                      boxShadow: "0 2px 10px rgba(0, 0, 0, 0)",
+                    }}
+                  >
+                    <div dangerouslySetInnerHTML={{ __html: radarInfo }} />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Fixed mobile legend – no title, just coloured dots and theme names */}
+      {isMobile && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            width: "100%",
+            background:
+              theme === "light"
+                ? "rgba(255,255,255,0.95)"
+                : "rgba(20,20,20,0.95)",
+            borderTop: `1px solid ${borderColor}`,
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: "0.5rem 1rem",
+            padding: "0.4rem 0.8rem",
+            zIndex: 2000,
+            boxSizing: "border-box",
+            fontSize: "0.7rem",
+            color: textColor,
+          }}
+        >
+          {orderedThemes.map((themeName) => {
+            const colorHex = colorToHex(getMarkerColor(themeName));
+            return (
+              <div
+                key={themeName}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.3rem",
+                }}
+              >
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: "10px",
+                    height: "10px",
+                    borderRadius: "50%",
+                    background: getMarkerColor(themeName),
+                    border: `1px solid ${colorHex}`,
+                  }}
+                ></span>
+                {themeName}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
