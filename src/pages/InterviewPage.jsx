@@ -625,9 +625,9 @@ const interviews = [
   // -------- INTERVIEW 5: Layla (Ein Qiniya Walking Interview) --------
   {
     id: 5,
-    title: "Interviewee: Layla",
+    title: "Interviewee: F",
     meta: "Architect, researcher, and community educator",
-    date: "Recorded in Ein Qiniya, 2025",
+    date: "Recorded in Ein Qiniya, 2026",
     transcript: [
       { speaker: "A", text: "I want to explain briefly my intention for this conversation.", timestamp: "00:00:00" },
       { speaker: "A", text: "It is part of a wider research and artistic fieldwork process, looking at how land, movement, and ecology are experienced and understood in this area, especially through walking, farming, and everyday relations with plants, soil, air, and animals – particularly birds.", timestamp: "00:00:11" },
@@ -817,7 +817,8 @@ export default function InterviewsPage() {
         ringing, environmental education, and close observation of seasonal and multispecies 
         change. They describe knowledge formed through returning to particular places, noticing 
         what has altered, and remembering what was present before access was restricted or 
-        habitats were damaged.
+        habitats were damaged. Their work is not only ecological, it is a form of resistance 
+        against erasure, preserving Palestinian heritage, memory, and multispecies life.
       </p>
       <p>
         A separate conversation is with an Israeli ornithologist involved in establishing radar 
