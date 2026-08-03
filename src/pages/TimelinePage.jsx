@@ -1136,9 +1136,9 @@ export default function TimelinePage() {
                   style={{
                     position: "absolute",
                     bottom: "30px",
-                    right: "-66px",
+                    right: "-80px",
                     width: "250px",
-                    maxHeight: "70%",
+                    maxHeight: "80%",
                     overflowY: "auto",
                     ...containerStyle,
                     backgroundColor: "rgba(0, 0, 0, 0)",
