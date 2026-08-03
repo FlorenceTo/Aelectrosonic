@@ -540,7 +540,7 @@ const interviews = [
       { speaker: "B", text: "I'll send you an email after we finish talking, with his email, and you can ask to discuss with him as well, okay?", timestamp: "00:02:09" },
       { speaker: "A", text: "Are you saying to speak with him instead, or also speak with him?", timestamp: "00:02:25" },
       { speaker: "B", text: "No, I can speak with you too. But I did my study, and now I'm 78 years old. I finished my study with the Air Force using radars. Professor Nir Sapir is now leading this – he's following my study. He is using several different kinds of radars. So it would be really more important to talk to him, but I can tell you what I was doing, of course.", timestamp: "00:02:29" },
-      { speaker: "A", text: "Thank you for suggesting him. I'm also really interested in the histories of your work. There is no past without a present, which is why I'm trying to understand more deeply about the histories of these technologies.", timestamp: "00:02:57" },
+      { speaker: "A", text: "Thank you for suggesting him. I'm also interested in the histories of your work. There is no past without a present, which is why I'm trying to understand more deeply about the histories of these technologies.", timestamp: "00:02:57" },
       { speaker: "B", text: "Did I send you some of my papers?", timestamp: "00:03:26" },
       { speaker: "A", text: "You haven't sent me your papers. I think some of your papers are also written in Hebrew", timestamp: "00:03:30" },
       { speaker: "B", text: "Okay, so send me your email, and I will send you several papers about my work, in English.", timestamp: "00:03:39" },
