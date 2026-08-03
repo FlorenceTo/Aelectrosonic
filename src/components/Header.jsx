@@ -336,7 +336,7 @@ export default function Header() {
             font-size: 0.8rem;
             color: inherit;
             cursor: pointer;
-            margin-left: -0.5rem;   /* Shift left to align with main content */
+            margin-left: -0.3rem;   /* Shift left to align with main content */
           }
           .mobile-nav-dropdown option {
             background: #1c1c1b;
