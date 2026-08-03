@@ -4048,7 +4048,7 @@ uniform ${n} ${r} u_${i};
                           <strong>Area:</strong> ${t.area}<br>
                           <strong>Coordinates:</strong> ${t.lat}, ${t.lng}<br>
                           ${t.description}<br>
-                          <a href="${t.source}" target="_blank">Source</a>`)}else S(``)},[m,u]),(0,x.useEffect)(()=>{if(!(!t.current||!e.current))try{let t=[{type:`line`,x0:`1948-05-14`,x1:`1948-05-14`,y0:0,y1:1,yref:`paper`,line:{color:`#9afc97`,width:.7,dash:`dash`}},{type:`line`,x0:`1967-06-05`,x1:`1967-06-05`,y0:0,y1:1,yref:`paper`,line:{color:`#9afc97`,width:.7,dash:`dash`}},{type:`line`,x0:`1995-09-28`,x1:`1995-09-28`,y0:0,y1:1,yref:`paper`,line:{color:`#9afc97`,width:.7,dash:`dash`}},{type:`line`,x0:`2023-10-07`,x1:`2023-10-07`,y0:0,y1:1,yref:`paper`,line:{color:`#9afc97`,width:.7,dash:`dash`}}];if(m){let e=K(m),r=n===`light`?`#2c6e2c`:`#9afc97`;t.push({type:`line`,x0:e,x1:e,y0:0,y1:1,yref:`paper`,line:{color:r,width:.5,dash:`solid`}})}if(N&&F&&j){let e=K(j),r=n===`light`?`#000000`:`#ffffff`;t.push({type:`line`,x0:e,x1:e,y0:0,y1:1,yref:`paper`,line:{color:r,width:.5,dash:`solid`}})}vr.default.relayout(e.current,{shapes:t})}catch{}},[m,j,n,N,F]);let q=e=>{let t=parseInt(e.target.value);h(new Date(t))},J=e=>{M(new Date(parseInt(e.target.value)))},Y=n===`light`?`#2c6e2c`:`#9afc97`,X=n===`light`?`#333333`:`#f0f0f0`,Z={border:`1px solid ${Y}`,backgroundColor:`transparent`,padding:`10px`,borderRadius:`0`},ee={marginTop:`0`,marginLeft:`20px`,width:`71%`};return c?(0,$.jsxs)(`div`,{children:[(0,$.jsx)(On,{}),(0,$.jsxs)(`div`,{className:`container`,style:{color:`red`},children:[`Error: `,c]})]}):(0,$.jsxs)(`div`,{children:[(0,$.jsx)(On,{}),(0,$.jsxs)(`div`,{className:`container`,style:{maxWidth:`1400px`,margin:`0 auto`,padding:`1rem`},children:[(0,$.jsx)(`style`,{children:`
+                          <a href="${t.source}" target="_blank">Source</a>`)}else S(``)},[m,u]),(0,x.useEffect)(()=>{if(!(!t.current||!e.current))try{let t=[{type:`line`,x0:`1948-05-14`,x1:`1948-05-14`,y0:0,y1:1,yref:`paper`,line:{color:`#9afc97`,width:.7,dash:`dash`}},{type:`line`,x0:`1967-06-05`,x1:`1967-06-05`,y0:0,y1:1,yref:`paper`,line:{color:`#9afc97`,width:.7,dash:`dash`}},{type:`line`,x0:`1995-09-28`,x1:`1995-09-28`,y0:0,y1:1,yref:`paper`,line:{color:`#9afc97`,width:.7,dash:`dash`}},{type:`line`,x0:`2023-10-07`,x1:`2023-10-07`,y0:0,y1:1,yref:`paper`,line:{color:`#9afc97`,width:.7,dash:`dash`}}];if(m){let e=K(m),r=n===`light`?`#2c6e2c`:`#9afc97`;t.push({type:`line`,x0:e,x1:e,y0:0,y1:1,yref:`paper`,line:{color:r,width:.5,dash:`solid`}})}if(N&&F&&j){let e=K(j),r=n===`light`?`#000000`:`#ffffff`;t.push({type:`line`,x0:e,x1:e,y0:0,y1:1,yref:`paper`,line:{color:r,width:.5,dash:`solid`}})}vr.default.relayout(e.current,{shapes:t})}catch{}},[m,j,n,N,F]);let q=e=>{let t=parseInt(e.target.value);h(new Date(t))},J=e=>{M(new Date(parseInt(e.target.value)))},Y=n===`light`?`#2c6e2c`:`#9afc97`,X=n===`light`?`#333333`:`#f0f0f0`,Z={border:`1px solid ${Y}`,backgroundColor:`transparent`,padding:`10px`,borderRadius:`0`,overflowY:`auto`,display:`flex`,alignItems:`flex-start`},ee={marginTop:`0`,marginLeft:`20px`,width:`71%`};return c?(0,$.jsxs)(`div`,{children:[(0,$.jsx)(On,{}),(0,$.jsxs)(`div`,{className:`container`,style:{color:`red`},children:[`Error: `,c]})]}):(0,$.jsxs)(`div`,{children:[(0,$.jsx)(On,{}),(0,$.jsxs)(`div`,{className:`container`,style:{maxWidth:`1400px`,margin:`0 auto`,padding:`1rem`},children:[(0,$.jsx)(`style`,{children:`
           .mobile-legend-container {
             display: none;
           }
@@ -4066,6 +4066,7 @@ uniform ${n} ${r} u_${i};
             .timeline-left-col > div:last-child {
               width: 100% !important;
               margin-top: 0.5rem !important;
+              height: 120px !important; /* ★ fixed height on mobile ★ */
             }
 
             .timeline-middle-col {
@@ -4074,7 +4075,7 @@ uniform ${n} ${r} u_${i};
               width: 100% !important;
             }
 
-            /* Plot: shrink to fit, increase height, remove all margins */
+            /* Plot: shrink to fit, increase height */
             .plot-wrapper {
               overflow-x: auto !important;
               margin-bottom: 0 !important;
@@ -4086,7 +4087,7 @@ uniform ${n} ${r} u_${i};
               margin-bottom: 0 !important;
             }
 
-            /* Sliders: full width, keep original top margins */
+            /* Sliders: full width, remove top margin */
             .slider-container {
               width: 100% !important;
               margin-left: 0 !important;
