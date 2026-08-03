@@ -474,7 +474,7 @@ export default function TimelinePage() {
                 itemdoubleclick: false,
               },
               // ★ REDUCED BOTTOM MARGIN ON MOBILE ★
-              margin: { l: isMobile ? 0 : 20, r: isMobile ? 10 : 80, t: 10, b: isMobile ? 10 : 50 },
+              margin: { l: isMobile ? 0 : 20, r: isMobile ? 10 : 80, t: 10, b: isMobile ? 0 : 50 },
               hoverlabel: { bgcolor: theme === "light" ? "rgba(220,220,220,0.7)" : "rgba(30,30,30,0.7)", bordercolor: "#9afc97", font: { size: 10 }, align: "left", namelength: -1 },
               shapes: fixedShapes,
               annotations: [
