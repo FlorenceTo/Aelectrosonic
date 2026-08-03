@@ -611,6 +611,7 @@ export default function TimelinePage() {
       <Header />
       <div className="container" style={{ maxWidth: "1400px", margin: "0 auto", padding: "1rem" }}>
         <style>{`
+          /* Hide mobile legend on desktop */
           .mobile-legend-container {
             display: none;
           }
@@ -630,73 +631,53 @@ export default function TimelinePage() {
               margin-top: 0.5rem !important;
             }
 
+            /* Middle column: flex column with ordering */
             .timeline-middle-col {
               flex: 1 1 100% !important;
               min-width: 0 !important;
               width: 100% !important;
+              display: flex !important;
+              flex-direction: column !important;
             }
 
-            /* Plot: shrink to fit, increase height */
-            .plot-wrapper {
-              overflow-x: auto !important;
+            /* Slider containers: order 1, plot: order 2, legend: order 3 */
+            .slider-container {
+              order: 1;
+              width: 100% !important;
+              margin-left: 0 !important;
             }
+            .plot-wrapper {
+              order: 2;
+              width: 100%;
+              overflow-x: auto;
+            }
+            .mobile-legend-container {
+              order: 3;
+              display: block !important;
+              width: 100%;
+              border: 1px solid ${borderColor};
+              padding: 0.3rem 0.5rem;
+              background: rgba(0, 0, 0, 0.3);
+              margin-top: 0.5rem;
+            }
+            body.light-bg .mobile-legend-container {
+              background: rgba(255, 255, 255, 0.8);
+            }
+
+            /* Plot: shrink to fit, increase height, keep margin */
             .plot-wrapper > div {
               min-width: 0 !important;
               width: 100% !important;
               height: 600px !important;
-              /* keep original margin-bottom (0.5rem) */
+              margin-bottom: 0.5rem !important;
             }
 
-            /* Sliders: full width, keep original top margins */
-            .slider-container {
-              width: 100% !important;
-              margin-left: 0 !important;
-            }
-
-            /* Mobile legend */
-            .mobile-legend-container {
-              display: block;
-              margin-bottom: 0.5rem;
-              width: 100%;
-            }
-            .mobile-legend-details {
-              border: 1px solid ${borderColor};
-              padding: 0.3rem 0.5rem;
-              background: rgba(0, 0, 0, 0.3);
-              cursor: pointer;
-              font-family: monospace;
-              font-size: 0.8rem;
-            }
-            body.light-bg .mobile-legend-details {
-              background: rgba(255, 255, 255, 0.8);
-            }
-            .mobile-legend-summary {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              list-style: none;
-              user-select: none;
-            }
-            .mobile-legend-summary::-webkit-details-marker {
-              display: none;
-            }
-            .legend-arrow {
-              transition: transform 0.2s ease;
-              font-size: 0.7rem;
-            }
-            .mobile-legend-details[open] .legend-arrow {
-              transform: rotate(180deg);
-            }
+            /* Mobile legend items (no dropdown) */
             .mobile-legend-items {
               display: flex;
               flex-wrap: wrap;
               gap: 0.3rem 0.8rem;
-              padding: 0.5rem 0 0.2rem 0;
-              border-top: 1px solid rgba(154, 252, 151, 0.2);
-              margin-top: 0.3rem;
-            }
-            body.light-bg .mobile-legend-items {
-              border-top-color: rgba(44, 110, 44, 0.2);
+              padding: 0.2rem 0;
             }
             .legend-item {
               display: flex;
@@ -723,6 +704,27 @@ export default function TimelinePage() {
             /* Hide Plotly legend on mobile */
             .plot-wrapper .legend {
               display: none !important;
+            }
+
+            /* Radar info panel: inline */
+            .radar-info-panel-inline {
+              width: 100% !important;
+              max-height: 180px !important;
+              height: 180px !important;
+              margin-top: 0.5rem !important;
+              margin-bottom: 0.5rem !important;
+              position: relative !important;
+              bottom: auto !important;
+              right: auto !important;
+              overflow-y: auto !important;
+              order: 2; /* keep it between sliders and plot if needed, or adjust */
+            }
+            /* Adjust radar slider top margin */
+            .radar-slider {
+              margin-top: 0.8rem !important;
+            }
+            .osm-container {
+              margin-top: 0.8rem !important;
             }
           }
 
@@ -804,34 +806,8 @@ export default function TimelinePage() {
             </div>
           </div>
 
-          {/* MIDDLE COLUMN: Plot + sliders + radar overlay + OSM overlay controls */}
+          {/* MIDDLE COLUMN: Sliders + radar info + plot + legend (mobile order via flex) */}
           <div className="timeline-middle-col" style={{ flex: "1", minWidth: "400px", position: "relative" }}>
-            {/* Mobile legend */}
-            <div className="mobile-legend-container">
-              <details className="mobile-legend-details">
-                <summary className="mobile-legend-summary">
-                  <span>Timeline Legend</span>
-                  <span className="legend-arrow">▾</span>
-                </summary>
-                <div className="mobile-legend-items">
-                  {orderedThemes.map((themeName) => (
-                    <div key={themeName} className="legend-item">
-                      <span 
-                        className="legend-color-swatch" 
-                        style={{ backgroundColor: getMarkerColor(themeName) }}
-                      />
-                      <span className="legend-label">{themeName}</span>
-                    </div>
-                  ))}
-                </div>
-              </details>
-            </div>
-
-            {/* Plot wrapper with class */}
-            <div className="plot-wrapper" style={{ width: "100%", overflowX: "auto" }}>
-              <div ref={plotRef} style={{ minWidth: "800px", height: "500px", marginBottom: "0.5rem" }} />
-            </div>
-
             {/* Timeline slider */}
             <div className="slider-container" style={sliderContainerStyle}>
               <div className="timeline-slider-label" style={{ marginBottom: "0.4rem", marginTop: "-1.20rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
@@ -872,8 +848,8 @@ export default function TimelinePage() {
               </div>
             )}
 
-            {/* OSM raster overlay controls – placed under radar slider */}
-            <div className="slider-container" style={{ ...sliderContainerStyle, marginTop: "0.5rem" }}>
+            {/* OSM raster overlay controls */}
+            <div className="slider-container osm-container" style={{ ...sliderContainerStyle, marginTop: "0.5rem" }}>
               <label style={{ fontFamily: "monospace", fontSize: "0.8rem", fontWeight: "normal", display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.2rem" }}>
                 <input
                   type="checkbox"
@@ -904,26 +880,46 @@ export default function TimelinePage() {
               )}
             </div>
 
-            {/* Radar info overlay */}
+            {/* Radar info panel */}
             {radarInfo && (
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: "30px",
-                  right: "-66px",
-                  width: "280px",
-                  maxHeight: "70%",
-                  overflowY: "auto",
-                  ...containerStyle,
-                  backgroundColor: "rgba(0, 0, 0, 0)",
-                  backdropFilter: "blur(4px)",
-                  zIndex: 1000,
-                  boxShadow: "0 2px 10px rgba(0, 0, 0, 0)",
-                }}
-              >
+              <div className="radar-info-panel-inline" style={{
+                width: "280px",
+                maxHeight: "70%",
+                overflowY: "auto",
+                ...containerStyle,
+                backgroundColor: "rgba(0, 0, 0, 0.85)",
+                backdropFilter: "blur(4px)",
+                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.3)",
+                marginTop: "0.5rem",
+                marginBottom: "0.5rem",
+                fontSize: "0.8rem",
+                position: "relative",
+                bottom: "auto",
+                right: "auto",
+              }}>
                 <div dangerouslySetInnerHTML={{ __html: radarInfo }} />
               </div>
             )}
+
+            {/* Plot container */}
+            <div className="plot-wrapper" style={{ width: "100%", overflowX: "auto" }}>
+              <div ref={plotRef} style={{ minWidth: "800px", height: "500px", marginBottom: "0.5rem" }} />
+            </div>
+
+            {/* Mobile legend – simple fixed box without title, placed below plot */}
+            <div className="mobile-legend-container">
+              <div className="mobile-legend-items">
+                {orderedThemes.map((themeName) => (
+                  <div key={themeName} className="legend-item">
+                    <span 
+                      className="legend-color-swatch" 
+                      style={{ backgroundColor: getMarkerColor(themeName) }}
+                    />
+                    <span className="legend-label">{themeName}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
