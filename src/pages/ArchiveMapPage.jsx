@@ -348,9 +348,7 @@ export default function ArchiveMapPage() {
                 yellow/white = strong. The <strong>vertical axis</strong> shows frequency
                 (higher frequencies at the top), the <strong>horizontal axis</strong> is time.
               </p>
-              <h4>Waveform</h4>
-              <p>The waveform shows amplitude (loudness) over time. Taller peaks = louder sounds.</p>
-              <h4>Controls</h4>
+              <p><strong>Waveform</strong>shows amplitude (loudness) over time. Taller peaks = louder sounds.</p>
               <p>
                 <strong>Dynamic range</strong> adjusts contrast – higher values reveal quieter details.
                 <strong>Fill width</strong> crops empty high frequencies to use the full width.
