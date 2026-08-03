@@ -73,13 +73,13 @@ export default function InterferencePage() {
             >
               <h3 style={{ marginTop: 0, marginBottom: "0.8rem" }}>Interference as an investigative condition</h3>
               <p>
-                This terrain is built from raw GPS tracking data recorded from a single Griffon Vulture moving across the Negev Desert near the Dead Sea. The dataset remains unfiltered, preserving moments where the positional signal collapses or disappears.
+                This terrain is generated from raw GPS tracking data recorded from a single Griffon Vulture moving across the Negev Desert and the area surrounding the Dead Sea. The data remains unfiltered, retaining the moments when the tracking system failed to produce a valid position or the signal disappeared from the record.
               </p>
               <p>
-                Rather than treating these disruptions as technical errors, the project reads them as traces of the surrounding electromagnetic environment. The signal losses repeatedly cluster in specific geographic locations associated with military radar infrastructures operating within the region.
+                Rather than removing these interruptions as technical errors, the visualisation keeps them present as part of the conditions through which the bird’s movement became knowable. Some of the anomalies appear repeatedly within particular geographic areas, including locations near military and radar infrastructures. Their proximity does not establish a direct cause, but it raises questions about the electromagnetic conditions surrounding the tracking system and the moments when its relation to the bird, satellite and ground infrastructure broke down.
               </p>
               <p>
-                The terrain visualises these interference events spatially. Elevation represents the density of signal disruption, while colour fields indicate surrounding radar frequency bands, including UHF and X-band transmissions.
+                The terrain gives these interruptions a spatial form. Elevation represents the density of anomalous or missing positions: higher peaks indicate locations where disruption occurred more frequently. The GPS route and its interruptions are plotted directly, allowing the clustering of these events to be examined without turning them into evidence of a single explanation.
               </p>
               <p style={{ fontSize: "0.85rem", opacity: 0.7 }}>
                 Interaction: drag to rotate, scroll to zoom, right‑click to pan.
