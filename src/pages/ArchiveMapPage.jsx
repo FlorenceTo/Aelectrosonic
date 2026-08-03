@@ -317,7 +317,6 @@ export default function ArchiveMapPage() {
         {/* RIGHT: SOUND LIST WITH SPECTROGRAMS */}
         <div className="archive-list-side">
           <h2 className="no-underline">Sonic Dispossession</h2>
-
           <p>
             The selected recordings were made during fieldwork in Palestine, mainly using directional microphones and electromagnetic recorders. The directional microphone brought distant sounds closer without necessarily revealing their source, while the electromagnetic recorder translated signals from electrical and communications infrastructure into audible material. Birds, aircraft, wind, transmission towers and interrupted signals entered the recordings through different forms of attention.
           </p>
