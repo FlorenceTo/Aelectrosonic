@@ -60,7 +60,7 @@ export default function ArchiveMapPage() {
   const cardRefs = useRef({});
 
   // Map tile selection state
-  const [tileType, setTileType] = useState("carto");
+  const [tileType, setTileType] = useState("arcgis");
 
   // Help panel visibility
   const [helpVisible, setHelpVisible] = useState(false);
@@ -253,6 +253,7 @@ export default function ArchiveMapPage() {
             style={{ height: "100%", width: "100%" }}
             zoomControl={true}
             scrollWheelZoom={true}
+            attributionControl={false}
           >
             {tileType === "carto" ? (
               <TileLayer
@@ -316,7 +317,18 @@ export default function ArchiveMapPage() {
         {/* RIGHT: SOUND LIST WITH SPECTROGRAMS */}
         <div className="archive-list-side">
           <h2 className="no-underline">Sonic Dispossession</h2>
-          <p>Spectrograms show frequency, vibration, and energy over time. Click any marker or card to focus location.</p>
+
+          <p>
+            The selected recordings were made during fieldwork in Palestine, mainly using directional microphones and electromagnetic recorders. The directional microphone brought distant sounds closer without necessarily revealing their source, while the electromagnetic recorder translated signals from electrical and communications infrastructure into audible material. Birds, aircraft, wind, transmission towers and interrupted signals entered the recordings through different forms of attention.
+          </p>
+
+          <p>
+            The recordings do not provide a complete account of each location. They register what the instruments were able to detect at a particular moment, alongside what remained distant, obscured or outside their range. Sonic dispossession refers here to the ways sound, signal and movement are altered by occupation, restricted access and the infrastructures organising the air and land.
+          </p>
+
+          <p>
+            The spectrograms show changes in frequency and energy over time. Click any marker or card to move between locations and recordings.
+          </p>
 
           <button className="help-toggle-btn" onClick={() => setHelpVisible(!helpVisible)}>
             How to read spectrograms
@@ -651,9 +663,6 @@ export default function ArchiveMapPage() {
         }
         :global(.light-bg) .field-notes-panel {
           background: rgba(255, 255, 255, 0.7);
-        }
-        :global(.leaflet-control-attribution) {
-          display: none !important;
         }
         :global(.leaflet-popup-content-wrapper) {
           border-radius: 0 !important;
