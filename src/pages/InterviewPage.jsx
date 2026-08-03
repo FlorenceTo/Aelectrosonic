@@ -48,7 +48,7 @@ const interviews = [
   {
     id: 1,
     title: "Interviewee: B",
-    meta: "Founder and director of a biodiversity and sustainability institute",
+    meta: "Founder and director of a Biodiversity and Sustainability Institute",
     date: "Recorded in Bethlehem, 2026",
     transcript: [
       { speaker: "A", text: "Thank you very much for taking the time to meet with me in person.", timestamp: "00:00:00,000 → 00:00:05,000" },
@@ -348,7 +348,7 @@ const interviews = [
   {
     id: 2,
     title: "Interviewee: C",
-    meta: "Co‑founder and executive director of Nature Palestine Society",
+    meta: "Co‑founder and Executive Director of Nature Palestine Society",
     date: "Recorded in Ramallah, 2026",
     transcript: [
       { speaker: "A", text: "Can you please introduce yourself, your position, and where you’re from?", timestamp: "00:00:00" },
@@ -626,7 +626,7 @@ const interviews = [
   {
     id: 5,
     title: "Interviewee: F",
-    meta: "Architect, researcher, and community educator",
+    meta: "Architect, Researcher, and Community Educator",
     date: "Recorded in Ein Qiniya, 2026",
     transcript: [
       { speaker: "A", text: "I want to explain briefly my intention for this conversation.", timestamp: "00:00:00" },

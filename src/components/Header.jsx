@@ -324,7 +324,7 @@ export default function Header() {
         )}
       </div>
 
-      {/* Additional styles for mobile dropdown – placed inside component so it's scoped */}
+      {/* Additional styles for mobile dropdown – alignment fix */}
       <style>{`
         @media (max-width: 768px) {
           .mobile-nav-dropdown {
@@ -336,7 +336,7 @@ export default function Header() {
             font-size: 0.8rem;
             color: inherit;
             cursor: pointer;
-            margin-left: 0;
+            margin-left: -0.5rem;   /* Shift left to align with main content */
           }
           .mobile-nav-dropdown option {
             background: #1c1c1b;
