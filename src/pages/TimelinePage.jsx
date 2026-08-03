@@ -473,7 +473,6 @@ export default function TimelinePage() {
                 itemclick: false,
                 itemdoubleclick: false,
               },
-              // ★ REDUCED BOTTOM MARGIN ON MOBILE ★
               margin: { l: isMobile ? 0 : 20, r: isMobile ? 10 : 80, t: 10, b: isMobile ? 0 : 50 },
               hoverlabel: { bgcolor: theme === "light" ? "rgba(220,220,220,0.7)" : "rgba(30,30,30,0.7)", bordercolor: "#9afc97", font: { size: 10 }, align: "left", namelength: -1 },
               shapes: fixedShapes,
@@ -593,12 +592,18 @@ export default function TimelinePage() {
 
   const borderColor = theme === "light" ? "#2c6e2c" : "#9afc97";
   const textColor = theme === "light" ? "#333333" : "#f0f0f0";
+  
+  // ★ Desktop info box: auto‑expand (no fixed height) ★
   const containerStyle = {
     border: `1px solid ${borderColor}`,
     backgroundColor: "transparent",
     padding: "10px",
     borderRadius: "0",
+    overflowY: "auto",
+    display: "flex",
+    alignItems: "flex-start",
   };
+  
   const sliderContainerStyle = {
     marginTop: "0",
     marginLeft: "20px",
@@ -629,6 +634,7 @@ export default function TimelinePage() {
             .timeline-left-col > div:last-child {
               width: 100% !important;
               margin-top: 0.5rem !important;
+              height: 120px !important; /* ★ fixed height on mobile ★ */
             }
 
             .timeline-middle-col {
@@ -637,7 +643,7 @@ export default function TimelinePage() {
               width: 100% !important;
             }
 
-            /* Plot: shrink to fit, increase height, remove all margins */
+            /* Plot: shrink to fit, increase height */
             .plot-wrapper {
               overflow-x: auto !important;
               margin-bottom: 0 !important;
@@ -649,7 +655,7 @@ export default function TimelinePage() {
               margin-bottom: 0 !important;
             }
 
-            /* Sliders: full width, keep original top margins */
+            /* Sliders: full width, remove top margin */
             .slider-container {
               width: 100% !important;
               margin-left: 0 !important;
