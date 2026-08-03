@@ -636,7 +636,7 @@ export default function TimelinePage() {
               width: 100% !important;
             }
 
-            /* Plot: shrink to fit, increase height */
+            /* Plot: shrink to fit, increase height, remove bottom margin */
             .plot-wrapper {
               overflow-x: auto !important;
             }
@@ -644,13 +644,23 @@ export default function TimelinePage() {
               min-width: 0 !important;
               width: 100% !important;
               height: 600px !important;
-              /* keep original margin-bottom (0.5rem) */
+              margin-bottom: 0 !important;
             }
 
-            /* Sliders: full width, keep original top margins */
+            /* Sliders: full width */
             .slider-container {
               width: 100% !important;
               margin-left: 0 !important;
+            }
+
+            /* Pull the timeline slider label up to close the gap */
+            .timeline-slider-label {
+              margin-top: -1.8rem !important;
+            }
+
+            /* Keep original spacing between sliders */
+            .radar-slider {
+              margin-top: 0.8rem !important;
             }
 
             /* Mobile legend */
