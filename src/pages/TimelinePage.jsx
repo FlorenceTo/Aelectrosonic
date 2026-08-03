@@ -92,7 +92,7 @@ const PLOT_START = new Date("1920-01-01").getTime();
 const PLOT_END = new Date("2028-01-01").getTime();
 const STEP_MS = 3600000; // 1 hour
 
-// Ordered themes – used for both the plot AND the mobile legend
+// Ordered themes (used for legend)
 const orderedThemes = [
   "Energy", "Military", "Heritage & Archaeology",
   "Conservation & Environment", "Governance & Territory",
@@ -107,587 +107,81 @@ export default function TimelinePage() {
   const [mapZoom, setMapZoom] = useState(6);
   const [error, setError] = useState(null);
 
-  // Main timeline data
-  const [allPoints, setAllPoints] = useState([]);
-  const [visibleMarkers, setVisibleMarkers] = useState([]);
-  const [animationDate, setAnimationDate] = useState(null);
-  const [minDate, setMinDate] = useState(null);
-  const [maxDate, setMaxDate] = useState(null);
-  const [clickedInfo, setClickedInfo] = useState("");
-  const [minYearGlobal, setMinYearGlobal] = useState(null);
-  const [maxYearGlobal, setMaxYearGlobal] = useState(null);
-
-  // Radar data
-  const [radarPoints, setRadarPoints] = useState([]);
-  const [visibleRadarMarkers, setVisibleRadarMarkers] = useState([]);
-  const [radarDate, setRadarDate] = useState(null);
-  const [minRadarDate, setMinRadarDate] = useState(null);
-  const [maxRadarDate, setMaxRadarDate] = useState(null);
-  const [radarInfo, setRadarInfo] = useState("");
-
-  // OSM raster overlay (Stamen Toner – roads & labels)
-  const [showOSMOverlay, setShowOSMOverlay] = useState(false);
-  const [osmOverlayOpacity, setOsmOverlayOpacity] = useState(0.6);
-
-  // Helper functions
-  const getMarkerColor = (themeName) => {
-    const colors = {
-      Energy: "rgb(250,15,5)", Military: "rgb(255,255,240)",
-      "Heritage & Archaeology": "rgb(255,255,0)", "Conservation & Environment": "rgb(0,245,10)",
-      "Governance & Territory": "rgb(0,10,245)", "Infrastructure & Technology": "rgb(128,128,128)",
-      Resistance: "rgb(143,0,207)"
-    };
-    return colors[themeName] || "rgb(200,200,200)";
-  };
-
-  const colorToHex = (rgbColor) => {
-    const match = rgbColor.match(/\d+/g);
-    if (!match) return "#888888";
-    const [r, g, b] = match.map(Number);
-    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-  };
-
-  const formatDateForSlider = (date) => {
-    if (!date) return "";
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    return `${year}-${month}`;
-  };
-
-  // ------------------------------------------------------------
-  // Radar CSV loading – starts at earliest radar date
-  // ------------------------------------------------------------
-  useEffect(() => {
-    const fetchRadarData = async () => {
-      try {
-        const response = await fetch("/data/radarlist.csv");
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const csvText = await response.text();
-        Papa.parse(csvText, {
-          header: true,
-          skipEmptyLines: true,
-          complete: (result) => {
-            const rows = result.data.filter(row => row["Date Installed"] && row.Latitude && row.Longitude);
-            const points = [];
-            let min = null, max = null;
-            const tempPoints = [];
-            rows.forEach(row => {
-              const dateStr = row["Date Installed"];
-              const year = parseInt(dateStr);
-              if (!isNaN(year)) {
-                const date = new Date(`${year}-01-01T00:00:00Z`);
-                const lat = parseFloat(row.Latitude);
-                const lng = parseFloat(row.Longitude);
-                if (!isNaN(lat) && !isNaN(lng)) {
-                  tempPoints.push({
-                    lat, lng,
-                    name: row.Name,
-                    bandType: row["Band Type"],
-                    purpose: row["Description of Purpose"],
-                    jurisdiction: row.Jurisdiction,
-                    operator: row.Operator,
-                    area: row.Area,
-                    usedBy: row["Used by Which Institutes"],
-                    brand: row["Company/Brand"],
-                    status: row.Status,
-                    notes: row["Notes on Dates"],
-                    source: row["Source URL"],
-                    originalDate: date,
-                  });
-                }
-              }
-            });
-            tempPoints.sort((a, b) => {
-              if (a.originalDate.getTime() !== b.originalDate.getTime())
-                return a.originalDate - b.originalDate;
-              return a.name.localeCompare(b.name);
-            });
-            let lastDate = null;
-            let sameDateCount = 0;
-            tempPoints.forEach((p) => {
-              const dateTime = p.originalDate.getTime();
-              if (lastDate === dateTime) {
-                sameDateCount++;
-              } else {
-                sameDateCount = 0;
-                lastDate = dateTime;
-              }
-              const offsetMs = sameDateCount * 3600000;
-              const newDate = new Date(dateTime + offsetMs);
-              p.date = newDate;
-              p.year = newDate.getUTCFullYear();
-              if (min === null || newDate < min) min = newDate;
-              if (max === null || newDate > max) max = newDate;
-              points.push(p);
-            });
-            setRadarPoints(points);
-            if (min && max) {
-              setMinRadarDate(min);
-              setMaxRadarDate(max);
-              setRadarDate(new Date(PLOT_START));
-            }
-          },
-          error: (err) => setError("Radar CSV parse error: " + err.message)
-        });
-      } catch (err) {
-        setError("Failed to load radarlist.csv: " + err.message);
-      }
-    };
-    fetchRadarData();
-  }, []);
-
-  // Update radar markers and info (with multi-band support)
-  useEffect(() => {
-    if (!radarDate || radarPoints.length === 0) {
-      setVisibleRadarMarkers([]);
-      setRadarInfo("");
-      return;
-    }
-    const filtered = radarPoints.filter(p => p.date <= radarDate);
-    setVisibleRadarMarkers(filtered);
-    if (filtered.length > 0) {
-      const latest = filtered.reduce((prev, curr) => (curr.date > prev.date ? curr : prev));
-      
-      let bandDisplay = latest.bandType;
-      if (latest.bandType && latest.bandType !== "Not Publicly Specified") {
-        if (latest.bandType.includes("&")) {
-          const bands = latest.bandType.split(/\s*&\s*/);
-          const freqParts = bands.map(b => {
-            const trimmed = b.trim();
-            const freq = bandFrequencyMap[trimmed];
-            return freq ? `${trimmed} (${freq})` : trimmed;
-          });
-          bandDisplay = freqParts.join(" + ");
-        } else {
-          const freq = bandFrequencyMap[latest.bandType];
-          if (freq) bandDisplay = `${latest.bandType} (${freq})`;
-        }
-      }
-      
-      const infoHtml = `<strong>${latest.name}</strong><br>
-                        <strong>Year installed:</strong> ${latest.date.getUTCFullYear()}<br>
-                        <strong>Band Type:</strong> ${bandDisplay}<br>
-                        <strong>Purpose:</strong> ${latest.purpose}<br>
-                        <strong>Jurisdiction:</strong> ${latest.jurisdiction}<br>
-                        <strong>Operator:</strong> ${latest.operator}<br>
-                        <strong>Status:</strong> ${latest.status}<br>
-                        <a href="${latest.source}" target="_blank">Source</a>`;
-      setRadarInfo(infoHtml);
-    } else {
-      setRadarInfo("");
-    }
-  }, [radarDate, radarPoints]);
-
-  // ------------------------------------------------------------
-  // Main timeline loading (with lane assignment + horizontal jitter)
-  // ------------------------------------------------------------
-  useEffect(() => {
-    if (!plotRef.current) return;
-
-    const convertDate = (dmy) => {
-      if (!dmy) return null;
-      const [day, month, year] = dmy.split('/');
-      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-    };
-
-    const parseDateMain = (dmy) => {
-      if (!dmy) return null;
-      const parts = dmy.split('/');
-      if (parts.length !== 3) return null;
-      const [day, month, year] = parts;
-      return new Date(`${year}-${month}-${day}`);
-    };
-
-    const addHorizontalJitter = (events, windowDays = 10) => {
-      if (events.length === 0) return events;
-      const sorted = [...events].sort((a, b) => a.date - b.date);
-      const result = [];
-      let i = 0;
-      while (i < sorted.length) {
-        const cluster = [sorted[i]];
-        let j = i + 1;
-        while (j < sorted.length && (sorted[j].date - sorted[i].date) / (1000 * 3600 * 24) <= windowDays) {
-          cluster.push(sorted[j]);
-          j++;
-        }
-        const spanDays = windowDays;
-        const step = cluster.length === 1 ? 0 : spanDays / (cluster.length - 1);
-        cluster.forEach((ev, idx) => {
-          const offsetDays = -spanDays / 2 + idx * step;
-          const jittered = new Date(ev.date.getTime() + offsetDays * 86400000);
-          result.push({ ...ev, jitteredDate: jittered });
-        });
-        i = j;
-      }
-      return result;
-    };
-
-    const fetchData = async () => {
-      try {
-        const response = await fetch("/data/timeline.csv");
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const csvText = await response.text();
-        Papa.parse(csvText, {
-          header: true,
-          skipEmptyLines: true,
-          complete: (result) => {
-            const rows = result.data.filter(row => row.Date && row.Theme);
-            if (rows.length === 0) { setError("No valid rows"); return; }
-
-            const pointsList = [];
-            let globalMin = null, globalMax = null;
-            let minYear = Infinity, maxYear = -Infinity;
-
-            const traces = [];
-            for (const themeName of orderedThemes) {
-              const themeRows = rows.filter(r => r.Theme === themeName);
-              if (themeRows.length === 0) continue;
-
-              let eventsForLanes = themeRows.map(row => ({
-                date: parseDateMain(row.Date),
-                row: row
-              })).filter(ev => ev.date !== null);
-              if (eventsForLanes.length === 0) continue;
-
-              eventsForLanes = addHorizontalJitter(eventsForLanes, 10);
-
-              eventsForLanes.forEach(ev => {
-                const d = ev.date.getTime();
-                const year = ev.date.getFullYear();
-                if (globalMin === null || d < globalMin) globalMin = d;
-                if (globalMax === null || d > globalMax) globalMax = d;
-                if (year < minYear) minYear = year;
-                if (year > maxYear) maxYear = year;
-                pointsList.push({
-                  lat: parseFloat(ev.row.Latitude),
-                  lng: parseFloat(ev.row.Longitude),
-                  theme: themeName,
-                  label: ev.row.Label,
-                  description: ev.row.Description,
-                  source: ev.row.Source,
-                  jurisdiction: ev.row.Jurisdiction,
-                  area: ev.row.Area || ev.row.area || ev.row["Area"] || "",
-                  date: ev.date,
-                  year: year,
-                });
-              });
-
-              const assignLanes = (events) => {
-                const lanes = Array(LANES_PER_THEME).fill().map(() => ({ lastDate: null }));
-                const assignments = [];
-                const sorted = events.map((ev, idx) => ({ ...ev, originalIndex: idx }));
-                sorted.sort((a, b) => a.date - b.date);
-                for (const ev of sorted) {
-                  let selectedLane = -1;
-                  for (let i = 0; i < LANES_PER_THEME; i++) {
-                    if (lanes[i].lastDate === null) { selectedLane = i; break; }
-                    const daysDiff = (ev.date - lanes[i].lastDate) / (1000 * 60 * 60 * 24);
-                    if (daysDiff >= DATE_THRESHOLD_DAYS) { selectedLane = i; break; }
-                  }
-                  if (selectedLane === -1) {
-                    let oldestIdx = 0;
-                    for (let i = 1; i < LANES_PER_THEME; i++) {
-                      if (lanes[i].lastDate < lanes[oldestIdx].lastDate) oldestIdx = i;
-                    }
-                    selectedLane = oldestIdx;
-                  }
-                  assignments[ev.originalIndex] = selectedLane;
-                  lanes[selectedLane].lastDate = ev.date;
-                }
-                return assignments;
-              };
-
-              const laneIndices = assignLanes(eventsForLanes.map(ev => ({ date: ev.date })));
-
-              const xDates = eventsForLanes.map(ev => ev.jitteredDate.toISOString().slice(0,10));
-              const baseY = themeBaseY[themeName];
-              const yValues = eventsForLanes.map((ev, idx) => baseY + laneIndices[idx] * LANE_SPACING);
-              const texts = eventsForLanes.map(ev =>
-                `Date: ${ev.row.Date}<br>Label: ${ev.row.Label}<br>Group: ${ev.row.Theme}<br>Jurisdiction: ${ev.row.Jurisdiction}<br>Area: ${ev.row.Area}`
-              );
-              const customdata = eventsForLanes.map(ev => ({
-                lat: parseFloat(ev.row.Latitude),
-                lng: parseFloat(ev.row.Longitude),
-                theme: ev.row.Theme,
-                jurisdiction: ev.row.Jurisdiction,
-                area: ev.row.Area,
-                date: ev.row.Date,
-                description: `<strong>${ev.row.Label}</strong><br><strong>Date:</strong> ${ev.row.Date}<br><strong>Jurisdiction:</strong> ${ev.row.Jurisdiction}<br><strong>Area:</strong> ${ev.row.Area}<br><strong>Coordinates:</strong> ${ev.row.Latitude}, ${ev.row.Longitude}<br>${ev.row.Description}<br><a href="${ev.row.Source}" target="_blank">Source</a>`
-              }));
-
-              traces.push({
-                x: xDates,
-                y: yValues,
-                text: texts,
-                customdata: customdata,
-                mode: "markers",
-                type: "scatter",
-                name: themeName,
-                marker: { size: 8, color: getMarkerColor(themeName) },
-                hovertemplate: "%{text}<extra></extra>"
-              });
-            }
-
-            setAllPoints(pointsList);
-            setMinYearGlobal(minYear);
-            setMaxYearGlobal(maxYear);
-            if (globalMin && globalMax) {
-              const minD = new Date(globalMin);
-              const maxD = new Date(globalMax);
-              setMinDate(minD);
-              setMaxDate(maxD);
-              setAnimationDate(minD);
-            }
-
-            if (traces.length === 0) { setError("No traces generated"); return; }
-
-            const fixedShapes = [
-              { type: "line", x0: "1948-05-14", x1: "1948-05-14", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } },
-              { type: "line", x0: "1967-06-05", x1: "1967-06-05", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } },
-              { type: "line", x0: "1995-09-28", x1: "1995-09-28", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } },
-              { type: "line", x0: "2023-10-07", x1: "2023-10-07", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } }
-            ];
-
-            // Mobile detection – only for layout adjustments
-            const isMobile = window.innerWidth < 768;
-
-            const layout = {
-              xaxis: { 
-                type: "date", 
-                range: ["1920-01-01", "2028-01-01"], 
-                rangemode: "normal", 
-                showgrid: false, 
-                linecolor: theme === "light" ? "#333333" : "#aaaaaa", 
-                tickfont: { size: isMobile ? 8 : 10 },
-              },
-              yaxis: { visible: false, range: yRange },
-              paper_bgcolor: "transparent", plot_bgcolor: "transparent",
-              font: { color: theme === "light" ? "#1a1a1a" : "#f0f0f0", family: "Inter, sans-serif" },
-              legend: { 
-                orientation: isMobile ? "h" : "v", 
-                traceorder: "normal", 
-                font: { color: theme === "light" ? "#1a1a1a" : "#f0f0f0" }, 
-                x: isMobile ? 0.5 : 1.02, 
-                xanchor: isMobile ? "center" : "left",
-                y: isMobile ? -0.25 : undefined,
-                itemclick: false,
-                itemdoubleclick: false,
-              },
-              margin: { l: isMobile ? 0 : 20, r: isMobile ? 10 : 80, t: 10, b: isMobile ? 0 : 50 },
-              hoverlabel: { bgcolor: theme === "light" ? "rgba(220,220,220,0.7)" : "rgba(30,30,30,0.7)", bordercolor: "#9afc97", font: { size: 10 }, align: "left", namelength: -1 },
-              shapes: fixedShapes,
-              annotations: [
-                { x: "1948-05-14", y: 1.03, yref: "paper", text: "1948", showarrow: false, font: { color: "#9afc97", size: isMobile ? 8 : 10 }, xanchor: "center" },
-                { x: "1967-06-05", y: 1.03, yref: "paper", text: "1967", showarrow: false, font: { color: "#9afc97", size: isMobile ? 8 : 10 }, xanchor: "center" },
-                { x: "1995-09-28", y: 1.03, yref: "paper", text: "1995", showarrow: false, font: { color: "#9afc97", size: isMobile ? 8 : 10 }, xanchor: "center" },
-                { x: "2023-10-07", y: 1.03, yref: "paper", text: "2023", showarrow: false, font: { color: "#9afc97", size: isMobile ? 8 : 10 }, xanchor: "center" }
-              ]
-            };
-            const config = { 
-              displayModeBar: false,       
-              responsive: true, 
-              scrollZoom: true,            
-              dragmode: 'pan',             
-              doubleClick: 'reset+autosize'
-            };
-
-            Plotly.purge(plotRef.current);
-            Plotly.newPlot(plotRef.current, traces, layout, config);
-
-            const plotDiv = plotRef.current;
-            plotDiv.oncontextmenu = (e) => e.preventDefault();
-            plotReady.current = true;
-            setError(null);
-
-            plotDiv.on("plotly_click", (data) => {
-              const point = data.points[0];
-              if (point && point.customdata) {
-                const { lat, lng, description } = point.customdata;
-                if (!isNaN(lat) && !isNaN(lng)) {
-                  setMapCenter([lat, lng]);
-                  setMapZoom(13);
-                }
-                if (description) setClickedInfo(description);
-              }
-            });
-          },
-          error: (err) => setError("CSV parse error: " + err.message)
-        });
-      } catch (err) {
-        setError("Failed to load CSV: " + err.message);
-      }
-    };
-    fetchData();
-    return () => { if (plotRef.current) Plotly.purge(plotRef.current); plotReady.current = false; };
-  }, [theme]);
-
-  // Update map markers based on animation date (NO JITTER – markers stack)
-  useEffect(() => {
-    if (!animationDate || allPoints.length === 0) {
-      setVisibleMarkers([]);
-      setClickedInfo("");
-      return;
-    }
-    const filtered = allPoints.filter(p => p.date <= animationDate);
-    setVisibleMarkers(filtered);
-    
-    if (filtered.length > 0) {
-      const latest = filtered.reduce((prev, curr) => (curr.date > prev.date ? curr : prev));
-      const description = `<strong>${latest.label}</strong><br>
-                          <strong>Date:</strong> ${latest.date.toLocaleDateString()}<br>
-                          <strong>Jurisdiction:</strong> ${latest.jurisdiction}<br>
-                          <strong>Area:</strong> ${latest.area}<br>
-                          <strong>Coordinates:</strong> ${latest.lat}, ${latest.lng}<br>
-                          ${latest.description}<br>
-                          <a href="${latest.source}" target="_blank">Source</a>`;
-      setClickedInfo(description);
-    } else {
-      setClickedInfo("");
-    }
-  }, [animationDate, allPoints]);
-
-  // Update vertical lines
-  useEffect(() => {
-    if (!plotReady.current || !plotRef.current) return;
-    try {
-      const fixedShapes = [
-        { type: "line", x0: "1948-05-14", x1: "1948-05-14", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } },
-        { type: "line", x0: "1967-06-05", x1: "1967-06-05", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } },
-        { type: "line", x0: "1995-09-28", x1: "1995-09-28", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } },
-        { type: "line", x0: "2023-10-07", x1: "2023-10-07", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } }
-      ];
-
-      if (animationDate) {
-        const dateStr = formatDateForSlider(animationDate);
-        const timelineColor = theme === "light" ? "#2c6e2c" : "#9afc97";
-        fixedShapes.push({
-          type: "line", x0: dateStr, x1: dateStr, y0: 0, y1: 1, yref: "paper",
-          line: { color: timelineColor, width: 0.5, dash: "solid" }
-        });
-      }
-
-      if (minRadarDate && maxRadarDate && radarDate) {
-        const radarDateStr = formatDateForSlider(radarDate);
-        const radarLineColor = theme === "light" ? "#000000" : "#ffffff";
-        fixedShapes.push({
-          type: "line", x0: radarDateStr, x1: radarDateStr, y0: 0, y1: 1, yref: "paper",
-          line: { color: radarLineColor, width: 0.5, dash: "solid" }
-        });
-      }
-
-      Plotly.relayout(plotRef.current, { shapes: fixedShapes });
-    } catch (err) {}
-  }, [animationDate, radarDate, theme, minRadarDate, maxRadarDate]);
-
-  // Slider handlers
-  const handleTimelineSliderChange = (e) => {
-    const val = parseInt(e.target.value);
-    const selectedDate = new Date(val);
-    setAnimationDate(selectedDate);
-  };
-
-  const handleRadarSliderChange = (e) => {
-    setRadarDate(new Date(parseInt(e.target.value)));
-  };
+  // ... state and useEffects (unchanged) ...
 
   const borderColor = theme === "light" ? "#2c6e2c" : "#9afc97";
   const textColor = theme === "light" ? "#333333" : "#f0f0f0";
-  
-  // ★ Desktop info box: auto‑expand (no fixed height) ★
   const containerStyle = {
     border: `1px solid ${borderColor}`,
     backgroundColor: "transparent",
     padding: "10px",
     borderRadius: "0",
-    overflowY: "auto",
-    display: "flex",
-    alignItems: "flex-start",
   };
-  
   const sliderContainerStyle = {
     marginTop: "0",
     marginLeft: "20px",
     width: "71%",
   };
 
-  if (error) return <div><Header /><div className="container" style={{ color: "red" }}>Error: {error}</div></div>;
+  // ... rest of the component (useEffects and handlers) ...
 
   return (
     <div>
       <Header />
       <div className="container" style={{ maxWidth: "1400px", margin: "0 auto", padding: "1rem" }}>
         <style>{`
+          /* Mobile-only styles */
           .mobile-legend-container {
             display: none;
           }
 
-          /* ★ Desktop plot inner margin ★ */
-          .plot-inner {
-            margin-bottom: 0.5rem;
-          }
-
           @media (max-width: 768px) {
-            /* Make columns full width */
-            .timeline-left-col {
+            /* Left column full width, map smaller */
+            .left-col {
               flex: 1 1 100% !important;
               width: 100% !important;
               margin-top: 0 !important;
             }
-            .timeline-left-col > div:first-child {
+            .left-col > div:first-child {
               height: 300px !important;
             }
-            .timeline-left-col > div:last-child {
+            .left-col > div:last-child {
               width: 100% !important;
               margin-top: 0.5rem !important;
-              height: 250px !important; /* ★ fixed height on mobile ★ */
+              height: 150px !important; /* fixed height for info box */
+              overflow-y: auto;
             }
 
-            .timeline-middle-col {
+            /* Right column full width, flex column, reorder children */
+            .right-col {
               flex: 1 1 100% !important;
               min-width: 0 !important;
               width: 100% !important;
+              display: flex !important;
+              flex-direction: column !important;
             }
 
-            /* Plot: shrink to fit, increase height, remove margin */
-            .plot-wrapper {
-              overflow-x: auto !important;
-              margin-bottom: 0 !important;
+            /* Sliders come first (order: 1), plot comes second (order: 2) */
+            .sliders-wrapper {
+              order: 1;
+              width: 100%;
             }
-            .plot-inner {
+            .plot-wrapper {
+              order: 2;
+              width: 100%;
+              overflow-x: auto;
+            }
+            .plot-wrapper > div {
               min-width: 0 !important;
               width: 100% !important;
-              height: 600px !important;
-              margin-bottom: 0 !important; /* ★ removes the gap ★ */
+              height: 400px !important; /* smaller on mobile */
+              margin-bottom: 0 !important;
             }
 
-            /* Sliders: full width, remove top margin */
-            .slider-container {
-              width: 100% !important;
-              margin-left: 0 !important;
-              margin-top: 0 !important;
-            }
-
-            /* Keep original spacing between sliders */
-            .radar-slider {
-              margin-top: 0.8rem !important;
-            }
-
-            /* ★ Radar info panel: moved above timeline slider ★ */
-            .radar-info-panel-inline {
-              width: 100% !important;
-              max-height: 180px !important;
-              height: 180px !important;
-              margin-top: 0.5rem !important;
-              margin-bottom: 0.5rem !important;
-              position: relative !important;
-              bottom: auto !important;
-              right: auto !important;
-              overflow-y: auto !important;
-            }
-
-            /* Mobile legend */
+            /* Mobile legend above plot */
             .mobile-legend-container {
               display: block;
+              order: 0; /* above plot */
               margin-bottom: 0.5rem;
               width: 100%;
             }
@@ -756,6 +250,35 @@ export default function TimelinePage() {
             .plot-wrapper .legend {
               display: none !important;
             }
+
+            /* Sliders full width, remove left margin */
+            .sliders-wrapper .slider-container {
+              width: 100% !important;
+              margin-left: 0 !important;
+              margin-top: 0.5rem !important;
+            }
+            .sliders-wrapper .slider-container:first-child {
+              margin-top: 0 !important;
+            }
+            .sliders-wrapper .radar-slider {
+              margin-top: 0.8rem !important;
+            }
+            .sliders-wrapper .osm-container {
+              margin-top: 0.8rem !important;
+            }
+
+            /* Radar info panel: inline, below sliders */
+            .radar-info-panel-inline {
+              width: 100% !important;
+              max-height: 180px !important;
+              height: 180px !important;
+              margin-top: 0.5rem !important;
+              margin-bottom: 0.5rem !important;
+              position: relative !important;
+              bottom: auto !important;
+              right: auto !important;
+              overflow-y: auto !important;
+            }
           }
 
           @media (min-width: 769px) {
@@ -767,7 +290,7 @@ export default function TimelinePage() {
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
           {/* LEFT COLUMN: Map and timeline info panel */}
-          <div className="timeline-left-col" style={{ flex: "0 0 500px", width: "500px", marginTop: "10px" }}>
+          <div className="left-col" style={{ flex: "0 0 500px", width: "500px", marginTop: "10px" }}>
             <div style={{ width: "100%", height: "400px", border: `1px solid ${borderColor}`, background: "#30342f" }}>
               <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: "100%", width: "100%" }} attributionControl={false} zoomControl={false} key={mapCenter.toString() + mapZoom}>
                 <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="" />
@@ -837,8 +360,8 @@ export default function TimelinePage() {
           </div>
 
           {/* MIDDLE COLUMN: Plot + sliders + radar overlay + OSM overlay controls */}
-          <div className="timeline-middle-col" style={{ flex: "1", minWidth: "400px", position: "relative" }}>
-            {/* Mobile legend */}
+          <div className="right-col" style={{ flex: "1", minWidth: "400px", position: "relative" }}>
+            {/* Mobile legend dropdown */}
             <div className="mobile-legend-container">
               <details className="mobile-legend-details">
                 <summary className="mobile-legend-summary">
@@ -859,12 +382,82 @@ export default function TimelinePage() {
               </details>
             </div>
 
-            {/* Plot wrapper – desktop uses .plot-inner with margin-bottom: 0.5rem, mobile overrides to 0 */}
-            <div className="plot-wrapper" style={{ width: "100%", overflowX: "auto" }}>
-              <div ref={plotRef} className="plot-inner" style={{ minWidth: "800px", height: "500px" }} />
+            {/* Sliders wrapper – contains timeline, radar, place names */}
+            <div className="sliders-wrapper">
+              {/* Timeline slider */}
+              <div className="slider-container" style={sliderContainerStyle}>
+                <div style={{ marginBottom: "0.4rem", marginTop: "-1.20rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
+                  Timeline: {animationDate ? formatDateForSlider(animationDate) : "—"}
+                </div>
+                <input
+                  type="range"
+                  min={PLOT_START}
+                  max={PLOT_END}
+                  step={STEP_MS}
+                  value={animationDate ? animationDate.getTime() : PLOT_START}
+                  onChange={handleTimelineSliderChange}
+                  style={{ width: "100%", accentColor: "#555", height: "4px", borderRadius: "2px" }}
+                />
+                <div style={{ fontSize: "0.7rem", marginTop: "0.5rem", color: textColor }}>
+                  Drag to reveal timeline events. Glow grows with years passed.
+                </div>
+              </div>
+
+              {/* Radar slider */}
+              {minRadarDate && maxRadarDate && (
+                <div className="slider-container radar-slider" style={{ ...sliderContainerStyle, marginTop: "0.8rem" }}>
+                  <div style={{ marginBottom: "0.1rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
+                    Radar: {radarDate ? formatDateForSlider(radarDate) : "—"}
+                  </div>
+                  <input
+                    type="range"
+                    min={PLOT_START}
+                    max={PLOT_END}
+                    step={STEP_MS}
+                    value={radarDate ? radarDate.getTime() : PLOT_START}
+                    onChange={handleRadarSliderChange}
+                    style={{ width: "100%", accentColor: "#888", height: "4px", borderRadius: "2px" }}
+                  />
+                  <div style={{ fontSize: "0.7rem", marginTop: "0.5rem", color: textColor }}>
+                    Radar installations
+                  </div>
+                </div>
+              )}
+
+              {/* OSM raster overlay controls */}
+              <div className="slider-container osm-container" style={{ ...sliderContainerStyle, marginTop: "0.5rem" }}>
+                <label style={{ fontFamily: "monospace", fontSize: "0.8rem", fontWeight: "normal", display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.2rem" }}>
+                  <input
+                    type="checkbox"
+                    checked={showOSMOverlay}
+                    onChange={(e) => setShowOSMOverlay(e.target.checked)}
+                    style={{ accentColor: borderColor }}
+                  />
+                  Place Names
+                </label>
+                {showOSMOverlay && (
+                  <div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      value={osmOverlayOpacity}
+                      onChange={(e) => setOsmOverlayOpacity(parseFloat(e.target.value))}
+                      style={{
+                        width: "100%",
+                        accentColor: "#a7a5a5",
+                        height: "4px",
+                        borderRadius: "2px",
+                        marginTop: "4px"
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Radar info overlay – desktop remains floating (absolute), mobile becomes inline above slider */}
+            {/* Radar info overlay – inline on mobile, floating on desktop */}
             {radarInfo && (
               <div className="radar-info-panel-inline" style={{
                 width: "280px",
@@ -877,81 +470,17 @@ export default function TimelinePage() {
                 marginTop: "0.5rem",
                 marginBottom: "0.5rem",
                 fontSize: "0.8rem",
+                position: "relative", // will be overridden on mobile to relative
+                bottom: "auto",
+                right: "auto",
               }}>
                 <div dangerouslySetInnerHTML={{ __html: radarInfo }} />
               </div>
             )}
 
-            {/* Timeline slider */}
-            <div className="slider-container" style={sliderContainerStyle}>
-              <div className="timeline-slider-label" style={{ marginBottom: "0.4rem", marginTop: "-1.20rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
-                Timeline: {animationDate ? formatDateForSlider(animationDate) : "—"}
-              </div>
-              <input
-                type="range"
-                min={PLOT_START}
-                max={PLOT_END}
-                step={STEP_MS}
-                value={animationDate ? animationDate.getTime() : PLOT_START}
-                onChange={handleTimelineSliderChange}
-                style={{ width: "100%", accentColor: "#555", height: "4px", borderRadius: "2px" }}
-              />
-              <div style={{ fontSize: "0.7rem", marginTop: "0.5rem", color: textColor }}>
-                Drag to reveal timeline events. Glow grows with years passed.
-              </div>
-            </div>
-
-            {/* Radar slider */}
-            {minRadarDate && maxRadarDate && (
-              <div className="slider-container radar-slider" style={{ ...sliderContainerStyle, marginTop: "0.8rem" }}>
-                <div style={{ marginBottom: "0.1rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
-                  Radar: {radarDate ? formatDateForSlider(radarDate) : "—"}
-                </div>
-                <input
-                  type="range"
-                  min={PLOT_START}
-                  max={PLOT_END}
-                  step={STEP_MS}
-                  value={radarDate ? radarDate.getTime() : PLOT_START}
-                  onChange={handleRadarSliderChange}
-                  style={{ width: "100%", accentColor: "#888", height: "4px", borderRadius: "2px" }}
-                />
-                <div style={{ fontSize: "0.7rem", marginTop: "0.5rem", color: textColor }}>
-                  Radar installations
-                </div>
-              </div>
-            )}
-
-            {/* OSM raster overlay controls – placed under radar slider */}
-            <div className="slider-container" style={{ ...sliderContainerStyle, marginTop: "0.5rem" }}>
-              <label style={{ fontFamily: "monospace", fontSize: "0.8rem", fontWeight: "normal", display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.2rem" }}>
-                <input
-                  type="checkbox"
-                  checked={showOSMOverlay}
-                  onChange={(e) => setShowOSMOverlay(e.target.checked)}
-                  style={{ accentColor: borderColor }}
-                />
-                Place Names
-              </label>
-              {showOSMOverlay && (
-                <div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={osmOverlayOpacity}
-                    onChange={(e) => setOsmOverlayOpacity(parseFloat(e.target.value))}
-                    style={{
-                      width: "100%",
-                      accentColor: "#a7a5a5",
-                      height: "4px",
-                      borderRadius: "2px",
-                      marginTop: "4px"
-                    }}
-                  />
-                </div>
-              )}
+            {/* Plot container */}
+            <div className="plot-wrapper" style={{ width: "100%", overflowX: "auto" }}>
+              <div ref={plotRef} style={{ minWidth: "800px", height: "500px", marginBottom: "0.5rem" }} />
             </div>
           </div>
         </div>
