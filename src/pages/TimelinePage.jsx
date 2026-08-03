@@ -306,12 +306,6 @@ export default function TimelinePage() {
   useEffect(() => {
     if (!plotRef.current) return;
 
-    const convertDate = (dmy) => {
-      if (!dmy) return null;
-      const [day, month, year] = dmy.split("/");
-      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-    };
-
     const parseDateMain = (dmy) => {
       if (!dmy) return null;
       const parts = dmy.split("/");
@@ -540,7 +534,11 @@ export default function TimelinePage() {
                 rangemode: "normal",
                 showgrid: false,
                 linecolor: theme === "light" ? "#333333" : "#aaaaaa",
-                tickfont: { size: 10 },
+                tickfont: {
+                  size: isMobile ? 8 : 10,      // smaller ticks on mobile
+                },
+                tickangle: isMobile ? -45 : 0,  // rotate ticks to fit
+                automargin: true,               // let plotly adjust margins for rotated ticks
               },
               yaxis: { visible: false, range: yRange },
               paper_bgcolor: "transparent",
@@ -561,7 +559,7 @@ export default function TimelinePage() {
               },
               margin: {
                 l: 20,
-                r: isMobile ? 20 : 80,
+                r: isMobile ? 10 : 80,
                 t: 10,
                 b: isMobile ? 60 : 50,
               },
@@ -657,7 +655,7 @@ export default function TimelinePage() {
       if (plotRef.current) Plotly.purge(plotRef.current);
       plotReady.current = false;
     };
-  }, [theme, isMobile]); // isMobile is added so layout re‑builds when screen size changes
+  }, [theme, isMobile]); // isMobile added so layout re‑builds when screen size changes
 
   // Update map markers based on animation date (NO JITTER – markers stack)
   useEffect(() => {
@@ -780,12 +778,6 @@ export default function TimelinePage() {
     padding: "10px",
     borderRadius: "0",
   };
-  // Base slider container style – overridden on mobile to match plot width
-  const sliderContainerStyle = {
-    marginTop: "0",
-    marginLeft: "20px",
-    width: "71%",
-  };
 
   if (error)
     return (
@@ -802,15 +794,39 @@ export default function TimelinePage() {
       <Header />
       <div
         className="container"
-        style={{ maxWidth: "1400px", margin: "0 auto", padding: "1rem" }}
+        style={{
+          maxWidth: "1400px",
+          margin: "0 auto",
+          padding: isMobile ? "0.5rem" : "1rem",
+          paddingBottom: isMobile ? "70px" : "1rem", // avoid hiding under legend
+          overflowX: "hidden", // prevent any accidental horizontal scroll
+        }}
       >
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-          {/* LEFT COLUMN: Map and timeline info panel */}
-          <div style={{ flex: "0 0 500px", width: "500px", marginTop: "10px" }}>
+        {/* 
+          On mobile: stack columns vertically, each 100% wide.
+          On desktop: flex row with fixed left column.
+        */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row",
+            flexWrap: "wrap",
+            gap: "0.5rem",
+          }}
+        >
+          {/* LEFT COLUMN: Map and info panels */}
+          <div
+            style={{
+              flex: isMobile ? "1 1 100%" : "0 0 500px",
+              width: isMobile ? "100%" : "500px",
+              marginTop: "10px",
+            }}
+          >
+            {/* Map */}
             <div
               style={{
                 width: "100%",
-                height: "400px",
+                height: isMobile ? "300px" : "400px", // slightly shorter on mobile
                 border: `1px solid ${borderColor}`,
                 background: "#30342f",
               }}
@@ -919,7 +935,7 @@ export default function TimelinePage() {
               </MapContainer>
             </div>
 
-            {/* Timeline info box – increased height + fixed on mobile */}
+            {/* Timeline info box */}
             <div
               style={{
                 ...containerStyle,
@@ -942,7 +958,7 @@ export default function TimelinePage() {
                   ...containerStyle,
                   marginTop: "0.5rem",
                   width: "100%",
-                  height: "150px",       // fixed height to prevent jitter
+                  height: "150px",
                   overflowY: "auto",
                   backgroundColor: "rgba(0, 0, 0, 0.1)",
                 }}
@@ -952,27 +968,85 @@ export default function TimelinePage() {
             )}
           </div>
 
-          {/* MIDDLE COLUMN: Plot + sliders + radar overlay (desktop) + OSM overlay controls */}
-          <div style={{ flex: "1", minWidth: "400px", position: "relative" }}>
-            {/* Single scrollable wrapper – makes plot & sliders share the same width */}
-            <div style={{ width: "100%", overflowX: "auto" }}>
-              <div style={{ minWidth: "800px" }}>
-                {/* The plot itself */}
+          {/* MIDDLE COLUMN: Plot + sliders + OSM controls */}
+          <div
+            style={{
+              flex: isMobile ? "1 1 100%" : "1",
+              minWidth: isMobile ? "100%" : "400px",
+              width: isMobile ? "100%" : undefined,
+              position: "relative",
+            }}
+          >
+            {/* No horizontal scroll wrapper needed on mobile */}
+            <div style={{ width: "100%" }}>
+              {/* The plot itself */}
+              <div
+                ref={plotRef}
+                style={{
+                  width: "100%",
+                  height: isMobile ? "400px" : "500px",
+                  marginBottom: "0.5rem",
+                }}
+              />
+
+              {/* Timeline slider */}
+              <div
+                style={{
+                  marginTop: "0",
+                  marginLeft: isMobile ? 0 : "20px",
+                  width: isMobile ? "100%" : "71%",
+                  ...(isMobile && {
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.25rem",
+                  }),
+                }}
+              >
                 <div
-                  ref={plotRef}
+                  style={{
+                    marginBottom: "0.4rem",
+                    marginTop: "-1.20rem",
+                    fontFamily: "monospace",
+                    fontSize: isMobile ? "0.7rem" : "0.8rem",
+                  }}
+                >
+                  Timeline:{" "}
+                  {animationDate ? formatDateForSlider(animationDate) : "—"}
+                </div>
+                <input
+                  type="range"
+                  min={PLOT_START}
+                  max={PLOT_END}
+                  step={STEP_MS}
+                  value={
+                    animationDate ? animationDate.getTime() : PLOT_START
+                  }
+                  onChange={handleTimelineSliderChange}
                   style={{
                     width: "100%",
-                    height: "500px",
-                    marginBottom: "0.5rem",
+                    accentColor: "#555",
+                    height: "4px",
+                    borderRadius: "2px",
                   }}
                 />
-
-                {/* Timeline slider */}
                 <div
                   style={{
-                    ...sliderContainerStyle,
-                    marginLeft: isMobile ? 0 : sliderContainerStyle.marginLeft,
-                    width: isMobile ? "100%" : sliderContainerStyle.width,
+                    fontSize: "0.7rem",
+                    marginTop: "0.5rem",
+                    color: textColor,
+                  }}
+                >
+                  Drag to reveal timeline events. Glow grows with years passed.
+                </div>
+              </div>
+
+              {/* Radar slider */}
+              {minRadarDate && maxRadarDate && (
+                <div
+                  style={{
+                    marginTop: "0.8rem",
+                    marginLeft: isMobile ? 0 : "20px",
+                    width: isMobile ? "100%" : "71%",
                     ...(isMobile && {
                       display: "flex",
                       flexDirection: "column",
@@ -982,27 +1056,24 @@ export default function TimelinePage() {
                 >
                   <div
                     style={{
-                      marginBottom: "0.4rem",
-                      marginTop: "-1.20rem",
+                      marginBottom: "0.1rem",
                       fontFamily: "monospace",
                       fontSize: isMobile ? "0.7rem" : "0.8rem",
                     }}
                   >
-                    Timeline:{" "}
-                    {animationDate ? formatDateForSlider(animationDate) : "—"}
+                    Radar:{" "}
+                    {radarDate ? formatDateForSlider(radarDate) : "—"}
                   </div>
                   <input
                     type="range"
                     min={PLOT_START}
                     max={PLOT_END}
                     step={STEP_MS}
-                    value={
-                      animationDate ? animationDate.getTime() : PLOT_START
-                    }
-                    onChange={handleTimelineSliderChange}
+                    value={radarDate ? radarDate.getTime() : PLOT_START}
+                    onChange={handleRadarSliderChange}
                     style={{
                       width: "100%",
-                      accentColor: "#555",
+                      accentColor: "#888",
                       height: "4px",
                       borderRadius: "2px",
                     }}
@@ -1014,146 +1085,92 @@ export default function TimelinePage() {
                       color: textColor,
                     }}
                   >
-                    Drag to reveal timeline events. Glow grows with years passed.
+                    Radar installations
                   </div>
                 </div>
+              )}
 
-                {/* Radar slider */}
-                {minRadarDate && maxRadarDate && (
-                  <div
-                    style={{
-                      ...sliderContainerStyle,
-                      marginTop: "0.8rem",
-                      marginLeft: isMobile
-                        ? 0
-                        : sliderContainerStyle.marginLeft,
-                      width: isMobile ? "100%" : sliderContainerStyle.width,
-                      ...(isMobile && {
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "0.25rem",
-                      }),
-                    }}
-                  >
-                    <div
-                      style={{
-                        marginBottom: "0.1rem",
-                        fontFamily: "monospace",
-                        fontSize: isMobile ? "0.7rem" : "0.8rem",
-                      }}
-                    >
-                      Radar:{" "}
-                      {radarDate ? formatDateForSlider(radarDate) : "—"}
-                    </div>
-                    <input
-                      type="range"
-                      min={PLOT_START}
-                      max={PLOT_END}
-                      step={STEP_MS}
-                      value={radarDate ? radarDate.getTime() : PLOT_START}
-                      onChange={handleRadarSliderChange}
-                      style={{
-                        width: "100%",
-                        accentColor: "#888",
-                        height: "4px",
-                        borderRadius: "2px",
-                      }}
-                    />
-                    <div
-                      style={{
-                        fontSize: "0.7rem",
-                        marginTop: "0.5rem",
-                        color: textColor,
-                      }}
-                    >
-                      Radar installations
-                    </div>
-                  </div>
-                )}
-
-                {/* OSM raster overlay controls */}
-                <div
+              {/* OSM overlay controls */}
+              <div
+                style={{
+                  marginTop: "0.5rem",
+                  marginLeft: isMobile ? 0 : "20px",
+                  width: isMobile ? "100%" : "71%",
+                  ...(isMobile && {
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.25rem",
+                  }),
+                }}
+              >
+                <label
                   style={{
-                    ...sliderContainerStyle,
-                    marginTop: "0.5rem",
-                    marginLeft: isMobile ? 0 : sliderContainerStyle.marginLeft,
-                    width: isMobile ? "100%" : sliderContainerStyle.width,
-                    ...(isMobile && {
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "0.25rem",
-                    }),
+                    fontFamily: "monospace",
+                    fontSize: isMobile ? "0.7rem" : "0.8rem",
+                    fontWeight: "normal",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    marginBottom: "0.2rem",
                   }}
                 >
-                  <label
-                    style={{
-                      fontFamily: "monospace",
-                      fontSize: isMobile ? "0.7rem" : "0.8rem",
-                      fontWeight: "normal",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.5rem",
-                      marginBottom: "0.2rem",
-                    }}
-                  >
+                  <input
+                    type="checkbox"
+                    checked={showOSMOverlay}
+                    onChange={(e) => setShowOSMOverlay(e.target.checked)}
+                    style={{ accentColor: borderColor }}
+                  />
+                  Place Names
+                </label>
+                {showOSMOverlay && (
+                  <div>
                     <input
-                      type="checkbox"
-                      checked={showOSMOverlay}
-                      onChange={(e) => setShowOSMOverlay(e.target.checked)}
-                      style={{ accentColor: borderColor }}
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      value={osmOverlayOpacity}
+                      onChange={(e) =>
+                        setOsmOverlayOpacity(parseFloat(e.target.value))
+                      }
+                      style={{
+                        width: "100%",
+                        accentColor: "#a7a5a5",
+                        height: "4px",
+                        borderRadius: "2px",
+                        marginTop: "4px",
+                      }}
                     />
-                    Place Names
-                  </label>
-                  {showOSMOverlay && (
-                    <div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.01"
-                        value={osmOverlayOpacity}
-                        onChange={(e) =>
-                          setOsmOverlayOpacity(parseFloat(e.target.value))
-                        }
-                        style={{
-                          width: "100%",
-                          accentColor: "#a7a5a5",
-                          height: "4px",
-                          borderRadius: "2px",
-                          marginTop: "4px",
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {/* Radar info overlay – only on DESKTOP (absolute positioned) */}
-                {!isMobile && radarInfo && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      bottom: "30px",
-                      right: "-66px",
-                      width: "280px",
-                      maxHeight: "70%",
-                      overflowY: "auto",
-                      ...containerStyle,
-                      backgroundColor: "rgba(0, 0, 0, 0)",
-                      backdropFilter: "blur(4px)",
-                      zIndex: 1000,
-                      boxShadow: "0 2px 10px rgba(0, 0, 0, 0)",
-                    }}
-                  >
-                    <div dangerouslySetInnerHTML={{ __html: radarInfo }} />
                   </div>
                 )}
               </div>
+
+              {/* Radar info overlay – only on DESKTOP (absolute positioned) */}
+              {!isMobile && radarInfo && (
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "30px",
+                    right: "-66px",
+                    width: "280px",
+                    maxHeight: "70%",
+                    overflowY: "auto",
+                    ...containerStyle,
+                    backgroundColor: "rgba(0, 0, 0, 0)",
+                    backdropFilter: "blur(4px)",
+                    zIndex: 1000,
+                    boxShadow: "0 2px 10px rgba(0, 0, 0, 0)",
+                  }}
+                >
+                  <div dangerouslySetInnerHTML={{ __html: radarInfo }} />
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Fixed mobile legend – no title, just coloured dots and theme names */}
+      {/* Fixed mobile legend */}
       {isMobile && (
         <div
           style={{
