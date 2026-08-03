@@ -4049,6 +4049,7 @@ uniform ${n} ${r} u_${i};
                           <strong>Coordinates:</strong> ${t.lat}, ${t.lng}<br>
                           ${t.description}<br>
                           <a href="${t.source}" target="_blank">Source</a>`)}else S(``)},[m,u]),(0,x.useEffect)(()=>{if(!(!t.current||!e.current))try{let t=[{type:`line`,x0:`1948-05-14`,x1:`1948-05-14`,y0:0,y1:1,yref:`paper`,line:{color:`#9afc97`,width:.7,dash:`dash`}},{type:`line`,x0:`1967-06-05`,x1:`1967-06-05`,y0:0,y1:1,yref:`paper`,line:{color:`#9afc97`,width:.7,dash:`dash`}},{type:`line`,x0:`1995-09-28`,x1:`1995-09-28`,y0:0,y1:1,yref:`paper`,line:{color:`#9afc97`,width:.7,dash:`dash`}},{type:`line`,x0:`2023-10-07`,x1:`2023-10-07`,y0:0,y1:1,yref:`paper`,line:{color:`#9afc97`,width:.7,dash:`dash`}}];if(m){let e=K(m),r=n===`light`?`#2c6e2c`:`#9afc97`;t.push({type:`line`,x0:e,x1:e,y0:0,y1:1,yref:`paper`,line:{color:r,width:.5,dash:`solid`}})}if(N&&F&&j){let e=K(j),r=n===`light`?`#000000`:`#ffffff`;t.push({type:`line`,x0:e,x1:e,y0:0,y1:1,yref:`paper`,line:{color:r,width:.5,dash:`solid`}})}vr.default.relayout(e.current,{shapes:t})}catch{}},[m,j,n,N,F]);let q=e=>{let t=parseInt(e.target.value);h(new Date(t))},J=e=>{M(new Date(parseInt(e.target.value)))},Y=n===`light`?`#2c6e2c`:`#9afc97`,X=n===`light`?`#333333`:`#f0f0f0`,Z={border:`1px solid ${Y}`,backgroundColor:`transparent`,padding:`10px`,borderRadius:`0`},ee={marginTop:`0`,marginLeft:`20px`,width:`71%`};return c?(0,$.jsxs)(`div`,{children:[(0,$.jsx)(On,{}),(0,$.jsxs)(`div`,{className:`container`,style:{color:`red`},children:[`Error: `,c]})]}):(0,$.jsxs)(`div`,{children:[(0,$.jsx)(On,{}),(0,$.jsxs)(`div`,{className:`container`,style:{maxWidth:`1400px`,margin:`0 auto`,padding:`1rem`},children:[(0,$.jsx)(`style`,{children:`
+          /* Hide mobile legend on desktop */
           .mobile-legend-container {
             display: none;
           }
@@ -4068,73 +4069,53 @@ uniform ${n} ${r} u_${i};
               margin-top: 0.5rem !important;
             }
 
+            /* Middle column: flex column with ordering */
             .timeline-middle-col {
               flex: 1 1 100% !important;
               min-width: 0 !important;
               width: 100% !important;
+              display: flex !important;
+              flex-direction: column !important;
             }
 
-            /* Plot: shrink to fit, increase height */
-            .plot-wrapper {
-              overflow-x: auto !important;
+            /* Slider containers: order 1, plot: order 2, legend: order 3 */
+            .slider-container {
+              order: 1;
+              width: 100% !important;
+              margin-left: 0 !important;
             }
+            .plot-wrapper {
+              order: 2;
+              width: 100%;
+              overflow-x: auto;
+            }
+            .mobile-legend-container {
+              order: 3;
+              display: block !important;
+              width: 100%;
+              border: 1px solid ${Y};
+              padding: 0.3rem 0.5rem;
+              background: rgba(0, 0, 0, 0.3);
+              margin-top: 0.5rem;
+            }
+            body.light-bg .mobile-legend-container {
+              background: rgba(255, 255, 255, 0.8);
+            }
+
+            /* Plot: shrink to fit, increase height, keep margin */
             .plot-wrapper > div {
               min-width: 0 !important;
               width: 100% !important;
               height: 600px !important;
-              /* keep original margin-bottom (0.5rem) */
+              margin-bottom: 0.5rem !important;
             }
 
-            /* Sliders: full width, keep original top margins */
-            .slider-container {
-              width: 100% !important;
-              margin-left: 0 !important;
-            }
-
-            /* Mobile legend */
-            .mobile-legend-container {
-              display: block;
-              margin-bottom: 0.5rem;
-              width: 100%;
-            }
-            .mobile-legend-details {
-              border: 1px solid ${Y};
-              padding: 0.3rem 0.5rem;
-              background: rgba(0, 0, 0, 0.3);
-              cursor: pointer;
-              font-family: monospace;
-              font-size: 0.8rem;
-            }
-            body.light-bg .mobile-legend-details {
-              background: rgba(255, 255, 255, 0.8);
-            }
-            .mobile-legend-summary {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              list-style: none;
-              user-select: none;
-            }
-            .mobile-legend-summary::-webkit-details-marker {
-              display: none;
-            }
-            .legend-arrow {
-              transition: transform 0.2s ease;
-              font-size: 0.7rem;
-            }
-            .mobile-legend-details[open] .legend-arrow {
-              transform: rotate(180deg);
-            }
+            /* Mobile legend items (no dropdown) */
             .mobile-legend-items {
               display: flex;
               flex-wrap: wrap;
               gap: 0.3rem 0.8rem;
-              padding: 0.5rem 0 0.2rem 0;
-              border-top: 1px solid rgba(154, 252, 151, 0.2);
-              margin-top: 0.3rem;
-            }
-            body.light-bg .mobile-legend-items {
-              border-top-color: rgba(44, 110, 44, 0.2);
+              padding: 0.2rem 0;
             }
             .legend-item {
               display: flex;
@@ -4162,6 +4143,27 @@ uniform ${n} ${r} u_${i};
             .plot-wrapper .legend {
               display: none !important;
             }
+
+            /* Radar info panel: inline */
+            .radar-info-panel-inline {
+              width: 100% !important;
+              max-height: 180px !important;
+              height: 180px !important;
+              margin-top: 0.5rem !important;
+              margin-bottom: 0.5rem !important;
+              position: relative !important;
+              bottom: auto !important;
+              right: auto !important;
+              overflow-y: auto !important;
+              order: 2; /* keep it between sliders and plot if needed, or adjust */
+            }
+            /* Adjust radar slider top margin */
+            .radar-slider {
+              margin-top: 0.8rem !important;
+            }
+            .osm-container {
+              margin-top: 0.8rem !important;
+            }
           }
 
           @media (min-width: 769px) {
@@ -4174,7 +4176,7 @@ uniform ${n} ${r} u_${i};
                                       <strong>Jurisdiction:</strong> ${e.jurisdiction}<br>
                                       <strong>Area:</strong> ${e.area}<br>
                                       ${e.description}<br>
-                                      <a href="${e.source}" target="_blank">Source</a>`),a([e.lat,e.lng]),s(13)}},children:(0,$.jsxs)(gr,{children:[(0,$.jsx)(`strong`,{children:e.label}),(0,$.jsx)(`br`,{}),(0,$.jsx)(`strong`,{children:`Date:`}),` `,e.date.toLocaleDateString(),(0,$.jsx)(`br`,{}),(0,$.jsx)(`strong`,{children:`Area:`}),` `,e.area||`Not provided`,(0,$.jsx)(`br`,{}),e.description,(0,$.jsx)(`br`,{}),(0,$.jsx)(`a`,{href:e.source,target:`_blank`,children:`Source`})]})},`timeline-${t}`)}),k.map((e,t)=>(0,$.jsx)(mr,{position:[e.lat,e.lng],icon:wr(12),children:(0,$.jsxs)(gr,{children:[(0,$.jsx)(`strong`,{children:e.name}),(0,$.jsx)(`br`,{}),(0,$.jsx)(`strong`,{children:`Type:`}),` `,e.bandType,(0,$.jsx)(`br`,{}),(0,$.jsx)(`strong`,{children:`Purpose:`}),` `,e.purpose,(0,$.jsx)(`br`,{}),(0,$.jsx)(`strong`,{children:`Jurisdiction:`}),` `,e.jurisdiction,(0,$.jsx)(`br`,{}),(0,$.jsx)(`strong`,{children:`Operator:`}),` `,e.operator,(0,$.jsx)(`br`,{}),(0,$.jsx)(`strong`,{children:`Status:`}),` `,e.status,(0,$.jsx)(`br`,{}),(0,$.jsx)(`a`,{href:e.source,target:`_blank`,children:`Source`})]})},`radar-${t}`))]},i.toString()+o)}),(0,$.jsx)(`div`,{style:{...Z,marginTop:`0.5rem`,width:`100%`},children:b?(0,$.jsx)(`div`,{dangerouslySetInnerHTML:{__html:b}}):`Click a dot or drag the timeline slider to see details.`})]}),(0,$.jsxs)(`div`,{className:`timeline-middle-col`,style:{flex:`1`,minWidth:`400px`,position:`relative`},children:[(0,$.jsx)(`div`,{className:`mobile-legend-container`,children:(0,$.jsxs)(`details`,{className:`mobile-legend-details`,children:[(0,$.jsxs)(`summary`,{className:`mobile-legend-summary`,children:[(0,$.jsx)(`span`,{children:`Timeline Legend`}),(0,$.jsx)(`span`,{className:`legend-arrow`,children:`▾`})]}),(0,$.jsx)(`div`,{className:`mobile-legend-items`,children:Pr.map(e=>(0,$.jsxs)(`div`,{className:`legend-item`,children:[(0,$.jsx)(`span`,{className:`legend-color-swatch`,style:{backgroundColor:W(e)}}),(0,$.jsx)(`span`,{className:`legend-label`,children:e})]},e))})]})}),(0,$.jsx)(`div`,{className:`plot-wrapper`,style:{width:`100%`,overflowX:`auto`},children:(0,$.jsx)(`div`,{ref:e,style:{minWidth:`800px`,height:`500px`,marginBottom:`0.5rem`}})}),(0,$.jsxs)(`div`,{className:`slider-container`,style:ee,children:[(0,$.jsxs)(`div`,{className:`timeline-slider-label`,style:{marginBottom:`0.4rem`,marginTop:`-1.20rem`,fontFamily:`monospace`,fontSize:`0.8rem`},children:[`Timeline: `,m?K(m):`—`]}),(0,$.jsx)(`input`,{type:`range`,min:jr,max:Mr,step:Nr,value:m?m.getTime():jr,onChange:q,style:{width:`100%`,accentColor:`#555`,height:`4px`,borderRadius:`2px`}}),(0,$.jsx)(`div`,{style:{fontSize:`0.7rem`,marginTop:`0.5rem`,color:X},children:`Drag to reveal timeline events. Glow grows with years passed.`})]}),N&&F&&(0,$.jsxs)(`div`,{className:`slider-container radar-slider`,style:{...ee,marginTop:`0.8rem`},children:[(0,$.jsxs)(`div`,{style:{marginBottom:`0.1rem`,fontFamily:`monospace`,fontSize:`0.8rem`},children:[`Radar: `,j?K(j):`—`]}),(0,$.jsx)(`input`,{type:`range`,min:jr,max:Mr,step:Nr,value:j?j.getTime():jr,onChange:J,style:{width:`100%`,accentColor:`#888`,height:`4px`,borderRadius:`2px`}}),(0,$.jsx)(`div`,{style:{fontSize:`0.7rem`,marginTop:`0.5rem`,color:X},children:`Radar installations`})]}),(0,$.jsxs)(`div`,{className:`slider-container`,style:{...ee,marginTop:`0.5rem`},children:[(0,$.jsxs)(`label`,{style:{fontFamily:`monospace`,fontSize:`0.8rem`,fontWeight:`normal`,display:`flex`,alignItems:`center`,gap:`0.5rem`,marginBottom:`0.2rem`},children:[(0,$.jsx)(`input`,{type:`checkbox`,checked:B,onChange:e=>V(e.target.checked),style:{accentColor:Y}}),`Place Names`]}),B&&(0,$.jsx)(`div`,{children:(0,$.jsx)(`input`,{type:`range`,min:`0`,max:`1`,step:`0.01`,value:H,onChange:e=>U(parseFloat(e.target.value)),style:{width:`100%`,accentColor:`#a7a5a5`,height:`4px`,borderRadius:`2px`,marginTop:`4px`}})})]}),R&&(0,$.jsx)(`div`,{style:{position:`absolute`,bottom:`30px`,right:`-66px`,width:`280px`,maxHeight:`70%`,overflowY:`auto`,...Z,backgroundColor:`rgba(0, 0, 0, 0)`,backdropFilter:`blur(4px)`,zIndex:1e3,boxShadow:`0 2px 10px rgba(0, 0, 0, 0)`},children:(0,$.jsx)(`div`,{dangerouslySetInnerHTML:{__html:R}})})]})]})]})]})}delete ur.default.Icon.Default.prototype._getIconUrl,ur.default.Icon.Default.mergeOptions({iconRetinaUrl:`https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png`,iconUrl:`https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png`,shadowUrl:`https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png`});var Ir=[`#e6194b`,`#3cb44b`,`#4363d8`,`#f032e6`,`#46f0f0`,`#f58231`,`#911eb4`,`#ffe119`];function Lr(e){return Ir[e%Ir.length]}function Rr({position:e}){let t=lr();return(0,x.useEffect)(()=>{e&&t.setView(e,t.getZoom())},[e,t]),null}function zr(){let[e,t]=(0,x.useState)({}),[n,r]=(0,x.useState)([]),[i,a]=(0,x.useState)(null),[o,s]=(0,x.useState)([]),[c,l]=(0,x.useState)(0),[u,d]=(0,x.useState)(!1),[f,p]=(0,x.useState)(30),[m,h]=(0,x.useState)([30.8569,34.8036]),[g,_]=(0,x.useState)(12),v=(0,x.useRef)(null),[y,b]=(0,x.useState)(!1),[S,C]=(0,x.useState)(new Set),[w,T]=(0,x.useState)([]),[E,D]=(0,x.useState)(!1),[O,k]=(0,x.useState)(2025),[A,j]=(0,x.useState)(1998),[M,N]=(0,x.useState)(2025),[P,F]=(0,x.useState)([]),[I,R]=(0,x.useState)([]),[z,B]=(0,x.useState)(!1),[V,H]=(0,x.useState)(!1),U=(0,x.useRef)(null),W=(0,x.useRef)(0);(0,x.useEffect)(()=>{fetch(`/data/bird_data.csv`).then(e=>{if(!e.ok)throw Error(`HTTP ${e.status}`);return e.text()}).then(e=>{let n=yr.default.parse(e,{header:!0,dynamicTyping:!0}).data.filter(e=>e[`location-long`]&&e[`location-lat`]&&e[`tag-local-identifier`]),i={};n.forEach(e=>{let t=e[`tag-local-identifier`];i[t]||(i[t]=[]),i[t].push({lat:e[`location-lat`],lng:e[`location-long`],timestamp:new Date(e.timestamp),speed:e[`ground-speed`]*3.6,heading:e.heading,species:e[`individual-taxon-canonical-name`],tag:t})});let o={},c=[];for(let e in i){let t=i[e].sort((e,t)=>e.timestamp-t.timestamp);o[e]=t,c.push({id:e,species:t[0]?.species||`Unknown`,pointCount:t.length})}c.sort((e,t)=>e.id-t.id),r(c),t(o),c.length>0&&(a(c[0].id),s(o[c[0].id]),C(new Set(c.map(e=>e.id))),o[c[0].id].length&&(h([o[c[0].id][0].lat,o[c[0].id][0].lng]),l(0)))}).catch(e=>console.error(`Bird data error:`,e))},[]),(0,x.useEffect)(()=>{fetch(`/data/radarlist.csv`).then(e=>{if(!e.ok)throw Error(`HTTP ${e.status}`);return e.text()}).then(e=>{let t=yr.default.parse(e,{header:!0,skipEmptyLines:!0}).data.filter(e=>e.Latitude&&e.Longitude&&e[`Date Installed`]),n=[],r=9999,i=0;t.forEach(e=>{let t=e[`Date Installed`].toString().match(/\d{4}/);if(!t)return;let a=parseInt(t[0]);if(isNaN(a))return;let o=parseFloat(e.Latitude),s=parseFloat(e.Longitude);isNaN(o)||isNaN(s)||(n.push({lat:o,lng:s,name:e.Name,bandType:e[`Band Type`],purpose:e[`Description of Purpose`],jurisdiction:e.Jurisdiction,operator:e.Operator,area:e.Area,usedBy:e[`Used by Which Institutes`],brand:e[`Company/Brand`],status:e.Status,notes:e[`Notes on Dates`],source:e[`Source URL`],year:a}),a<r&&(r=a),a>i&&(i=a))}),T(n),j(r),N(i),k(i)}).catch(e=>console.error(`Radar data error:`,e))},[]),(0,x.useEffect)(()=>{fetch(`/data/feedingsites.csv`).then(e=>{if(!e.ok)throw Error(`HTTP ${e.status}`);return e.text()}).then(e=>{let t=yr.default.parse(e,{header:!0,skipEmptyLines:!0}).data.filter(e=>e.Latitude&&e.Longitude),n=[],r=[];t.forEach(e=>{let t=parseFloat(e.Latitude),i=parseFloat(e.Longitude);if(isNaN(t)||isNaN(i))return;let a=e.Type||``,o={lat:t,lng:i,name:e.Name||`Unnamed Site`,description:e[`Description of Purpose`]||``,operator:e.Operator||``,status:e.Status||``,jurisdiction:e.Jurisdiction||``,dateInstalled:e[`Date Installed`]||``,type:a};a.toLowerCase().includes(`camera`)||a.toLowerCase().includes(`cam`)||a.toLowerCase().includes(`nest`)?r.push(o):n.push(o)}),F(n),R(r),console.log(`Feeding sites loaded:`,n.length),console.log(`Cameras loaded:`,r.length)}).catch(e=>console.error(`Feeding sites data error:`,e))},[]);let G={};n.forEach((e,t)=>{G[e.id]=Lr(t)}),(0,x.useEffect)(()=>{if(y||!i||!e[i])return;let t=e[i];s(t),l(0),d(!1),t.length&&h([t[0].lat,t[0].lng]),v.current&&clearTimeout(v.current)},[i,e,y]),(0,x.useEffect)(()=>{if(y)return;if(!u||o.length===0||c>=o.length-1){c>=o.length-1&&u&&d(!1);return}let e=o[c].timestamp,t=(o[c+1].timestamp-e)/f;return t=Math.min(t,2e3),t=Math.max(t,30),v.current=setTimeout(()=>{l(e=>e+1)},t),()=>clearTimeout(v.current)},[u,c,o,f,y]);let K=()=>{d(!1),l(0),o.length&&h([o[0].lat,o[0].lng])},q=()=>d(e=>!e),J=e=>{C(t=>{let n=new Set(t);return n.has(e)?n.delete(e):n.add(e),n})},Y=()=>C(new Set(n.map(e=>e.id))),X=()=>C(new Set),Z=E?w.filter(e=>e.year<=O):[],ee=z?P:[],te=V?I:[];if(Object.keys(e).length===0)return(0,$.jsx)(`div`,{style:{padding:`1rem`},children:`Loading bird tracking data...`});let ne=[],re=[];if(y){for(let t of n)if(S.has(t.id)){let n=e[t.id],r=n.map(e=>[e.lat,e.lng]),i=G[t.id];ne.push((0,$.jsx)(hr,{positions:r,color:i,weight:.8,opacity:.5},`line-${t.id}`));let a=n[0];a&&re.push((0,$.jsx)(dr,{center:[a.lat,a.lng],radius:4,fillColor:i,color:i,weight:1,opacity:.8,fillOpacity:1},`start-${t.id}`))}}let ie=o[c],ae=o.slice(0,c+1).map(e=>[e.lat,e.lng]),oe=o[0],se=G[i]||`#f39c12`,ce=y?320:400;return(0,$.jsxs)(`div`,{className:`bird-tracker`,style:{marginTop:`1rem`},children:[(0,$.jsx)(`style`,{children:`
+                                      <a href="${e.source}" target="_blank">Source</a>`),a([e.lat,e.lng]),s(13)}},children:(0,$.jsxs)(gr,{children:[(0,$.jsx)(`strong`,{children:e.label}),(0,$.jsx)(`br`,{}),(0,$.jsx)(`strong`,{children:`Date:`}),` `,e.date.toLocaleDateString(),(0,$.jsx)(`br`,{}),(0,$.jsx)(`strong`,{children:`Area:`}),` `,e.area||`Not provided`,(0,$.jsx)(`br`,{}),e.description,(0,$.jsx)(`br`,{}),(0,$.jsx)(`a`,{href:e.source,target:`_blank`,children:`Source`})]})},`timeline-${t}`)}),k.map((e,t)=>(0,$.jsx)(mr,{position:[e.lat,e.lng],icon:wr(12),children:(0,$.jsxs)(gr,{children:[(0,$.jsx)(`strong`,{children:e.name}),(0,$.jsx)(`br`,{}),(0,$.jsx)(`strong`,{children:`Type:`}),` `,e.bandType,(0,$.jsx)(`br`,{}),(0,$.jsx)(`strong`,{children:`Purpose:`}),` `,e.purpose,(0,$.jsx)(`br`,{}),(0,$.jsx)(`strong`,{children:`Jurisdiction:`}),` `,e.jurisdiction,(0,$.jsx)(`br`,{}),(0,$.jsx)(`strong`,{children:`Operator:`}),` `,e.operator,(0,$.jsx)(`br`,{}),(0,$.jsx)(`strong`,{children:`Status:`}),` `,e.status,(0,$.jsx)(`br`,{}),(0,$.jsx)(`a`,{href:e.source,target:`_blank`,children:`Source`})]})},`radar-${t}`))]},i.toString()+o)}),(0,$.jsx)(`div`,{style:{...Z,marginTop:`0.5rem`,width:`100%`},children:b?(0,$.jsx)(`div`,{dangerouslySetInnerHTML:{__html:b}}):`Click a dot or drag the timeline slider to see details.`})]}),(0,$.jsxs)(`div`,{className:`timeline-middle-col`,style:{flex:`1`,minWidth:`400px`,position:`relative`},children:[(0,$.jsxs)(`div`,{className:`slider-container`,style:ee,children:[(0,$.jsxs)(`div`,{className:`timeline-slider-label`,style:{marginBottom:`0.4rem`,marginTop:`-1.20rem`,fontFamily:`monospace`,fontSize:`0.8rem`},children:[`Timeline: `,m?K(m):`—`]}),(0,$.jsx)(`input`,{type:`range`,min:jr,max:Mr,step:Nr,value:m?m.getTime():jr,onChange:q,style:{width:`100%`,accentColor:`#555`,height:`4px`,borderRadius:`2px`}}),(0,$.jsx)(`div`,{style:{fontSize:`0.7rem`,marginTop:`0.5rem`,color:X},children:`Drag to reveal timeline events. Glow grows with years passed.`})]}),N&&F&&(0,$.jsxs)(`div`,{className:`slider-container radar-slider`,style:{...ee,marginTop:`0.8rem`},children:[(0,$.jsxs)(`div`,{style:{marginBottom:`0.1rem`,fontFamily:`monospace`,fontSize:`0.8rem`},children:[`Radar: `,j?K(j):`—`]}),(0,$.jsx)(`input`,{type:`range`,min:jr,max:Mr,step:Nr,value:j?j.getTime():jr,onChange:J,style:{width:`100%`,accentColor:`#888`,height:`4px`,borderRadius:`2px`}}),(0,$.jsx)(`div`,{style:{fontSize:`0.7rem`,marginTop:`0.5rem`,color:X},children:`Radar installations`})]}),(0,$.jsxs)(`div`,{className:`slider-container osm-container`,style:{...ee,marginTop:`0.5rem`},children:[(0,$.jsxs)(`label`,{style:{fontFamily:`monospace`,fontSize:`0.8rem`,fontWeight:`normal`,display:`flex`,alignItems:`center`,gap:`0.5rem`,marginBottom:`0.2rem`},children:[(0,$.jsx)(`input`,{type:`checkbox`,checked:B,onChange:e=>V(e.target.checked),style:{accentColor:Y}}),`Place Names`]}),B&&(0,$.jsx)(`div`,{children:(0,$.jsx)(`input`,{type:`range`,min:`0`,max:`1`,step:`0.01`,value:H,onChange:e=>U(parseFloat(e.target.value)),style:{width:`100%`,accentColor:`#a7a5a5`,height:`4px`,borderRadius:`2px`,marginTop:`4px`}})})]}),R&&(0,$.jsx)(`div`,{className:`radar-info-panel-inline`,style:{width:`280px`,maxHeight:`70%`,overflowY:`auto`,...Z,backgroundColor:`rgba(0, 0, 0, 0.85)`,backdropFilter:`blur(4px)`,boxShadow:`0 2px 10px rgba(0, 0, 0, 0.3)`,marginTop:`0.5rem`,marginBottom:`0.5rem`,fontSize:`0.8rem`,position:`relative`,bottom:`auto`,right:`auto`},children:(0,$.jsx)(`div`,{dangerouslySetInnerHTML:{__html:R}})}),(0,$.jsx)(`div`,{className:`plot-wrapper`,style:{width:`100%`,overflowX:`auto`},children:(0,$.jsx)(`div`,{ref:e,style:{minWidth:`800px`,height:`500px`,marginBottom:`0.5rem`}})}),(0,$.jsx)(`div`,{className:`mobile-legend-container`,children:(0,$.jsx)(`div`,{className:`mobile-legend-items`,children:Pr.map(e=>(0,$.jsxs)(`div`,{className:`legend-item`,children:[(0,$.jsx)(`span`,{className:`legend-color-swatch`,style:{backgroundColor:W(e)}}),(0,$.jsx)(`span`,{className:`legend-label`,children:e})]},e))})})]})]})]})]})}delete ur.default.Icon.Default.prototype._getIconUrl,ur.default.Icon.Default.mergeOptions({iconRetinaUrl:`https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png`,iconUrl:`https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png`,shadowUrl:`https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png`});var Ir=[`#e6194b`,`#3cb44b`,`#4363d8`,`#f032e6`,`#46f0f0`,`#f58231`,`#911eb4`,`#ffe119`];function Lr(e){return Ir[e%Ir.length]}function Rr({position:e}){let t=lr();return(0,x.useEffect)(()=>{e&&t.setView(e,t.getZoom())},[e,t]),null}function zr(){let[e,t]=(0,x.useState)({}),[n,r]=(0,x.useState)([]),[i,a]=(0,x.useState)(null),[o,s]=(0,x.useState)([]),[c,l]=(0,x.useState)(0),[u,d]=(0,x.useState)(!1),[f,p]=(0,x.useState)(30),[m,h]=(0,x.useState)([30.8569,34.8036]),[g,_]=(0,x.useState)(12),v=(0,x.useRef)(null),[y,b]=(0,x.useState)(!1),[S,C]=(0,x.useState)(new Set),[w,T]=(0,x.useState)([]),[E,D]=(0,x.useState)(!1),[O,k]=(0,x.useState)(2025),[A,j]=(0,x.useState)(1998),[M,N]=(0,x.useState)(2025),[P,F]=(0,x.useState)([]),[I,R]=(0,x.useState)([]),[z,B]=(0,x.useState)(!1),[V,H]=(0,x.useState)(!1),U=(0,x.useRef)(null),W=(0,x.useRef)(0);(0,x.useEffect)(()=>{fetch(`/data/bird_data.csv`).then(e=>{if(!e.ok)throw Error(`HTTP ${e.status}`);return e.text()}).then(e=>{let n=yr.default.parse(e,{header:!0,dynamicTyping:!0}).data.filter(e=>e[`location-long`]&&e[`location-lat`]&&e[`tag-local-identifier`]),i={};n.forEach(e=>{let t=e[`tag-local-identifier`];i[t]||(i[t]=[]),i[t].push({lat:e[`location-lat`],lng:e[`location-long`],timestamp:new Date(e.timestamp),speed:e[`ground-speed`]*3.6,heading:e.heading,species:e[`individual-taxon-canonical-name`],tag:t})});let o={},c=[];for(let e in i){let t=i[e].sort((e,t)=>e.timestamp-t.timestamp);o[e]=t,c.push({id:e,species:t[0]?.species||`Unknown`,pointCount:t.length})}c.sort((e,t)=>e.id-t.id),r(c),t(o),c.length>0&&(a(c[0].id),s(o[c[0].id]),C(new Set(c.map(e=>e.id))),o[c[0].id].length&&(h([o[c[0].id][0].lat,o[c[0].id][0].lng]),l(0)))}).catch(e=>console.error(`Bird data error:`,e))},[]),(0,x.useEffect)(()=>{fetch(`/data/radarlist.csv`).then(e=>{if(!e.ok)throw Error(`HTTP ${e.status}`);return e.text()}).then(e=>{let t=yr.default.parse(e,{header:!0,skipEmptyLines:!0}).data.filter(e=>e.Latitude&&e.Longitude&&e[`Date Installed`]),n=[],r=9999,i=0;t.forEach(e=>{let t=e[`Date Installed`].toString().match(/\d{4}/);if(!t)return;let a=parseInt(t[0]);if(isNaN(a))return;let o=parseFloat(e.Latitude),s=parseFloat(e.Longitude);isNaN(o)||isNaN(s)||(n.push({lat:o,lng:s,name:e.Name,bandType:e[`Band Type`],purpose:e[`Description of Purpose`],jurisdiction:e.Jurisdiction,operator:e.Operator,area:e.Area,usedBy:e[`Used by Which Institutes`],brand:e[`Company/Brand`],status:e.Status,notes:e[`Notes on Dates`],source:e[`Source URL`],year:a}),a<r&&(r=a),a>i&&(i=a))}),T(n),j(r),N(i),k(i)}).catch(e=>console.error(`Radar data error:`,e))},[]),(0,x.useEffect)(()=>{fetch(`/data/feedingsites.csv`).then(e=>{if(!e.ok)throw Error(`HTTP ${e.status}`);return e.text()}).then(e=>{let t=yr.default.parse(e,{header:!0,skipEmptyLines:!0}).data.filter(e=>e.Latitude&&e.Longitude),n=[],r=[];t.forEach(e=>{let t=parseFloat(e.Latitude),i=parseFloat(e.Longitude);if(isNaN(t)||isNaN(i))return;let a=e.Type||``,o={lat:t,lng:i,name:e.Name||`Unnamed Site`,description:e[`Description of Purpose`]||``,operator:e.Operator||``,status:e.Status||``,jurisdiction:e.Jurisdiction||``,dateInstalled:e[`Date Installed`]||``,type:a};a.toLowerCase().includes(`camera`)||a.toLowerCase().includes(`cam`)||a.toLowerCase().includes(`nest`)?r.push(o):n.push(o)}),F(n),R(r),console.log(`Feeding sites loaded:`,n.length),console.log(`Cameras loaded:`,r.length)}).catch(e=>console.error(`Feeding sites data error:`,e))},[]);let G={};n.forEach((e,t)=>{G[e.id]=Lr(t)}),(0,x.useEffect)(()=>{if(y||!i||!e[i])return;let t=e[i];s(t),l(0),d(!1),t.length&&h([t[0].lat,t[0].lng]),v.current&&clearTimeout(v.current)},[i,e,y]),(0,x.useEffect)(()=>{if(y)return;if(!u||o.length===0||c>=o.length-1){c>=o.length-1&&u&&d(!1);return}let e=o[c].timestamp,t=(o[c+1].timestamp-e)/f;return t=Math.min(t,2e3),t=Math.max(t,30),v.current=setTimeout(()=>{l(e=>e+1)},t),()=>clearTimeout(v.current)},[u,c,o,f,y]);let K=()=>{d(!1),l(0),o.length&&h([o[0].lat,o[0].lng])},q=()=>d(e=>!e),J=e=>{C(t=>{let n=new Set(t);return n.has(e)?n.delete(e):n.add(e),n})},Y=()=>C(new Set(n.map(e=>e.id))),X=()=>C(new Set),Z=E?w.filter(e=>e.year<=O):[],ee=z?P:[],te=V?I:[];if(Object.keys(e).length===0)return(0,$.jsx)(`div`,{style:{padding:`1rem`},children:`Loading bird tracking data...`});let ne=[],re=[];if(y){for(let t of n)if(S.has(t.id)){let n=e[t.id],r=n.map(e=>[e.lat,e.lng]),i=G[t.id];ne.push((0,$.jsx)(hr,{positions:r,color:i,weight:.8,opacity:.5},`line-${t.id}`));let a=n[0];a&&re.push((0,$.jsx)(dr,{center:[a.lat,a.lng],radius:4,fillColor:i,color:i,weight:1,opacity:.8,fillOpacity:1},`start-${t.id}`))}}let ie=o[c],ae=o.slice(0,c+1).map(e=>[e.lat,e.lng]),oe=o[0],se=G[i]||`#f39c12`,ce=y?320:400;return(0,$.jsxs)(`div`,{className:`bird-tracker`,style:{marginTop:`1rem`},children:[(0,$.jsx)(`style`,{children:`
         .bird-tracker input[type="range"] {
           -webkit-appearance: none;
           background: #444;
