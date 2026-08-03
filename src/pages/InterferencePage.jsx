@@ -79,7 +79,7 @@ export default function InterferencePage() {
                 Rather than removing these interruptions as technical errors, the visualisation keeps them present as part of the conditions through which the bird’s movement became knowable. Some of the anomalies appear repeatedly within particular geographic areas, including locations near military and radar infrastructures. Their proximity does not establish a direct cause, but it raises questions about the electromagnetic conditions surrounding the tracking system and the moments when its relation to the bird, satellite and ground infrastructure broke down.
               </p>
               <p>
-                The terrain gives these interruptions a spatial form. Elevation represents the density of anomalous or missing positions: higher peaks indicate locations where disruption occurred more frequently. The GPS route and its interruptions are plotted directly, allowing the clustering of these events to be examined without turning them into evidence of a single explanation.
+                The raw GPS track and its interruptions are plotted directly, allowing you to explore the spatial clustering of these anomalies.
               </p>
               <p style={{ fontSize: "0.85rem", opacity: 0.7 }}>
                 Interaction: drag to rotate, scroll to zoom, right‑click to pan.
