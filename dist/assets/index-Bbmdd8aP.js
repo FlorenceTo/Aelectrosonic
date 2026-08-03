@@ -4074,9 +4074,10 @@ uniform ${n} ${r} u_${i};
               width: 100% !important;
             }
 
-            /* Plot: shrink to fit, increase height, remove bottom margin */
+            /* Plot: shrink to fit, increase height, remove all margins */
             .plot-wrapper {
               overflow-x: auto !important;
+              margin-bottom: 0 !important;
             }
             .plot-wrapper > div {
               min-width: 0 !important;
@@ -4085,15 +4086,16 @@ uniform ${n} ${r} u_${i};
               margin-bottom: 0 !important;
             }
 
-            /* Sliders: full width */
+            /* Sliders: full width, remove top margin */
             .slider-container {
               width: 100% !important;
               margin-left: 0 !important;
+              margin-top: 0 !important;
             }
 
             /* Pull the timeline slider label up to close the gap */
             .timeline-slider-label {
-              margin-top: -1.8rem !important;
+              margin-top: -2.2rem !important;
             }
 
             /* Keep original spacing between sliders */
