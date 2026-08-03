@@ -170,9 +170,10 @@ export default function TimelinePage() {
   };
 
   // ------------------------------------------------------------
-  // Radar CSV loading – starts at earliest radar date
+  // Radar CSV loading
   // ------------------------------------------------------------
   useEffect(() => {
+    // ... (same as before, no changes here)
     const fetchRadarData = async () => {
       try {
         const response = await fetch("/data/radarlist.csv");
@@ -255,8 +256,9 @@ export default function TimelinePage() {
     fetchRadarData();
   }, []);
 
-  // Update radar markers and info (with multi-band support)
+  // Update radar markers and info
   useEffect(() => {
+    // ... (unchanged)
     if (!radarDate || radarPoints.length === 0) {
       setVisibleRadarMarkers([]);
       setRadarInfo("");
@@ -269,7 +271,6 @@ export default function TimelinePage() {
         curr.date > prev.date ? curr : prev
       );
 
-      // Build frequency display for single or multiple bands (e.g., "UHF & S-Band")
       let bandDisplay = latest.bandType;
       if (latest.bandType && latest.bandType !== "Not Publicly Specified") {
         if (latest.bandType.includes("&")) {
@@ -301,12 +302,13 @@ export default function TimelinePage() {
   }, [radarDate, radarPoints]);
 
   // ------------------------------------------------------------
-  // Main timeline loading (with lane assignment + horizontal jitter)
+  // Main timeline loading
   // ------------------------------------------------------------
   useEffect(() => {
     if (!plotRef.current) return;
 
     const parseDateMain = (dmy) => {
+      // ... (unchanged)
       if (!dmy) return null;
       const parts = dmy.split("/");
       if (parts.length !== 3) return null;
@@ -315,6 +317,7 @@ export default function TimelinePage() {
     };
 
     const addHorizontalJitter = (events, windowDays = 10) => {
+      // ... (unchanged)
       if (events.length === 0) return events;
       const sorted = [...events].sort((a, b) => a.date - b.date);
       const result = [];
@@ -342,6 +345,7 @@ export default function TimelinePage() {
     };
 
     const fetchData = async () => {
+      // ... (mostly unchanged; only the layout margin changed)
       try {
         const response = await fetch("/data/timeline.csv");
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -364,6 +368,7 @@ export default function TimelinePage() {
 
             const traces = [];
             for (const themeName of orderedThemes) {
+              // ... (same data processing as before)
               const themeRows = rows.filter((r) => r.Theme === themeName);
               if (themeRows.length === 0) continue;
 
@@ -399,6 +404,7 @@ export default function TimelinePage() {
               });
 
               const assignLanes = (events) => {
+                // ... (same lane assignment)
                 const lanes = Array(LANES_PER_THEME)
                   .fill()
                   .map(() => ({ lastDate: null }));
@@ -468,7 +474,7 @@ export default function TimelinePage() {
                 name: themeName,
                 marker: { size: 8, color: getMarkerColor(themeName) },
                 hovertemplate: "%{text}<extra></extra>",
-                showlegend: !isMobile, // hide Plotly legend items on mobile
+                showlegend: !isMobile,
               });
             }
 
@@ -489,6 +495,7 @@ export default function TimelinePage() {
             }
 
             const fixedShapes = [
+              // ... (same as before)
               {
                 type: "line",
                 x0: "1948-05-14",
@@ -535,10 +542,10 @@ export default function TimelinePage() {
                 showgrid: false,
                 linecolor: theme === "light" ? "#333333" : "#aaaaaa",
                 tickfont: {
-                  size: isMobile ? 8 : 10,      // smaller ticks on mobile
+                  size: isMobile ? 8 : 10,
                 },
-                tickangle: isMobile ? -45 : 0,  // rotate ticks to fit
-                automargin: true,               // let plotly adjust margins for rotated ticks
+                tickangle: isMobile ? -45 : 0,
+                automargin: true,
               },
               yaxis: { visible: false, range: yRange },
               paper_bgcolor: "transparent",
@@ -555,11 +562,12 @@ export default function TimelinePage() {
                 },
                 x: 1.02,
                 xanchor: "left",
-                ...(isMobile && { display: false }), // completely hide on mobile
+                ...(isMobile && { display: false }),
               },
               margin: {
-                l: 20,
-                r: isMobile ? 10 : 80,
+                // ** Mobile: zero side margins so plot aligns with sliders **
+                l: isMobile ? 0 : 20,
+                r: isMobile ? 0 : 80,
                 t: 10,
                 b: isMobile ? 60 : 50,
               },
@@ -575,6 +583,7 @@ export default function TimelinePage() {
               },
               shapes: fixedShapes,
               annotations: [
+                // ... (same annotations)
                 {
                   x: "1948-05-14",
                   y: 1.03,
@@ -624,14 +633,12 @@ export default function TimelinePage() {
             Plotly.purge(plotRef.current);
             Plotly.newPlot(plotRef.current, traces, layout, config);
 
-            // Disable right-click context menu on the plot
             const plotDiv = plotRef.current;
             plotDiv.oncontextmenu = (e) => e.preventDefault();
 
             plotReady.current = true;
             setError(null);
 
-            // Click on timeline dot: zoom map
             plotDiv.on("plotly_click", (data) => {
               const point = data.points[0];
               if (point && point.customdata) {
@@ -655,10 +662,11 @@ export default function TimelinePage() {
       if (plotRef.current) Plotly.purge(plotRef.current);
       plotReady.current = false;
     };
-  }, [theme, isMobile]); // isMobile added so layout re‑builds when screen size changes
+  }, [theme, isMobile]);
 
-  // Update map markers based on animation date (NO JITTER – markers stack)
+  // Update map markers based on animation date
   useEffect(() => {
+    // ... (unchanged)
     if (!animationDate || allPoints.length === 0) {
       setVisibleMarkers([]);
       setClickedInfo("");
@@ -686,6 +694,7 @@ export default function TimelinePage() {
 
   // Update vertical lines
   useEffect(() => {
+    // ... (unchanged)
     if (!plotReady.current || !plotRef.current) return;
     try {
       const fixedShapes = [
@@ -798,14 +807,10 @@ export default function TimelinePage() {
           maxWidth: "1400px",
           margin: "0 auto",
           padding: isMobile ? "0.5rem" : "1rem",
-          paddingBottom: isMobile ? "70px" : "1rem", // avoid hiding under legend
-          overflowX: "hidden", // prevent any accidental horizontal scroll
+          paddingBottom: isMobile ? "80px" : "1rem", // increased from 70px to 80px
+          overflowX: "hidden",
         }}
       >
-        {/* 
-          On mobile: stack columns vertically, each 100% wide.
-          On desktop: flex row with fixed left column.
-        */}
         <div
           style={{
             display: "flex",
@@ -814,7 +819,7 @@ export default function TimelinePage() {
             gap: "0.5rem",
           }}
         >
-          {/* LEFT COLUMN: Map and info panels */}
+          {/* LEFT COLUMN: Map + info */}
           <div
             style={{
               flex: isMobile ? "1 1 100%" : "0 0 500px",
@@ -822,11 +827,10 @@ export default function TimelinePage() {
               marginTop: "10px",
             }}
           >
-            {/* Map */}
             <div
               style={{
                 width: "100%",
-                height: isMobile ? "300px" : "400px", // slightly shorter on mobile
+                height: isMobile ? "300px" : "400px",
                 border: `1px solid ${borderColor}`,
                 background: "#30342f",
               }}
@@ -839,13 +843,11 @@ export default function TimelinePage() {
                 zoomControl={false}
                 key={mapCenter.toString() + mapZoom}
               >
-                {/* ESRI satellite base layer */}
                 <TileLayer
                   url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                   attribution=""
                 />
 
-                {/* Stamen Toner overlay (roads & labels) */}
                 {showOSMOverlay && (
                   <TileLayer
                     className="toner-blend-layer"
@@ -935,13 +937,13 @@ export default function TimelinePage() {
               </MapContainer>
             </div>
 
-            {/* Timeline info box */}
+            {/* Timeline info box – 40% taller on mobile: 280px */}
             <div
               style={{
                 ...containerStyle,
                 marginTop: "0.5rem",
                 width: "100%",
-                ...(isMobile && { height: "200px", overflowY: "auto" }),
+                ...(isMobile && { height: "280px", overflowY: "auto" }),
               }}
             >
               {clickedInfo ? (
@@ -951,7 +953,6 @@ export default function TimelinePage() {
               )}
             </div>
 
-            {/* Radar info – only on mobile, placed under the timeline info */}
             {isMobile && radarInfo && (
               <div
                 style={{
@@ -975,11 +976,16 @@ export default function TimelinePage() {
               minWidth: isMobile ? "100%" : "400px",
               width: isMobile ? "100%" : undefined,
               position: "relative",
+              overflow: "visible", // crucial: allow the radar overlay to extend outside
             }}
           >
-            {/* No horizontal scroll wrapper needed on mobile */}
-            <div style={{ width: "100%" }}>
-              {/* The plot itself */}
+            {/* No scroll wrapper needed on mobile; desktop keeps overflow auto but radar now outside */}
+            <div
+              style={{
+                width: "100%",
+                overflowX: isMobile ? "visible" : "auto",
+              }}
+            >
               <div
                 ref={plotRef}
                 style={{
@@ -1018,9 +1024,7 @@ export default function TimelinePage() {
                   min={PLOT_START}
                   max={PLOT_END}
                   step={STEP_MS}
-                  value={
-                    animationDate ? animationDate.getTime() : PLOT_START
-                  }
+                  value={animationDate ? animationDate.getTime() : PLOT_START}
                   onChange={handleTimelineSliderChange}
                   style={{
                     width: "100%",
@@ -1061,8 +1065,7 @@ export default function TimelinePage() {
                       fontSize: isMobile ? "0.7rem" : "0.8rem",
                     }}
                   >
-                    Radar:{" "}
-                    {radarDate ? formatDateForSlider(radarDate) : "—"}
+                    Radar: {radarDate ? formatDateForSlider(radarDate) : "—"}
                   </div>
                   <input
                     type="range"
@@ -1144,28 +1147,28 @@ export default function TimelinePage() {
                   </div>
                 )}
               </div>
-
-              {/* Radar info overlay – only on DESKTOP (absolute positioned) */}
-              {!isMobile && radarInfo && (
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: "30px",
-                    right: "-66px",
-                    width: "280px",
-                    maxHeight: "70%",
-                    overflowY: "auto",
-                    ...containerStyle,
-                    backgroundColor: "rgba(0, 0, 0, 0)",
-                    backdropFilter: "blur(4px)",
-                    zIndex: 1000,
-                    boxShadow: "0 2px 10px rgba(0, 0, 0, 0)",
-                  }}
-                >
-                  <div dangerouslySetInnerHTML={{ __html: radarInfo }} />
-                </div>
-              )}
             </div>
+
+            {/* Radar info overlay – DESKTOP only; now placed outside the inner scroll wrapper */}
+            {!isMobile && radarInfo && (
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: "30px",
+                  right: "-66px",
+                  width: "280px",
+                  maxHeight: "70%",
+                  overflowY: "auto",
+                  ...containerStyle,
+                  backgroundColor: "rgba(0, 0, 0, 0)",
+                  backdropFilter: "blur(4px)",
+                  zIndex: 1000,
+                  boxShadow: "0 2px 10px rgba(0, 0, 0, 0)",
+                }}
+              >
+                <div dangerouslySetInnerHTML={{ __html: radarInfo }} />
+              </div>
+            )}
           </div>
         </div>
       </div>
