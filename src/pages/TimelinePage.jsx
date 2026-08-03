@@ -593,7 +593,7 @@ export default function TimelinePage() {
   const borderColor = theme === "light" ? "#2c6e2c" : "#9afc97";
   const textColor = theme === "light" ? "#333333" : "#f0f0f0";
   
-  // ★ Desktop info box: auto‑expand (no fixed height) ★
+  // Desktop info box: auto‑expand (no fixed height)
   const containerStyle = {
     border: `1px solid ${borderColor}`,
     backgroundColor: "transparent",
@@ -621,7 +621,7 @@ export default function TimelinePage() {
             display: none;
           }
 
-          /* ★ Desktop plot inner margin ★ */
+          /* Desktop plot inner margin */
           .plot-inner {
             margin-bottom: 0.5rem;
           }
@@ -639,7 +639,7 @@ export default function TimelinePage() {
             .timeline-left-col > div:last-child {
               width: 100% !important;
               margin-top: 0.5rem !important;
-              height: 250px !important; /* ★ fixed height on mobile ★ */
+              height: 250px !important; /* fixed height on mobile */
             }
 
             .timeline-middle-col {
@@ -657,14 +657,14 @@ export default function TimelinePage() {
               min-width: 0 !important;
               width: 100% !important;
               height: 600px !important;
-              margin-bottom: 0 !important; /* ★ removes the gap ★ */
+              margin-bottom: 0 !important; /* removes the gap */
             }
 
-            /* Sliders: full width, remove top margin */
+            /* Sliders: full width, remove top margin, and pull up to close gap */
             .slider-container {
               width: 100% !important;
               margin-left: 0 !important;
-              margin-top: 0 !important;
+              margin-top: -0.5rem !important; /* pull up to eliminate gap */
             }
 
             /* Keep original spacing between sliders */
@@ -672,7 +672,12 @@ export default function TimelinePage() {
               margin-top: 0.8rem !important;
             }
 
-            /* ★ Radar info panel: moved above timeline slider ★ */
+            /* ★ Add spacing between Radar installations and Place Names ★ */
+            .osm-container {
+              margin-top: 0.8rem !important;
+            }
+
+            /* Radar info panel: moved above timeline slider */
             .radar-info-panel-inline {
               width: 100% !important;
               max-height: 180px !important;
@@ -859,12 +864,12 @@ export default function TimelinePage() {
               </details>
             </div>
 
-            {/* Plot wrapper – desktop uses .plot-inner with margin-bottom: 0.5rem, mobile overrides to 0 */}
+            {/* Plot – desktop uses .plot-inner with margin-bottom: 0.5rem, mobile overrides to 0 */}
             <div className="plot-wrapper" style={{ width: "100%", overflowX: "auto" }}>
               <div ref={plotRef} className="plot-inner" style={{ minWidth: "800px", height: "500px" }} />
             </div>
 
-            {/* Radar info overlay – desktop remains floating (absolute), mobile becomes inline above slider */}
+            {/* Radar info panel – desktop floating, mobile inline above slider */}
             {radarInfo && (
               <div className="radar-info-panel-inline" style={{
                 width: "280px",
@@ -923,7 +928,7 @@ export default function TimelinePage() {
             )}
 
             {/* OSM raster overlay controls – placed under radar slider */}
-            <div className="slider-container" style={{ ...sliderContainerStyle, marginTop: "0.5rem" }}>
+            <div className="slider-container osm-container" style={{ ...sliderContainerStyle, marginTop: "0.5rem" }}>
               <label style={{ fontFamily: "monospace", fontSize: "0.8rem", fontWeight: "normal", display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.2rem" }}>
                 <input
                   type="checkbox"
