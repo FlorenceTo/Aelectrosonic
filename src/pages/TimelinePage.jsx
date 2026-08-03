@@ -269,7 +269,6 @@ export default function TimelinePage() {
         curr.date > prev.date ? curr : prev
       );
 
-      // Build frequency display for single or multiple bands
       let bandDisplay = latest.bandType;
       if (latest.bandType && latest.bandType !== "Not Publicly Specified") {
         if (latest.bandType.includes("&")) {
@@ -559,7 +558,7 @@ export default function TimelinePage() {
               },
               margin: {
                 l: isMobile ? 0 : 20,
-                r: isMobile ? 0 : 80,
+                r: isMobile ? 0 : 20,   // ← changed from 80 to 20
                 t: 10,
                 b: isMobile ? 60 : 50,
               },
@@ -796,7 +795,7 @@ export default function TimelinePage() {
           maxWidth: "1400px",
           margin: "0 auto",
           padding: isMobile ? "0.5rem" : "1rem",
-          paddingBottom: isMobile ? "100px" : "1rem", // increased to 100px for mobile
+          paddingBottom: isMobile ? "100px" : "1rem",
           overflowX: "hidden",
         }}
       >
@@ -926,7 +925,7 @@ export default function TimelinePage() {
               </MapContainer>
             </div>
 
-            {/* Timeline info box – height increased on mobile */}
+            {/* Timeline info box */}
             <div
               style={{
                 ...containerStyle,
