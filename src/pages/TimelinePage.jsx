@@ -473,7 +473,8 @@ export default function TimelinePage() {
                 itemclick: false,
                 itemdoubleclick: false,
               },
-              margin: { l: isMobile ? 0 : 20, r: isMobile ? 10 : 80, t: 10, b: 50 },
+              // ★ REDUCED BOTTOM MARGIN ON MOBILE ★
+              margin: { l: isMobile ? 0 : 20, r: isMobile ? 10 : 80, t: 10, b: isMobile ? 10 : 50 },
               hoverlabel: { bgcolor: theme === "light" ? "rgba(220,220,220,0.7)" : "rgba(30,30,30,0.7)", bordercolor: "#9afc97", font: { size: 10 }, align: "left", namelength: -1 },
               shapes: fixedShapes,
               annotations: [
@@ -648,16 +649,11 @@ export default function TimelinePage() {
               margin-bottom: 0 !important;
             }
 
-            /* Sliders: full width, remove top margin */
+            /* Sliders: full width, keep original top margins */
             .slider-container {
               width: 100% !important;
               margin-left: 0 !important;
               margin-top: 0 !important;
-            }
-
-            /* Pull the timeline slider label up to close the gap */
-            .timeline-slider-label {
-              margin-top: 0.2rem !important;
             }
 
             /* Keep original spacing between sliders */

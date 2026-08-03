@@ -4086,16 +4086,16 @@ uniform ${n} ${r} u_${i};
               margin-bottom: 0 !important;
             }
 
-            /* Sliders: full width, shift timeline slider up by 5px */
+            /* Sliders: full width, remove top margin */
             .slider-container {
               width: 100% !important;
               margin-left: 0 !important;
-              margin-top: -5px !important;
+              margin-top: 0 !important;
             }
 
-            /* Pull the timeline slider label up */
+            /* Pull the timeline slider label up to close the gap */
             .timeline-slider-label {
-              margin-top: -2.2rem !important;
+              margin-top: 0.2rem !important;
             }
 
             /* Keep original spacing between sliders */
