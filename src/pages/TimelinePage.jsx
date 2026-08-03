@@ -448,9 +448,6 @@ export default function TimelinePage() {
               { type: "line", x0: "2023-10-07", x1: "2023-10-07", y0: 0, y1: 1, yref: "paper", line: { color: "#9afc97", width: 0.7, dash: "dash" } }
             ];
 
-            // Mobile detection – only for layout adjustments
-            const isMobile = window.innerWidth < 768;
-
             const layout = {
               xaxis: { 
                 type: "date", 
@@ -458,29 +455,20 @@ export default function TimelinePage() {
                 rangemode: "normal", 
                 showgrid: false, 
                 linecolor: theme === "light" ? "#333333" : "#aaaaaa", 
-                tickfont: { size: isMobile ? 8 : 10 },
+                tickfont: { size: 10 },
               },
               yaxis: { visible: false, range: yRange },
               paper_bgcolor: "transparent", plot_bgcolor: "transparent",
               font: { color: theme === "light" ? "#1a1a1a" : "#f0f0f0", family: "Inter, sans-serif" },
-              legend: { 
-                orientation: isMobile ? "h" : "v", 
-                traceorder: "normal", 
-                font: { color: theme === "light" ? "#1a1a1a" : "#f0f0f0" }, 
-                x: isMobile ? 0.5 : 1.02, 
-                xanchor: isMobile ? "center" : "left",
-                y: isMobile ? -0.25 : undefined,
-                itemclick: false,
-                itemdoubleclick: false,
-              },
-              margin: { l: isMobile ? 0 : 20, r: isMobile ? 10 : 80, t: 10, b: 50 },
+              legend: { orientation: "v", traceorder: "normal", font: { color: theme === "light" ? "#1a1a1a" : "#f0f0f0" }, x: 1.02, xanchor: "left" },
+              margin: { l: 20, r: 80, t: 10, b: 50 },
               hoverlabel: { bgcolor: theme === "light" ? "rgba(220,220,220,0.7)" : "rgba(30,30,30,0.7)", bordercolor: "#9afc97", font: { size: 10 }, align: "left", namelength: -1 },
               shapes: fixedShapes,
               annotations: [
-                { x: "1948-05-14", y: 1.03, yref: "paper", text: "1948", showarrow: false, font: { color: "#9afc97", size: isMobile ? 8 : 10 }, xanchor: "center" },
-                { x: "1967-06-05", y: 1.03, yref: "paper", text: "1967", showarrow: false, font: { color: "#9afc97", size: isMobile ? 8 : 10 }, xanchor: "center" },
-                { x: "1995-09-28", y: 1.03, yref: "paper", text: "1995", showarrow: false, font: { color: "#9afc97", size: isMobile ? 8 : 10 }, xanchor: "center" },
-                { x: "2023-10-07", y: 1.03, yref: "paper", text: "2023", showarrow: false, font: { color: "#9afc97", size: isMobile ? 8 : 10 }, xanchor: "center" }
+                { x: "1948-05-14", y: 1.03, yref: "paper", text: "1948", showarrow: false, font: { color: "#9afc97", size: 10 }, xanchor: "center" },
+                { x: "1967-06-05", y: 1.03, yref: "paper", text: "1967", showarrow: false, font: { color: "#9afc97", size: 10 }, xanchor: "center" },
+                { x: "1995-09-28", y: 1.03, yref: "paper", text: "1995", showarrow: false, font: { color: "#9afc97", size: 10 }, xanchor: "center" },
+                { x: "2023-10-07", y: 1.03, yref: "paper", text: "2023", showarrow: false, font: { color: "#9afc97", size: 10 }, xanchor: "center" }
               ]
             };
             const config = { 
@@ -493,12 +481,15 @@ export default function TimelinePage() {
 
             Plotly.purge(plotRef.current);
             Plotly.newPlot(plotRef.current, traces, layout, config);
-
+            
+            // Disable right-click context menu on the plot
             const plotDiv = plotRef.current;
             plotDiv.oncontextmenu = (e) => e.preventDefault();
+            
             plotReady.current = true;
             setError(null);
 
+            // Click on timeline dot: zoom map
             plotDiv.on("plotly_click", (data) => {
               const point = data.points[0];
               if (point && point.customdata) {
@@ -611,28 +602,30 @@ export default function TimelinePage() {
       <Header />
       <div className="container" style={{ maxWidth: "1400px", margin: "0 auto", padding: "1rem" }}>
         <style>{`
-          /* Hide mobile legend on desktop */
+          /* Mobile-only styles */
           .mobile-legend-container {
             display: none;
           }
 
           @media (max-width: 768px) {
-            /* Make columns full width */
-            .timeline-left-col {
+            /* Left column full width, map smaller */
+            .left-col {
               flex: 1 1 100% !important;
               width: 100% !important;
               margin-top: 0 !important;
             }
-            .timeline-left-col > div:first-child {
+            .left-col > div:first-child {
               height: 300px !important;
             }
-            .timeline-left-col > div:last-child {
+            .left-col > div:last-child {
               width: 100% !important;
               margin-top: 0.5rem !important;
+              height: 150px !important;
+              overflow-y: auto !important;
             }
 
-            /* Middle column: flex column with ordering */
-            .timeline-middle-col {
+            /* Right column full width, flex column, reorder children */
+            .right-col {
               flex: 1 1 100% !important;
               min-width: 0 !important;
               width: 100% !important;
@@ -640,39 +633,36 @@ export default function TimelinePage() {
               flex-direction: column !important;
             }
 
-            /* Slider containers: order 1, plot: order 2, legend: order 3 */
-            .slider-container {
+            /* Sliders come first (order: 1), plot comes second (order: 2), legend last (order: 3) */
+            .sliders-wrapper {
               order: 1;
-              width: 100% !important;
-              margin-left: 0 !important;
+              width: 100%;
             }
             .plot-wrapper {
               order: 2;
               width: 100%;
               overflow-x: auto;
             }
+            .plot-wrapper > div {
+              min-width: 0 !important;
+              width: 100% !important;
+              height: 400px !important;
+              margin-bottom: 0 !important;
+            }
+
+            /* Legend at the very bottom */
             .mobile-legend-container {
-              order: 3;
-              display: block !important;
+              display: block;
+              order: 3; /* placed after plot */
+              margin-top: 0.5rem;
               width: 100%;
               border: 1px solid ${borderColor};
               padding: 0.3rem 0.5rem;
               background: rgba(0, 0, 0, 0.3);
-              margin-top: 0.5rem;
             }
             body.light-bg .mobile-legend-container {
               background: rgba(255, 255, 255, 0.8);
             }
-
-            /* Plot: shrink to fit, increase height, keep margin */
-            .plot-wrapper > div {
-              min-width: 0 !important;
-              width: 100% !important;
-              height: 600px !important;
-              margin-bottom: 0.5rem !important;
-            }
-
-            /* Mobile legend items (no dropdown) */
             .mobile-legend-items {
               display: flex;
               flex-wrap: wrap;
@@ -706,7 +696,23 @@ export default function TimelinePage() {
               display: none !important;
             }
 
-            /* Radar info panel: inline */
+            /* Sliders full width, remove left margin */
+            .sliders-wrapper .slider-container {
+              width: 100% !important;
+              margin-left: 0 !important;
+              margin-top: 0.5rem !important;
+            }
+            .sliders-wrapper .slider-container:first-child {
+              margin-top: 0 !important;
+            }
+            .sliders-wrapper .radar-slider {
+              margin-top: 0.8rem !important;
+            }
+            .sliders-wrapper .osm-container {
+              margin-top: 0.8rem !important;
+            }
+
+            /* Radar info panel: inline, below sliders */
             .radar-info-panel-inline {
               width: 100% !important;
               max-height: 180px !important;
@@ -717,14 +723,6 @@ export default function TimelinePage() {
               bottom: auto !important;
               right: auto !important;
               overflow-y: auto !important;
-              order: 2; /* keep it between sliders and plot if needed, or adjust */
-            }
-            /* Adjust radar slider top margin */
-            .radar-slider {
-              margin-top: 0.8rem !important;
-            }
-            .osm-container {
-              margin-top: 0.8rem !important;
             }
           }
 
@@ -737,10 +735,13 @@ export default function TimelinePage() {
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
           {/* LEFT COLUMN: Map and timeline info panel */}
-          <div className="timeline-left-col" style={{ flex: "0 0 500px", width: "500px", marginTop: "10px" }}>
+          <div className="left-col" style={{ flex: "0 0 500px", width: "500px", marginTop: "10px" }}>
             <div style={{ width: "100%", height: "400px", border: `1px solid ${borderColor}`, background: "#30342f" }}>
               <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: "100%", width: "100%" }} attributionControl={false} zoomControl={false} key={mapCenter.toString() + mapZoom}>
+                {/* ESRI satellite base layer */}
                 <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="" />
+                
+                {/* Stamen Toner overlay (roads & labels) */}
                 {showOSMOverlay && (
                   <TileLayer
                     className="toner-blend-layer"
@@ -749,6 +750,7 @@ export default function TimelinePage() {
                     opacity={osmOverlayOpacity}
                   />
                 )}
+                
                 {visibleMarkers.map((point, idx) => {
                   const colorHex = colorToHex(getMarkerColor(point.theme));
                   const yearsSince = (animationDate - point.date) / (1000 * 60 * 60 * 24 * 365.25);
@@ -806,81 +808,84 @@ export default function TimelinePage() {
             </div>
           </div>
 
-          {/* MIDDLE COLUMN: Sliders + radar info + plot + legend (mobile order via flex) */}
-          <div className="timeline-middle-col" style={{ flex: "1", minWidth: "400px", position: "relative" }}>
-            {/* Timeline slider */}
-            <div className="slider-container" style={sliderContainerStyle}>
-              <div className="timeline-slider-label" style={{ marginBottom: "0.4rem", marginTop: "-1.20rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
-                Timeline: {animationDate ? formatDateForSlider(animationDate) : "—"}
-              </div>
-              <input
-                type="range"
-                min={PLOT_START}
-                max={PLOT_END}
-                step={STEP_MS}
-                value={animationDate ? animationDate.getTime() : PLOT_START}
-                onChange={handleTimelineSliderChange}
-                style={{ width: "100%", accentColor: "#555", height: "4px", borderRadius: "2px" }}
-              />
-              <div style={{ fontSize: "0.7rem", marginTop: "0.5rem", color: textColor }}>
-                Drag to reveal timeline events. Glow grows with years passed.
-              </div>
-            </div>
-
-            {/* Radar slider */}
-            {minRadarDate && maxRadarDate && (
-              <div className="slider-container radar-slider" style={{ ...sliderContainerStyle, marginTop: "0.8rem" }}>
-                <div style={{ marginBottom: "0.1rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
-                  Radar: {radarDate ? formatDateForSlider(radarDate) : "—"}
+          {/* MIDDLE COLUMN: Sliders + plot + legend */}
+          <div className="right-col" style={{ flex: "1", minWidth: "400px", position: "relative" }}>
+            {/* Sliders wrapper – contains timeline, radar, place names */}
+            <div className="sliders-wrapper">
+              {/* Timeline slider */}
+              <div className="slider-container" style={sliderContainerStyle}>
+                <div style={{ marginBottom: "0.4rem", marginTop: "-1.20rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
+                  Timeline: {animationDate ? formatDateForSlider(animationDate) : "—"}
                 </div>
                 <input
                   type="range"
                   min={PLOT_START}
                   max={PLOT_END}
                   step={STEP_MS}
-                  value={radarDate ? radarDate.getTime() : PLOT_START}
-                  onChange={handleRadarSliderChange}
-                  style={{ width: "100%", accentColor: "#888", height: "4px", borderRadius: "2px" }}
+                  value={animationDate ? animationDate.getTime() : PLOT_START}
+                  onChange={handleTimelineSliderChange}
+                  style={{ width: "100%", accentColor: "#555", height: "4px", borderRadius: "2px" }}
                 />
                 <div style={{ fontSize: "0.7rem", marginTop: "0.5rem", color: textColor }}>
-                  Radar installations
+                  Drag to reveal timeline events. Glow grows with years passed.
                 </div>
               </div>
-            )}
 
-            {/* OSM raster overlay controls */}
-            <div className="slider-container osm-container" style={{ ...sliderContainerStyle, marginTop: "0.5rem" }}>
-              <label style={{ fontFamily: "monospace", fontSize: "0.8rem", fontWeight: "normal", display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.2rem" }}>
-                <input
-                  type="checkbox"
-                  checked={showOSMOverlay}
-                  onChange={(e) => setShowOSMOverlay(e.target.checked)}
-                  style={{ accentColor: borderColor }}
-                />
-                Place Names
-              </label>
-              {showOSMOverlay && (
-                <div>
+              {/* Radar slider */}
+              {minRadarDate && maxRadarDate && (
+                <div className="slider-container radar-slider" style={{ ...sliderContainerStyle, marginTop: "0.8rem" }}>
+                  <div style={{ marginBottom: "0.1rem", fontFamily: "monospace", fontSize: "0.8rem" }}>
+                    Radar: {radarDate ? formatDateForSlider(radarDate) : "—"}
+                  </div>
                   <input
                     type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={osmOverlayOpacity}
-                    onChange={(e) => setOsmOverlayOpacity(parseFloat(e.target.value))}
-                    style={{
-                      width: "100%",
-                      accentColor: "#a7a5a5",
-                      height: "4px",
-                      borderRadius: "2px",
-                      marginTop: "4px"
-                    }}
+                    min={PLOT_START}
+                    max={PLOT_END}
+                    step={STEP_MS}
+                    value={radarDate ? radarDate.getTime() : PLOT_START}
+                    onChange={handleRadarSliderChange}
+                    style={{ width: "100%", accentColor: "#888", height: "4px", borderRadius: "2px" }}
                   />
+                  <div style={{ fontSize: "0.7rem", marginTop: "0.5rem", color: textColor }}>
+                    Radar installations
+                  </div>
                 </div>
               )}
+
+              {/* OSM raster overlay controls */}
+              <div className="slider-container osm-container" style={{ ...sliderContainerStyle, marginTop: "0.5rem" }}>
+                <label style={{ fontFamily: "monospace", fontSize: "0.8rem", fontWeight: "normal", display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.2rem" }}>
+                  <input
+                    type="checkbox"
+                    checked={showOSMOverlay}
+                    onChange={(e) => setShowOSMOverlay(e.target.checked)}
+                    style={{ accentColor: borderColor }}
+                  />
+                  Place Names
+                </label>
+                {showOSMOverlay && (
+                  <div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      value={osmOverlayOpacity}
+                      onChange={(e) => setOsmOverlayOpacity(parseFloat(e.target.value))}
+                      style={{
+                        width: "100%",
+                        accentColor: "#a7a5a5",
+                        height: "4px",
+                        borderRadius: "2px",
+                        marginTop: "4px"
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Radar info panel */}
+            {/* Radar info overlay */}
             {radarInfo && (
               <div className="radar-info-panel-inline" style={{
                 width: "280px",
@@ -893,9 +898,6 @@ export default function TimelinePage() {
                 marginTop: "0.5rem",
                 marginBottom: "0.5rem",
                 fontSize: "0.8rem",
-                position: "relative",
-                bottom: "auto",
-                right: "auto",
               }}>
                 <div dangerouslySetInnerHTML={{ __html: radarInfo }} />
               </div>
@@ -906,7 +908,7 @@ export default function TimelinePage() {
               <div ref={plotRef} style={{ minWidth: "800px", height: "500px", marginBottom: "0.5rem" }} />
             </div>
 
-            {/* Mobile legend – simple fixed box without title, placed below plot */}
+            {/* Mobile legend at the very bottom */}
             <div className="mobile-legend-container">
               <div className="mobile-legend-items">
                 {orderedThemes.map((themeName) => (
