@@ -621,6 +621,11 @@ export default function TimelinePage() {
             display: none;
           }
 
+          /* ★ Desktop plot inner margin ★ */
+          .plot-inner {
+            margin-bottom: 0.5rem;
+          }
+
           @media (max-width: 768px) {
             /* Make columns full width */
             .timeline-left-col {
@@ -634,7 +639,7 @@ export default function TimelinePage() {
             .timeline-left-col > div:last-child {
               width: 100% !important;
               margin-top: 0.5rem !important;
-              height: 200px !important; /* ★ fixed height on mobile: 200px ★ */
+              height: 250px !important; /* ★ fixed height on mobile ★ */
             }
 
             .timeline-middle-col {
@@ -643,16 +648,16 @@ export default function TimelinePage() {
               width: 100% !important;
             }
 
-            /* Plot: shrink to fit, increase height */
+            /* Plot: shrink to fit, increase height, remove margin */
             .plot-wrapper {
               overflow-x: auto !important;
               margin-bottom: 0 !important;
             }
-            .plot-wrapper > div {
+            .plot-inner {
               min-width: 0 !important;
               width: 100% !important;
               height: 600px !important;
-              margin-bottom: 0 !important;
+              margin-bottom: 0 !important; /* ★ removes the gap ★ */
             }
 
             /* Sliders: full width, remove top margin */
@@ -854,12 +859,12 @@ export default function TimelinePage() {
               </details>
             </div>
 
-            {/* Plot wrapper with class */}
+            {/* Plot wrapper – desktop uses .plot-inner with margin-bottom: 0.5rem, mobile overrides to 0 */}
             <div className="plot-wrapper" style={{ width: "100%", overflowX: "auto" }}>
-              <div ref={plotRef} style={{ minWidth: "800px", height: "500px", marginBottom: "0.5rem" }} />
+              <div ref={plotRef} className="plot-inner" style={{ minWidth: "800px", height: "500px" }} />
             </div>
 
-            {/* Radar info overlay – moved ABOVE timeline slider on mobile */}
+            {/* Radar info overlay – desktop remains floating (absolute), mobile becomes inline above slider */}
             {radarInfo && (
               <div className="radar-info-panel-inline" style={{
                 width: "280px",
