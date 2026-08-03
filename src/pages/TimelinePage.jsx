@@ -1022,7 +1022,7 @@ export default function TimelinePage() {
                     color: textColor,
                   }}
                 >
-                  Drag to reveal timeline events. Glow grows with years passed.
+                  Drag to reveal timeline events.
                 </div>
               </div>
 
@@ -1136,7 +1136,7 @@ export default function TimelinePage() {
                   style={{
                     position: "absolute",
                     bottom: "30px",
-                    right: "-80px",
+                    right: "-20px",
                     width: "250px",
                     maxHeight: "80%",
                     overflowY: "auto",
