@@ -1137,7 +1137,7 @@ export default function TimelinePage() {
                     position: "absolute",
                     bottom: "30px",
                     right: "-66px",
-                    width: "280px",
+                    width: "250px",
                     maxHeight: "70%",
                     overflowY: "auto",
                     ...containerStyle,
