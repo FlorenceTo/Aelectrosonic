@@ -4,7 +4,7 @@ import Header from "../components/Header";
 export default function AboutPage() {
   const [theme, setTheme] = useState("dark");
 
-  // Theme detection (unchanged)
+  // Theme detection
   useEffect(() => {
     const observer = new MutationObserver(() => {
       const isLight = document.body.classList.contains("light-bg");
@@ -37,8 +37,11 @@ export default function AboutPage() {
             letterSpacing: "0.02em",
             width: "100%",
             boxSizing: "border-box",
+            position: "relative", // Needed for the absolute overlay
+            overflow: "hidden",   // Keeps the gradient inside the rounded box
           }}
         >
+          {/* ===== TEXT CONTENT ===== */}
           <p style={{ margin: "0 0 1rem 0" }}>
             During fieldwork in Palestine, I often became aware of systems that were present but not visible. A mobile phone could hold a strong connection where no telecommunications tower could be seen. A directional microphone could bring the sound of a distant bird or aircraft closer before either came into view. A wideband receiver could render electromagnetic activity audible, but only within the limits of its frequency range and sensitivity. What became perceptible depended on the instrument, its placement and the conditions surrounding it. The landscape did not render more visible as more devices were introduced; different aspects emerged while others remained distant, obscured or absent.
           </p>
@@ -51,6 +54,26 @@ export default function AboutPage() {
           <p style={{ margin: "0 0 1rem 0" }}>
             Interference becomes an investigative condition within this process. It draws attention to the moment when a relation becomes unstable: between a bird and its tracker, a satellite and receiver, a sound and microphone, or a body and the infrastructures surrounding it. An interruption may result from technical failure, environmental conditions, depleted power, signal obstruction or deliberate disruption; its presence alone cannot establish a cause. Remaining with it, rather than immediately removing it from the record, keeps open the question of what occurred and what the system was unable to register. The research presented here remains continuous and unfinished. Further fieldwork, conversations and technical experiments may change how earlier material is interpreted. This website functions as a working research environment for considering what exists, how it becomes perceptible and what happens when living movement is measured, translated and made public.
           </p>
+
+          {/* ===== GRADIENT WASH OVERLAY ===== */}
+          {/* 
+            Adjust the angle by changing "45deg" 
+            Adjust the wash intensity by changing the "0.25" values (e.g. 0.1 = faint, 0.4 = strong)
+          */}
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              backgroundImage: "linear-gradient(45deg, rgba(255, 0, 0, 0.25), rgba(0, 255, 0, 0.25))",
+              pointerEvents: "none", // Allows text selection and clicking through
+              zIndex: 1,
+              // Uncomment the line below for a more blended, "photoshop filter" feel:
+              // mixBlendMode: "overlay", 
+            }}
+          />
         </div>
       </div>
     </div>
