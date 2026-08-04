@@ -155,14 +155,16 @@ export default function BirdMapPage() {
           </div>
 
           <p>
-            For someone without technical knowledge, the tracker can be understood as a small programmable
-            computer carried by the bird. It was not a camera and did not continuously watch the animal. At
-            scheduled times, it calculated a GPS position, measured changes in the bird's bodily movement and
-            stored those measurements inside the device. Researchers later retrieved the records through a
-            short-range UHF radio connection. The tags followed different daytime schedules across the study
-            period. Some recorded GPS positions every ten minutes, while others recorded them every minute before
-            the records were reduced to ten-minute intervals for analysis. The route shown on the map is therefore
-            not a continuous journey observed from beginning to end. It is a reconstruction made by connecting
+            The tracker can be understood as a small programmable computer carried by the bird. It did not
+            function as a camera and did not continuously watch the animal. At scheduled times, it calculated
+            a GPS position, measured changes in the bird's bodily movement and stored those measurements
+            inside the device. Researchers later retrieved the records through a local UHF radio connection.
+            UHF stands for ultra-high frequency, a type of radio transmission that allowed the stored data to
+            be downloaded when researchers and their receiving equipment were within range of the tracker.
+            The tags followed different daytime schedules across the study period. Some recorded GPS
+            positions every ten minutes, while others recorded them every minute before the records were
+            reduced to ten-minute intervals for analysis. The route shown on the map is therefore not a
+            continuous journey observed from beginning to end. It is a reconstruction made by connecting
             separate measurements collected according to the device's programming.
           </p>
           <p>
