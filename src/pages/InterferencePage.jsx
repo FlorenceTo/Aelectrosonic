@@ -76,7 +76,7 @@ export default function InterferencePage() {
                 This terrain is generated from raw GPS tracking data recorded from a single Griffon Vulture moving across the Negev Desert and the area surrounding the Dead Sea. The data remains unfiltered, retaining the moments when the tracking system failed to produce a valid position or the signal disappeared from the record.
               </p>
               <p>
-                Rather than removing these interruptions as technical errors, the visualisation keeps them present as part of the conditions through which the bird’s movement became knowable. Some of the anomalies appear repeatedly within particular geographic areas, including locations near military and radar infrastructures. Their proximity does not establish a direct cause, but it raises questions about the electromagnetic conditions surrounding the tracking system and the moments when its relation to the bird, satellite and ground infrastructure broke down.
+                Rather than removing these interruptions as technical errors, the visualisation keeps them present as part of the conditions through which the bird's movement became knowable. Some of the anomalies appear repeatedly within particular geographic areas, including locations near military and radar infrastructures. Their proximity does not establish a direct cause, but it raises questions about the electromagnetic conditions surrounding the tracking system and the moments when its relation to the bird, satellite, and ground infrastructure created a signal loss.
               </p>
               <p>
                 The raw GPS track and its interruptions are plotted directly, allowing you to explore the spatial clustering of these anomalies.
