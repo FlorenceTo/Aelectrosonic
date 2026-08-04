@@ -21,7 +21,7 @@ export default function AboutPage() {
   // Style for gradient text – applied to each paragraph
   const gradientTextStyle = {
     margin: "0 0 1rem 0",
-    backgroundImage: "linear-gradient(38deg, rgba(255, 0, 0, 0.9), rgba(154, 252, 151, 0.9))",
+    backgroundImage: "linear-gradient(50deg, rgb(248, 248, 144), rgba(154, 252, 151, 0.9))",
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",
     backgroundClip: "text",
