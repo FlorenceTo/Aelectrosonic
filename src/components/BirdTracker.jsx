@@ -208,7 +208,7 @@ export default function BirdTracker() {
           const operator = row.Operator || "";
           const status = row.Status || "";
           const jurisdiction = row.Jurisdiction || "";
-          const dateInstalled = row["Date Installed"] || "";
+          const date = row["Date"] || "";
 
           const item = {
             lat,
