@@ -831,6 +831,12 @@ export default function InterviewsPage() {
         radically different conditions of authority, access, and mobility, and what this reveals 
         about the politics of observing life.
       </p>
+      <p className="ethos-note-small">
+      To protect participants from surveillance, facial recognition tracking, and data 
+      scanning, names are not used unless participants explicitly gave permission and 
+      stated their name during the conversation. This reflects a commitment to ethical 
+      research practice under conditions where visibility can carry risk.
+    </p>
 
         {/* ---- Tabs ---- */}
         <div className="tabs">
@@ -994,21 +1000,42 @@ export default function InterviewsPage() {
           border-color: #2c6e2c;
           color: #2c6e2c;
         }
-        @media (max-width: 768px) {
-          .speaker-text {
-            font-size: 0.75rem;
-          }
-          .transcript {
-            max-height: 60vh;
-          }
-          .tabs {
-            gap: 0.3rem;
-          }
-          .tab {
-            font-size: 0.75rem;
-            padding: 0.3rem 0.8rem;
-          }
+      @media (max-width: 768px) {
+        .speaker-text {
+          font-size: 0.75rem;
         }
+        .transcript {
+          max-height: 60vh;
+        }
+        .tabs {
+          gap: 0.3rem;
+        }
+        .tab {
+          font-size: 0.75rem;
+          padding: 0.3rem 0.8rem;
+        }
+        .ethos-note-small {
+          font-size: 0.7rem;
+        }
+      }
+
+      /* ---- NEW: ethical note styles (outside media query) ---- */
+      .ethos-note-small {
+        font-size: 0.8rem;
+        font-style: italic;
+        opacity: 0.75;
+        margin-top: 0.5rem;
+        max-width: 750px;
+        line-height: 1.5;
+      }
+      body.light-bg .ethos-note-small {
+        color: #333;
+      }
+          @media (max-width: 768px) {
+            .ethos-note-small {
+              font-size: 0.7rem;
+            }
+          }
       `}</style>
     </div>
   );
