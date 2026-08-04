@@ -1021,7 +1021,7 @@ export default function TimelinePage() {
                     color: textColor,
                   }}
                 >
-                  Drag to reveal timeline events.
+                  Drag to reveal timeline events
                 </div>
               </div>
 

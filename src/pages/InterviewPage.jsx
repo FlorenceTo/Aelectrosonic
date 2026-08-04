@@ -438,7 +438,7 @@ const interviews = [
   {
     id: 3,
     title: "Interviewee: D",
-    meta: "Executive Director, Environmental Education Center, Talitha Kumi",
+    meta: "Executive Director of Environmental Education Center, Talitha Kumi",
     date: "Recorded in Beit Jala, 2026",
     transcript: [
       { speaker: "A", text: "Can you please introduce yourself and what you do?", timestamp: "00:00:00" },
@@ -529,7 +529,7 @@ const interviews = [
   {
     id: 4,
     title: "Interviewee: E",
-    meta: "Professor (retired), Ornithologist",
+    meta: "Professor Emeritus and Ornithologist",
     date: "Recorded in Bethleham, 2026",
     transcript: [
       { speaker: "A", text: "I'm currently researching bird migration as a form of movement at the intersection of sensing technologies, aerospace management, and institutional decision-making. I'm particularly interested in how ecological knowledge is produced in regions where aerospace is tightly managed and politically complex. Your work appeared frequently in my research when looking at radar systems, because it sits between the topology of radar technology, aviation safety, and military planning. I'm interested in your practice – you've been doing this for 40 years – and I want to ask you some questions about conservation, how protecting birds in the sky is being utilised, and what difficulties and complexities are at hand.", timestamp: "00:00:00" },
@@ -625,7 +625,7 @@ const interviews = [
   {
     id: 5,
     title: "Interviewee: F",
-    meta: "Architect, Researcher, and Community Educator",
+    meta: "Architect, Researcher and Community Educator",
     date: "Recorded in Ein Qiniya, 2026",
     transcript: [
       { speaker: "A", text: "I want to explain briefly my intention for this conversation.", timestamp: "00:00:00" },
