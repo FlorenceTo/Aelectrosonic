@@ -102,7 +102,7 @@ export default function BirdMapPage() {
           {/* Image 1 – GPS device */}
           <div className="image-block">
             <img
-              src="/images/gps_device_eobs.jpeg"
+              src="/images/gps_device_eobs.jpg"
               alt="Representative GPS tracking devices used in Hebrew University vulture research."
               className="full-width-image"
             />
