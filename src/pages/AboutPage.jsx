@@ -4,7 +4,7 @@ import Header from "../components/Header";
 export default function AboutPage() {
   const [theme, setTheme] = useState("dark");
 
-  // Theme detection
+  // Theme detection (unchanged)
   useEffect(() => {
     const observer = new MutationObserver(() => {
       const isLight = document.body.classList.contains("light-bg");
@@ -40,17 +40,17 @@ export default function AboutPage() {
           }}
         >
           <p style={{ margin: "0 0 1rem 0" }}>
-            Welcome to Spectral Ecologies. You have arrived here because this link was shared with you, either by me or through someone connected to the project. This is an ongoing research practice and a space for developing ideas, materials, and encounters rather than a public archive. I kindly ask that the URL is not shared without permission. Thank you for respecting the nature of the work and the relationships that make it possible. If you would like to learn more or get in touch, please visit{" "}
-            <a 
-              href="https://www.florence-to.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ color: borderColor, textDecoration: "underline" }}
-            >
-              florence-to.com
-            </a>.
+            During fieldwork in Palestine, I often became aware of systems that were present but not visible. A mobile phone could hold a strong connection where no telecommunications tower could be seen. A directional microphone could bring the sound of a distant bird or aircraft closer before either came into view. A wideband receiver could render electromagnetic activity audible, but only within the limits of its frequency range and sensitivity. What became perceptible depended on the instrument, its placement and the conditions surrounding it. The landscape did not render more visible as more devices were introduced; different aspects emerged while others remained distant, obscured or absent.
           </p>
-
+          <p style={{ margin: "0 0 1rem 0" }}>
+            This research began from the partial and absent forms through which an environment becomes perceptible. What appears through a microphone, tracking device, map or spectrogram is never the environment in full. It is formed through a relation between a living body, a technical instrument, the conditions in which a measurement takes place and the person interpreting what has been recorded. A bird becomes a coordinate. Electromagnetic activity becomes sound. Separate measurements become a route. A missing position may be classified as an error, yet its disappearance also marks the point at which a technical relation has failed to produce what was expected. These translations make movement and infrastructure available for study, while changing the conditions through which they first became known.
+          </p>
+          <p style={{ margin: "0 0 1rem 0" }}>
+            I use the term spectral ecologies to describe these relations. Spectral refers to acoustic and electromagnetic frequencies, as well as to incomplete appearances: signals passing through bodies and landscapes without becoming directly visible, sounds arriving before their sources enter view, and movements reconstructed from traces left by sensing systems. Ecology is understood here as more than a relationship between organisms and a supposedly natural environment. It also includes satellites, transmitters, radar, tracking devices, communications networks, military infrastructures and the political conditions determining where people and animals can move. The material on this website should therefore be read neither as a transparent representation nor as evidence leading towards one explanation. Maps, recordings and visualisations retain the decisions, limits and interruptions through which knowledge was produced.
+          </p>
+          <p style={{ margin: "0 0 1rem 0" }}>
+            Interference becomes an investigative condition within this process. It draws attention to the moment when a relation becomes unstable: between a bird and its tracker, a satellite and receiver, a sound and microphone, or a body and the infrastructures surrounding it. An interruption may result from technical failure, environmental conditions, depleted power, signal obstruction or deliberate disruption; its presence alone cannot establish a cause. Remaining with it, rather than immediately removing it from the record, keeps open the question of what occurred and what the system was unable to register. The research presented here remains continuous and unfinished. Further fieldwork, conversations and technical experiments may change how earlier material is interpreted. This website functions as a working research environment for considering what exists, how it becomes perceptible and what happens when living movement is measured, translated and made public.
+          </p>
         </div>
       </div>
     </div>
