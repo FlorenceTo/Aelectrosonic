@@ -832,10 +832,7 @@ export default function InterviewsPage() {
         about the politics of observing life.
       </p>
       <p className="ethos-note-small">
-      To protect participants from surveillance, facial recognition tracking, and data 
-      scanning, names are not used unless participants explicitly gave permission and 
-      stated their name during the conversation. This reflects a commitment to ethical 
-      research practice under conditions where visibility can carry risk.
+        To protect participants from surveillance, facial recognition tracking, and data scanning, names are not used unless participants explicitly gave permission and stated their name during the conversation. This reflects a commitment to ethical research practice under conditions where visibility can carry risk.
     </p>
 
         {/* ---- Tabs ---- */}
