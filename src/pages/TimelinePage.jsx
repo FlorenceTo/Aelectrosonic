@@ -672,7 +672,6 @@ export default function TimelinePage() {
                           <strong>Date:</strong> ${latest.date.toLocaleDateString()}<br>
                           <strong>Jurisdiction:</strong> ${latest.jurisdiction}<br>
                           <strong>Area:</strong> ${latest.area}<br>
-                          <strong>Coordinates:</strong> ${latest.lat}, ${latest.lng}<br>
                           ${latest.description}<br>
                           <a href="${latest.source}" target="_blank">Source</a>`;
       setClickedInfo(description);

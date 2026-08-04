@@ -4559,7 +4559,6 @@ uniform ${n} ${r} u_${i};
         font-style: italic;
         opacity: 0.75;
         margin-top: 0.5rem;
-        max-width: 750px;
         line-height: 1.5;
       }
       body.light-bg .ethos-note-small {
