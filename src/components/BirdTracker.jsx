@@ -358,7 +358,7 @@ export default function BirdTracker() {
   // Dynamic map height based on mode
   const mapHeight = compareMode ? 320 : 400;
 
-  // Helper for responsive iframe height (kept for consistency, but we use a button now)
+  // Helper for responsive sizing
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   return (
@@ -611,7 +611,7 @@ export default function BirdTracker() {
                 </CircleMarker>
               ))}
 
-              {/* Camera markers - white (with clickable button instead of iframe) */}
+              {/* Camera markers - white (with clickable button) */}
               {visibleCameras.map((site, idx) => {
                 const popupMaxWidth = isMobile ? 280 : 420;
                 const popupMinWidth = isMobile ? 240 : 320;
@@ -660,18 +660,18 @@ export default function BirdTracker() {
                               display: "block",
                               padding: "0.6rem",
                               textAlign: "center",
-                              backgroundColor: "rgba(154, 252, 151, 0.15)",
-                              border: "1px solid #9afc97",
+                              backgroundColor: "#1c1c1b",
+                              border: "0px solid #9afc97",
                               borderRadius: "4px",
                               color: "#9afc97",
                               textDecoration: "none",
                               fontSize: "0.85rem",
                               transition: "background-color 0.2s ease",
                             }}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = "rgba(154, 252, 151, 0.25)"}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = "rgba(154, 252, 151, 0.15)"}
+                            onMouseEnter={(e) => e.target.style.backgroundColor = "#2a2a2a"}
+                            onMouseLeave={(e) => e.target.style.backgroundColor = "#1c1c1b"}
                           >
-                            📹 Watch Live Stream
+                            Watch Live Stream
                             <br />
                             <span style={{ fontSize: "0.6rem", opacity: 0.6 }}>
                               Opens in new window
@@ -928,7 +928,7 @@ export default function BirdTracker() {
                 </CircleMarker>
               ))}
 
-              {/* Camera markers - white (Compare mode, with clickable button) */}
+              {/* Camera markers - white (Compare mode) */}
               {visibleCameras.map((site, idx) => {
                 const popupMaxWidth = isMobile ? 280 : 420;
                 const popupMinWidth = isMobile ? 240 : 320;
@@ -977,7 +977,7 @@ export default function BirdTracker() {
                               display: "block",
                               padding: "0.6rem",
                               textAlign: "center",
-                              backgroundColor: "rgba(154, 252, 151, 0.15)",
+                              backgroundColor: "#1c1c1b",
                               border: "1px solid #9afc97",
                               borderRadius: "4px",
                               color: "#9afc97",
@@ -985,10 +985,10 @@ export default function BirdTracker() {
                               fontSize: "0.85rem",
                               transition: "background-color 0.2s ease",
                             }}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = "rgba(154, 252, 151, 0.25)"}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = "rgba(154, 252, 151, 0.15)"}
+                            onMouseEnter={(e) => e.target.style.backgroundColor = "#2a2a2a"}
+                            onMouseLeave={(e) => e.target.style.backgroundColor = "#1c1c1b"}
                           >
-                            📹 Watch Live Stream
+                            Watch Live Stream
                             <br />
                             <span style={{ fontSize: "0.6rem", opacity: 0.6 }}>
                               Opens in new window

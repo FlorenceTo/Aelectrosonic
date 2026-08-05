@@ -19,7 +19,7 @@ export default function AboutPage() {
   const borderColor = theme === "light" ? "#2c6e2c" : "#9afc97";
   const backgroundColor = theme === "light" ? "rgba(245, 243, 239, 0.95)" : "rgba(0, 0, 0, 0.3)";
 
-  // ---- Paragraph style – just the margin (CSS handles the gradient) ----
+  // ---- Paragraph style – just the margin ----
   const paragraphStyle = {
     margin: "0 0 1rem 0",
   };
@@ -43,17 +43,80 @@ export default function AboutPage() {
             boxSizing: "border-box",
           }}
         >
-          {/* ===== GRADIENT TEXT (CSS class handles the gradient) ===== */}
           <p className="gradient-text" style={paragraphStyle}>
-            During fieldwork in Palestine, I often became aware of systems that were present but not visible. A mobile phone could hold a strong connection where no telecommunications tower could be seen. A directional microphone could bring the sound of a distant bird or aircraft closer before either came into view. A wideband receiver could render electromagnetic activity audible, but only within the limits of its frequency range and sensitivity. What became perceptible depended on the instrument, its placement and the conditions surrounding it. The landscape did not become more visible as more devices were introduced; different aspects emerged while others remained distant, obscured or absent. This research began from the partial and absent forms through which an environment becomes perceptible. What appears through a microphone, tracking device, map or spectrogram is never the environment in full, but is produced through a relation between a living body, a technical instrument, the conditions in which a measurement takes place and the person interpreting what has been recorded. A bird becomes a coordinate. Electromagnetic activity becomes sound. Separate measurements become a route. A missing position may be classified as an error, yet its disappearance also marks the point at which a technical relation has failed to produce what was expected. These translations make movement and infrastructure available for study while changing the conditions through which they first became known.
+            This research began from the partial and absent forms through which an environment becomes perceptible.
+            What appears through a microphone, tracking device, map or spectrogram is never the environment in full.
+            It is formed through a relation between a living body, a technical instrument, the conditions in which a
+            measurement takes place and the person interpreting what has been recorded. A bird becomes a coordinate.
+            Electromagnetic activity becomes sound. Separate measurements become a route. A missing position may be
+            classified as an error, yet its disappearance also marks the point at which a technical relation has
+            failed to produce what was expected. These translations make movement and infrastructure available for
+            study while changing the conditions through which they first became known. During fieldwork in Palestine,
+            I often became aware of systems that were present but not visible. A mobile phone could hold a strong
+            connection where no telecommunications tower could be seen. A directional microphone could bring the
+            sound of a distant bird or aircraft closer before either came into view. A wideband receiver could
+            render electromagnetic activity audible, but only within the limits of its frequency range and
+            sensitivity. What became perceptible depended on the instrument, its placement and the conditions
+            surrounding it.
           </p>
 
           <p className="gradient-text" style={paragraphStyle}>
-            I use the term spectral ecologies to describe these relations. Spectral refers to acoustic and electromagnetic frequencies, as well as to incomplete appearances: signals passing through bodies and landscapes without becoming directly visible, sounds arriving before their sources enter view, and movements reconstructed from traces left by sensing systems. Ecology is understood here as more than a relationship between organisms and a supposedly natural environment. It also includes satellites, transmitters, radar, tracking devices, communications networks, military infrastructures and the political conditions determining where people and animals can move. The material on this website should therefore be read neither as a transparent representation nor as evidence leading towards a single explanation. Maps, recordings and visualisations retain the decisions, limits and interruptions through which knowledge was produced.
+            The website is intended to make research, methods and contextual information more accessible to
+            Palestinian scientists, biologists and ornithologists producing knowledge under occupation. This
+            includes researchers who resist collaborations in which Israeli institutions become the compulsory
+            technological providers, permit holders or validators of work conducted in Palestine, while
+            Palestinians are positioned primarily as local hosts rather than equal producers and owners of
+            knowledge. Israeli procedures for wireless experiments require an Israeli identity number or
+            registered company, and foreign applicants must apply through an Israeli citizen or company. In the
+            occupied West Bank, the Israeli Civil Administration separately regulates activities involving certain
+            wireless devices, including their importation, purchase, possession, development and integration. These
+            rules do not establish that every passive GPS logger is prohibited, but they show how transmitting
+            wildlife tags can become dependent on Israeli licensing, institutional approval or an Israeli
+            intermediary. The conditions of research are further shaped by restricted access to land. Palestine
+            lies along a major bird-migration corridor, yet the habitats through which birds pass cannot be
+            observed equally by those living within them. Checkpoints, road gates, settlements, firing zones,
+            closed military areas and repeated military incursions fragment movement across the West Bank. These
+            restrictions are not confined to Area C. Area A remains part of the occupied West Bank despite the
+            administrative responsibilities assigned to the Palestinian Authority, and Israeli forces continue to
+            enter Palestinian cities, villages and refugee camps, conduct raids, close roads and restrict movement.
+            The division of the West Bank into Areas A, B and C does not describe the actual conditions under which
+            Palestinians move, conduct fieldwork or maintain access to ecological sites.
           </p>
 
           <p className="gradient-text" style={paragraphStyle}>
-            Interference becomes an investigative condition within this process. It draws attention to the moment when a relation becomes unstable: between a bird and its tracker, a satellite and receiver, a sound and microphone, or a body and the infrastructures surrounding it. An interruption may result from technical failure, environmental conditions, depleted power, signal obstruction or deliberate disruption; its presence alone cannot establish a cause. Remaining with it, rather than immediately removing it from the record, keeps open the question of what occurred and what the system was unable to register. The research presented here remains continuous and unfinished. Further fieldwork, conversations and technical experiments may change how earlier material is interpreted. This website functions as a working research environment for considering what exists, how it becomes perceptible and what happens when living movement is measured, translated and made public.
+            Not all these restrictions appear in formal reports or searchable online accounts. During my fieldwork
+            in Palestine, I learned about them through working directly with ornithologists, biologists and others
+            who continue to care for land and animal life under occupation. They described how cameras, binoculars,
+            receivers and other field equipment could be treated with suspicion, and how access to particular areas
+            could change without warning because of military operations, settlers, checkpoints or road closures. The
+            absence of these experiences from public archives does not mean they do not occur. Some may remain
+            undocumented because publishing the details could expose researchers, communities or sensitive locations
+            to further risk. The ornithologists and biologists I worked with guided me through high-altitude
+            landscapes and taught me to understand bird movement through thermal currents, altitude, topography,
+            weather, calls and repeated observation. Their knowledge did not begin with a tracking device or
+            identification application. It developed through long relationships with particular places, through
+            watching how birds gained height, where they circled, how they moved with rising air and how their
+            behaviour changed with weather and disturbance. Listening could register a bird or aircraft before it
+            became visible, while familiarity with the landscape could reveal changes that an automated system was
+            unable to recognise.
+          </p>
+
+          <p className="gradient-text" style={paragraphStyle}>
+            The bioacoustic identification applications I tested during fieldwork often returned little or no
+            usable information for the Palestinian locations and species we encountered. This did not indicate an
+            absence of birds. It revealed an absence within the databases used by these applications. Species, calls
+            and territories that had not been sufficiently recorded, labelled or incorporated into the system became
+            difficult for the software to identify. What appeared as missing data was therefore connected to a wider
+            geographical and political gap in which some environments are extensively documented and made
+            machine-readable, while others remain technically underrepresented. Learning from Palestinian
+            researchers made clear that limited access to advanced technologies does not indicate an absence of
+            scientific knowledge. Ecological understanding was produced through listening, watching, remembering,
+            caring and returning to the same places over time. These methods are not informal substitutes for
+            technical science. They are forms of situated expertise that remain essential where access to equipment,
+            permits, frequencies, databases and research sites is restricted. They hold forms of knowledge that
+            instruments cannot produce on their own, including memories of ecological change, awareness of local
+            disturbance and an understanding of the relationships between animal movement, land use and political
+            conditions.
           </p>
         </div>
       </div>
