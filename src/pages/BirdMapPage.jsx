@@ -134,7 +134,7 @@ export default function BirdMapPage() {
           {/* Image 2 – vulture movement diagram */}
           <div className="image-block">
             <img
-              src="/images/vulture_movement_diagram.jpg"
+              src="/images/vulture_movement_diagram.png"
               alt="Illustration of accelerometer axes: sway, surge and heave."
               className="full-width-image"
             />
