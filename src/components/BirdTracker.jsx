@@ -371,12 +371,12 @@ export default function BirdTracker() {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   // Popup sizes - halved from original
-  const radarPopupMaxWidth = isMobile ? 140 : 210;
-  const radarPopupMinWidth = isMobile ? 120 : 160;
-  const feedingPopupMaxWidth = isMobile ? 140 : 210;
-  const feedingPopupMinWidth = isMobile ? 120 : 160;
-  const cameraPopupMaxWidth = isMobile ? 140 : 210;
-  const cameraPopupMinWidth = isMobile ? 120 : 160;
+  const radarPopupMaxWidth = isMobile ? 160 : 300;
+  const radarPopupMinWidth = isMobile ? 140 : 240;
+  const feedingPopupMaxWidth = isMobile ? 160 : 300;
+  const feedingPopupMinWidth = isMobile ? 140 : 240;
+  const cameraPopupMaxWidth = isMobile ? 160 : 300;
+  const cameraPopupMinWidth = isMobile ? 140 : 240;
 
   // Helper to render a "Watch Live Stream" button for a site that has a cameraUrl
   const renderWatchButton = (cameraUrl) => {
@@ -496,7 +496,7 @@ export default function BirdTracker() {
         }
 
         .leaflet-popup-content {
-          font-size: 0.75rem;
+          font-size: 0.60rem;
           overflow-wrap: break-word;
           word-wrap: break-word;
           word-break: break-word;
@@ -504,7 +504,7 @@ export default function BirdTracker() {
 
         @media (max-width: 600px) {
           .leaflet-popup-content {
-            font-size: 0.7rem;
+            font-size: 0.5rem;
           }
       `}</style>
 
