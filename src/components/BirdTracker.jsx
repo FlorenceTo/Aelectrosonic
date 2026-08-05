@@ -388,7 +388,7 @@ export default function BirdTracker() {
                 src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`}
                 alt="Live stream thumbnail"
                 style={{
-                  width: "100%",
+                  width: "40%",
                   borderRadius: "4px",
                   border: "1px solid #9afc97",
                   display: "block",
