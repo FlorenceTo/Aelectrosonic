@@ -388,7 +388,7 @@ export default function BirdTracker() {
                 src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`}
                 alt="Live stream thumbnail"
                 style={{
-                  width: "40%",
+                  width: "100%",
                   borderRadius: "4px",
                   border: "1px solid #9afc97",
                   display: "block",
@@ -698,8 +698,8 @@ export default function BirdTracker() {
 
               {/* Camera markers - white */}
               {visibleCameras.map((site, idx) => {
-                const popupMaxWidth = isMobile ? 280 : 420;
-                const popupMinWidth = isMobile ? 240 : 320;
+                const popupMaxWidth = isMobile ? 140 : 210;
+                const popupMinWidth = isMobile ? 120 : 160;
                 return (
                   <CircleMarker
                     key={`camera-${idx}`}
