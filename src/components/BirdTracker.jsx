@@ -588,7 +588,7 @@ export default function BirdTracker() {
                     <strong>{site.name}</strong>
                     <br />
                     {site.date && (
-                      <><strong>Year installed:</strong> {site.date}<br /></>
+                      <><strong>Year:</strong> {site.date}<br /></>
                     )}
                     {site.description && (
                       <><strong>Purpose:</strong> {site.description}<br /></>
@@ -866,7 +866,7 @@ export default function BirdTracker() {
                     <strong>{site.name}</strong>
                     <br />
                     {site.date && (
-                      <><strong>Year installed:</strong> {site.date}<br /></>
+                      <><strong>Year:</strong> {site.date}<br /></>
                     )}
                     {site.description && (
                       <><strong>Purpose:</strong> {site.description}<br /></>
@@ -900,7 +900,7 @@ export default function BirdTracker() {
                     <strong>{site.name}</strong>
                     <br />
                     {site.date && (
-                      <><strong>Year installed:</strong> {site.date}<br /></>
+                      <><strong>Year:</strong> {site.date}<br /></>
                     )}
                     {site.description && (
                       <><strong>Purpose:</strong> {site.description}<br /></>

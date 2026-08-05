@@ -1,7 +1,7 @@
 location,city_region,jurisdiction,country,recording_type,latitude_decimal,longitude_decimal,altitude_m,date,time,version,filename
 HCarmel,Haifa,Haifa District,Israel,Soil,32.75778,35.20255,436.98,04/01/2026,13:41,1,HCarmel_Haifa_Nesher_Soil_324528008N_35129.180E_436.98m_040126_1341_1
 HCarmel,Haifa,Haifa District,Israel,Soil,32.75778,35.20255,436.98,04/01/2026,13:42,1,HCarmel_Haifa_Nesher_Soil_324528008N_35129.180E_436.98m_040126_1342_1
-HCarmel,Haifa,Haifa District,Israel,Soil,32.75778,35.20255,436.98,04/01/2026,13:52,1,HCarmel_Haifa_Nesher_Soil_324528008N_35129.180E_436.98m_040126_1352_1
+HCarmel,Haifa,Haifa District,Israel,Electromagnetic,32.75778,35.20255,436.98,04/01/2026,13:52,1,HCarmel_Haifa_Nesher_Soil_324528008N_35129.180E_436.98m_040126_1352_1
 HCarmel,Haifa,Haifa District,Israel,Soil,32.75778,35.20255,436.98,04/01/2026,13:55,1,HCarmel_Haifa_Nesher_Soil_324528008N_35129.180E_436.98m_040126_1355_1
 HCarmel,Haifa,Haifa District,Israel,Soil,32.75778,35.20255,436.98,04/01/2026,13:59,1,HCarmel_Haifa_Nesher_Soil_324528008N_35129.180E_436.98m_040126_1359_1
 HCarmel,Haifa,Haifa District,Israel,Soil,32.75778,35.20255,436.98,04/01/2026,14:08,1,HCarmel_Haifa_Nesher_Soil_324528008N_35129.180E_436.98m_040126_1408_1
