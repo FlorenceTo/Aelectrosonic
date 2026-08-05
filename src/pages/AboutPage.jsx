@@ -3,89 +3,25 @@ import Header from "../components/Header";
 
 export default function AboutPage() {
   const [theme, setTheme] = useState("dark");
-  const [customBgColor, setCustomBgColor] = useState(null);
 
-  // ---- THEME + CUSTOM COLOR DETECTION ----
+  // ---- THEME DETECTION ----
   useEffect(() => {
     const observer = new MutationObserver(() => {
-      const body = document.body;
-      
-      // 1. Check for light-bg class
-      const isLight = body.classList.contains("light-bg");
+      const isLight = document.body.classList.contains("light-bg");
       setTheme(isLight ? "light" : "dark");
-
-      // 2. Check for custom background color (from color picker)
-      const bgColor = body.style.backgroundColor;
-      if (bgColor && bgColor !== "") {
-        setCustomBgColor(bgColor);
-      } else {
-        setCustomBgColor(null);
-      }
     });
-
-    observer.observe(document.body, { 
-      attributes: true, 
-      attributeFilter: ["class", "style"] 
-    });
-
-    // Initial check
-    const body = document.body;
-    const isLight = body.classList.contains("light-bg");
-    setTheme(isLight ? "light" : "dark");
-    
-    const bgColor = body.style.backgroundColor;
-    if (bgColor && bgColor !== "") {
-      setCustomBgColor(bgColor);
-    }
-
+    observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    setTheme(document.body.classList.contains("light-bg") ? "light" : "dark");
     return () => observer.disconnect();
   }, []);
 
-  // ---- HELPER: Check if a color is "light" (luminance > 0.5) ----
-  const isLightColor = (color) => {
-    if (!color) return false;
-    
-    let r, g, b;
-    if (color.startsWith('#')) {
-      const hex = color.replace('#', '');
-      if (hex.length === 3) {
-        r = parseInt(hex[0] + hex[0], 16);
-        g = parseInt(hex[1] + hex[1], 16);
-        b = parseInt(hex[2] + hex[2], 16);
-      } else if (hex.length === 6) {
-        r = parseInt(hex.substring(0, 2), 16);
-        g = parseInt(hex.substring(2, 4), 16);
-        b = parseInt(hex.substring(4, 6), 16);
-      }
-    } else if (color.startsWith('rgb')) {
-      const match = color.match(/\d+/g);
-      if (match) {
-        r = parseInt(match[0]);
-        g = parseInt(match[1]);
-        b = parseInt(match[2]);
-      }
-    } else {
-      return false;
-    }
-
-    // Relative luminance (WCAG formula)
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    return luminance > 0.5;
-  };
-
-  // ---- DETERMINE IF WE SHOULD INVERT (for custom colors) ----
-  const shouldInvert = customBgColor ? isLightColor(customBgColor) : false;
-
-  // ---- STYLES for the box ----
+  // ---- STYLES ----
   const borderColor = theme === "light" ? "#2c6e2c" : "#9afc97";
   const backgroundColor = theme === "light" ? "rgba(245, 243, 239, 0.95)" : "rgba(0, 0, 0, 0.3)";
 
-  // ---- Paragraph style – only applies filter for custom colors ----
+  // ---- Paragraph style – just the margin (CSS handles the gradient) ----
   const paragraphStyle = {
     margin: "0 0 1rem 0",
-    // Override CSS filter only when a custom color is active
-    filter: customBgColor ? (shouldInvert ? "invert(1)" : "none") : undefined,
-    transition: "filter 0.3s ease",
   };
 
   return (
@@ -107,7 +43,7 @@ export default function AboutPage() {
             boxSizing: "border-box",
           }}
         >
-          {/* ===== GRADIENT TEXT (CSS class + dynamic filter override) ===== */}
+          {/* ===== GRADIENT TEXT (CSS class handles the gradient) ===== */}
           <p className="gradient-text" style={paragraphStyle}>
             During fieldwork in Palestine, I often became aware of systems that were present but not visible. A mobile phone could hold a strong connection where no telecommunications tower could be seen. A directional microphone could bring the sound of a distant bird or aircraft closer before either came into view. A wideband receiver could render electromagnetic activity audible, but only within the limits of its frequency range and sensitivity. What became perceptible depended on the instrument, its placement and the conditions surrounding it. The landscape did not become more visible as more devices were introduced; different aspects emerged while others remained distant, obscured or absent. This research began from the partial and absent forms through which an environment becomes perceptible. What appears through a microphone, tracking device, map or spectrogram is never the environment in full, but is produced through a relation between a living body, a technical instrument, the conditions in which a measurement takes place and the person interpreting what has been recorded. A bird becomes a coordinate. Electromagnetic activity becomes sound. Separate measurements become a route. A missing position may be classified as an error, yet its disappearance also marks the point at which a technical relation has failed to produce what was expected. These translations make movement and infrastructure available for study while changing the conditions through which they first became known.
           </p>
