@@ -428,8 +428,7 @@ export default function BirdMapPage() {
             padding: 0.5rem;
           }
           .image-caption,
-          .small-text,
-          .small-text.source {
+          .small-text {
             text-align: justify;
         }
       `}</style>
