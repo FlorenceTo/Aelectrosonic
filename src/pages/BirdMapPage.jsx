@@ -1,346 +1,1035 @@
-// pages/BirdMapPage.jsx
-import Header from "../components/Header";
-import BirdTracker from "../components/BirdTracker";
+import { useState, useEffect, useRef } from "react";
+import { MapContainer, TileLayer, Polyline, CircleMarker, Popup, useMap } from "react-leaflet";
+import L from "leaflet";
+import Papa from "papaparse";
+import "leaflet/dist/leaflet.css";
 
-export default function BirdMapPage() {
+// Fix Leaflet default icon
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+});
+
+// Fixed colour palette for birds
+const BIRD_PALETTE = [
+  "#e6194b", // red
+  "#3cb44b", // green
+  "#4363d8", // blue
+  "#f032e6", // magenta
+  "#46f0f0", // cyan
+  "#f58231", // orange
+  "#911eb4", // purple
+  "#ffe119", // yellow
+];
+
+function getBirdColor(index) {
+  return BIRD_PALETTE[index % BIRD_PALETTE.length];
+}
+
+// Auto-pan component (only used in single bird mode)
+function MapUpdater({ position }) {
+  const map = useMap();
+  useEffect(() => {
+    if (position) map.setView(position, map.getZoom());
+  }, [position, map]);
+  return null;
+}
+
+export default function BirdTracker() {
+  // Bird data state
+  const [allPointsByBird, setAllPointsByBird] = useState({});
+  const [birdList, setBirdList] = useState([]);
+  const [selectedBirdId, setSelectedBirdId] = useState(null);
+  const [points, setPoints] = useState([]);
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speedFactor, setSpeedFactor] = useState(30);
+  const [mapCenter, setMapCenter] = useState([30.8569, 34.8036]);
+  const [mapZoom, setMapZoom] = useState(9);
+  const intervalRef = useRef(null);
+
+  // Compare mode state
+  const [compareMode, setCompareMode] = useState(false);
+  const [visibleBirds, setVisibleBirds] = useState(new Set());
+
+  // Radar overlay state
+  const [radarPoints, setRadarPoints] = useState([]);
+  const [radarEnabled, setRadarEnabled] = useState(false);
+  const [radarYear, setRadarYear] = useState(2025);
+  const [minRadarYear, setMinRadarYear] = useState(1998);
+  const [maxRadarYear, setMaxRadarYear] = useState(2025);
+
+  // Feeding sites and cameras state
+  const [feedingSites, setFeedingSites] = useState([]);
+  const [cameras, setCameras] = useState([]);
+  const [showFeedingSites, setShowFeedingSites] = useState(false);
+  const [showCameras, setShowCameras] = useState(false);
+
+  // Label overlay – ref to avoid re-rendering
+  const labelLayerRef = useRef(null);
+  const labelOpacityRef = useRef(0.0);
+
+  // Load bird data
+  useEffect(() => {
+    fetch("/data/bird_data.csv")
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
+      })
+      .then((csvText) => {
+        const parsed = Papa.parse(csvText, { header: true, dynamicTyping: true });
+        const rows = parsed.data.filter(
+          (row) => row["location-long"] && row["location-lat"] && row["tag-local-identifier"]
+        );
+
+        const groups = {};
+        rows.forEach((row) => {
+          const tag = row["tag-local-identifier"];
+          if (!groups[tag]) groups[tag] = [];
+          groups[tag].push({
+            lat: row["location-lat"],
+            lng: row["location-long"],
+            timestamp: new Date(row.timestamp),
+            speed: row["ground-speed"] * 3.6,
+            heading: row.heading,
+            species: row["individual-taxon-canonical-name"],
+            tag: tag,
+          });
+        });
+
+        const sortedGroups = {};
+        const birdInfo = [];
+        for (const tag in groups) {
+          const sorted = groups[tag].sort((a, b) => a.timestamp - b.timestamp);
+          sortedGroups[tag] = sorted;
+          birdInfo.push({
+            id: tag,
+            species: sorted[0]?.species || "Unknown",
+            pointCount: sorted.length,
+          });
+        }
+        birdInfo.sort((a, b) => a.id - b.id);
+        setBirdList(birdInfo);
+        setAllPointsByBird(sortedGroups);
+
+        if (birdInfo.length > 0) {
+          setSelectedBirdId(birdInfo[0].id);
+          setPoints(sortedGroups[birdInfo[0].id]);
+          setVisibleBirds(new Set(birdInfo.map((b) => b.id)));
+          if (sortedGroups[birdInfo[0].id].length) {
+            setMapCenter([
+              sortedGroups[birdInfo[0].id][0].lat,
+              sortedGroups[birdInfo[0].id][0].lng,
+            ]);
+            setCurrentIdx(0);
+          }
+        }
+      })
+      .catch((err) => console.error("Bird data error:", err));
+  }, []);
+
+  // Load radar data
+  useEffect(() => {
+    fetch("/data/radarlist.csv")
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
+      })
+      .then((csvText) => {
+        const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+        const rows = parsed.data.filter(
+          (row) => row.Latitude && row.Longitude && row["Date Installed"]
+        );
+        const pointsList = [];
+        let minYear = 9999,
+          maxYear = 0;
+        rows.forEach((row) => {
+          const yearStr = row["Date Installed"].toString();
+          const yearMatch = yearStr.match(/\d{4}/);
+          if (!yearMatch) return;
+          const year = parseInt(yearMatch[0]);
+          if (isNaN(year)) return;
+          const lat = parseFloat(row.Latitude);
+          const lng = parseFloat(row.Longitude);
+          if (isNaN(lat) || isNaN(lng)) return;
+          pointsList.push({
+            lat,
+            lng,
+            name: row.Name,
+            bandType: row["Band Type"],
+            purpose: row["Description of Purpose"],
+            jurisdiction: row.Jurisdiction,
+            operator: row.Operator,
+            area: row.Area,
+            usedBy: row["Used by Which Institutes"],
+            brand: row["Company/Brand"],
+            status: row.Status,
+            notes: row["Notes on Dates"],
+            source: row["Source URL"],
+            year: year,
+          });
+          if (year < minYear) minYear = year;
+          if (year > maxYear) maxYear = year;
+        });
+        setRadarPoints(pointsList);
+        setMinRadarYear(minYear);
+        setMaxRadarYear(maxYear);
+        setRadarYear(maxYear);
+      })
+      .catch((err) => console.error("Radar data error:", err));
+  }, []);
+
+  // Load feeding sites and cameras data
+  useEffect(() => {
+    fetch("/data/feedingsites.csv")
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
+      })
+      .then((csvText) => {
+        const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+        const rows = parsed.data.filter(
+          (row) => row.Latitude && row.Longitude
+        );
+
+        const feeding = [];
+        const camera = [];
+
+        rows.forEach((row) => {
+          const lat = parseFloat(row.Latitude);
+          const lng = parseFloat(row.Longitude);
+          if (isNaN(lat) || isNaN(lng)) return;
+
+          const type = row.Type || "";
+          const name = row.Name || "Unnamed Site";
+          const description = row["Description of Purpose"] || "";
+          const operator = row.Operator || "";
+          const status = row.Status || "";
+          const jurisdiction = row.Jurisdiction || "";
+          const date = row["Date"] || "";
+          const cameraUrl = row["CameraURL"] || "";
+
+          const item = {
+            lat,
+            lng,
+            name,
+            description,
+            operator,
+            status,
+            jurisdiction,
+            date,
+            type,
+            cameraUrl, // ★ NOW PROPERLY INCLUDED ★
+          };
+
+          // Classify based on Type column
+          const isCamera = type.toLowerCase().includes("camera") ||
+                           type.toLowerCase().includes("cam") ||
+                           type.toLowerCase().includes("nest");
+
+          if (isCamera) {
+            camera.push(item);
+          } else {
+            feeding.push(item);
+          }
+        });
+
+        setFeedingSites(feeding);
+        setCameras(camera);
+
+        console.log("Feeding sites loaded:", feeding.length);
+        console.log("Cameras loaded:", camera.length);
+        // Log first camera to check if cameraUrl is loaded
+        if (camera.length > 0) {
+          console.log("First camera:", camera[0]);
+          console.log("Camera URL:", camera[0].cameraUrl);
+        }
+      })
+      .catch((err) => console.error("Feeding sites data error:", err));
+  }, []);
+
+  // Colour map for birds
+  const birdColorMap = {};
+  birdList.forEach((bird, idx) => {
+    birdColorMap[bird.id] = getBirdColor(idx);
+  });
+
+  // Reset animation when selected bird changes (single mode)
+  useEffect(() => {
+    if (compareMode) return;
+    if (!selectedBirdId || !allPointsByBird[selectedBirdId]) return;
+    const newPoints = allPointsByBird[selectedBirdId];
+    setPoints(newPoints);
+    setCurrentIdx(0);
+    setIsPlaying(false);
+    if (newPoints.length) {
+      setMapCenter([newPoints[0].lat, newPoints[0].lng]);
+    }
+    if (intervalRef.current) clearTimeout(intervalRef.current);
+  }, [selectedBirdId, allPointsByBird, compareMode]);
+
+  // Animation loop (single mode)
+  useEffect(() => {
+    if (compareMode) return;
+    if (!isPlaying || points.length === 0 || currentIdx >= points.length - 1) {
+      if (currentIdx >= points.length - 1 && isPlaying) setIsPlaying(false);
+      return;
+    }
+    const now = points[currentIdx].timestamp;
+    const next = points[currentIdx + 1].timestamp;
+    let waitMs = (next - now) / speedFactor;
+    waitMs = Math.min(waitMs, 2000);
+    waitMs = Math.max(waitMs, 30);
+    intervalRef.current = setTimeout(() => {
+      setCurrentIdx((prev) => prev + 1);
+    }, waitMs);
+    return () => clearTimeout(intervalRef.current);
+  }, [isPlaying, currentIdx, points, speedFactor, compareMode]);
+
+  const reset = () => {
+    setIsPlaying(false);
+    setCurrentIdx(0);
+    if (points.length) setMapCenter([points[0].lat, points[0].lng]);
+  };
+  const togglePlay = () => setIsPlaying((prev) => !prev);
+  const toggleBirdVisibility = (birdId) => {
+    setVisibleBirds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(birdId)) newSet.delete(birdId);
+      else newSet.add(birdId);
+      return newSet;
+    });
+  };
+  const selectAllBirds = () => setVisibleBirds(new Set(birdList.map((b) => b.id)));
+  const deselectAllBirds = () => setVisibleBirds(new Set());
+
+  // Filter radar points by selected year
+  const visibleRadarPoints = radarEnabled
+    ? radarPoints.filter((p) => p.year <= radarYear)
+    : [];
+
+  // Filter feeding sites and cameras
+  const visibleFeedingSites = showFeedingSites ? feedingSites : [];
+  const visibleCameras = showCameras ? cameras : [];
+
+  if (Object.keys(allPointsByBird).length === 0)
+    return <div style={{ padding: "1rem" }}>Loading bird tracking data...</div>;
+
+  // Prepare polylines and start markers for compare mode
+  const comparePolylines = [];
+  const compareStartMarkers = [];
+  if (compareMode) {
+    for (const bird of birdList) {
+      if (visibleBirds.has(bird.id)) {
+        const birdPoints = allPointsByBird[bird.id];
+        const positions = birdPoints.map((p) => [p.lat, p.lng]);
+        const col = birdColorMap[bird.id];
+        comparePolylines.push(
+          <Polyline
+            key={`line-${bird.id}`}
+            positions={positions}
+            color={col}
+            weight={0.8}
+            opacity={0.5}
+          />
+        );
+        const firstPoint = birdPoints[0];
+        if (firstPoint) {
+          compareStartMarkers.push(
+            <CircleMarker
+              key={`start-${bird.id}`}
+              center={[firstPoint.lat, firstPoint.lng]}
+              radius={4}
+              fillColor={col}
+              color={col}
+              weight={1}
+              opacity={0.8}
+              fillOpacity={1}
+            />
+          );
+        }
+      }
+    }
+  }
+
+  // Single mode data
+  const currentPoint = points[currentIdx];
+  const trail = points.slice(0, currentIdx + 1).map((p) => [p.lat, p.lng]);
+  const firstPoint = points[0];
+  const currentColor = birdColorMap[selectedBirdId] || "#f39c12";
+
+  // Dynamic map height based on mode
+  const mapHeight = compareMode ? 320 : 400;
+
+  // Helper for responsive iframe height
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
   return (
-    <div>
-      <Header />
-      <div className="container" style={{ marginTop: "2rem", paddingBottom: "4rem" }}>
-        <h2 style={{ borderBottom: "none", marginBottom: "0.25rem", paddingBottom: 0 }}>
-          Bird Movement Tracker
-        </h2>
-        <p style={{ marginTop: 0, marginBottom: "1.5rem" }}>
-          Griffon vulture GPS telemetry
-        </p>
-
-        {/* --- About the data section --- */}
-        <div className="info-section">
-          <h3 className="section-title">About the data</h3>
-          <p>
-            This map shows the recorded movements of nine adult vultures from three species. Each bird carried
-            a small GPS device worn like a backpack, which recorded its position at regular intervals. The
-            tracks help us understand how vultures move across different kinds of terrain, where they stop or
-            return, and how they travel between feeding and roosting areas and possible breeding sites. They
-            can also show how roads, settlements, borders and other forms of infrastructure relate to their
-            movement.
-          </p>
-          <p>
-            The map also marks the positions of active radar sites in relation to the recorded flight paths.
-            This additional layer allows the vultures' movements to be viewed alongside technological and
-            military infrastructure. Proximity does not prove that radar affected the birds or altered their
-            navigation, but it reveals where animal routes and radar systems occupy the same landscape. These
-            routes are not shaped by topography alone. In some areas, conservation organisations provide
-            carcasses at artificial feeding stations. These sites can attract vultures to particular locations
-            and influence where they remain or return. The map therefore records both bird navigation and the
-            human systems that manage, monitor and occupy the areas through which vultures move.
-          </p>
-        </div>
-
-        {/* --- What the map can reveal section --- */}
-        <div className="info-section">
-          <h3 className="section-title">What the map can reveal</h3>
-          <p>
-            The dataset is held by Movebank, an online repository where researchers preserve and share
-            animal-tracking information. Each recorded journey is unique and cannot be reproduced, so storing
-            the data allows it to be studied again and used to explore questions beyond those asked in the
-            original research. Detailed tracking data can reveal colonies, regular roosting places, feeding
-            sites, conservation areas and the movements of vulnerable animals. It can also show routes through
-            politically or militarily sensitive territories, as well as relationships between wildlife, radar
-            sites, roads, settlements, borders and other infrastructure.
-          </p>
-          <p>
-            Making precise locations public can create risks. Sensitive habitats, vulnerable animals and
-            important feeding or breeding sites may become easier to identify. The tracks can also reveal
-            conservation interventions, such as artificial feeding stations, that actively influence where
-            vultures travel and gather. When viewed alongside radar sites, the tracks raise further questions
-            about how animal navigation passes through landscapes organised by surveillance, communications
-            and military infrastructure. The map does not establish that radar caused a particular movement,
-            but it makes these spatial relationships visible.
-          </p>
-          <p>
-            The map should therefore be read as both a record of vulture movement and a record of the conditions
-            surrounding and shaping that movement. These conditions include terrain, food availability,
-            conservation practices, technological infrastructure and political borders. The movement records
-            used in this map come from the dataset <em>Long-range adult movements of 3 vulture species
-            (data from Spiegel et al. 2015)</em>, published through the Movebank Data Repository.
-          </p>
-        </div>
-
-        {/* --- The map --- */}
-        <div className="map-container">
-          <BirdTracker />
-        </div>
-
-        {/* --- About the tracking device section --- */}
-        <div className="tracker-section">
-          {/* Full‑width image above the title – live nest cam */}
-          <div className="image-block">
-            <img
-              src="/images/live_nest_cam_vulture.jpg"
-              alt="Live cam capture: Griffon Vulture spreading its wings at its nest site at Gamla Nature Reserve."
-              className="full-width-image"
-            />
-            <p className="small-text image-caption">
-              Live cam capture: Griffon Vulture spreading its wings at its nest site at Gamla Nature Reserve.
-            </p>
-          </div>
-
-          <h3 className="section-title">About the tracking device</h3>
-          <p>
-            The movement dataset makes the vultures' routes visible, but the device that produced those routes
-            is much less visible. The accompanying Movebank reference material explains how the records are
-            organised and defines fields such as GPS position, speed, direction, acceleration, duty cycle, tag
-            manufacturer, tag mass and readout method. However, the material supplied with the dataset does not
-            publicly identify the tracker by a product name or model number. Academic papers connected to the
-            research identify it more generally as a 160 g GPS and accelerometer tag manufactured by e-obs GmbH.
-            The device was attached to the bird's back with a Teflon harness and combined GPS positioning,
-            body-movement sensing and UHF radio communication. The publications describe its components and
-            functions, but do not name a specific commercial model.
-          </p>
-
-          {/* Image 1 – GPS device */}
-          <div className="image-block">
-            <img
-              src="/images/gps_device_eobs.jpg"
-              alt="Representative GPS tracking devices used in Hebrew University vulture research."
-              className="full-width-image"
-            />
-            <p className="small-text">
-              According to Professor Ran Nathan, the device shown on the left is the type that would have been
-              carried by the griffon vulture recovered in Sudan. The photograph shows the physical form of the
-              tracker and its harness, but it is not a photograph of the device recovered from the bird and does
-              not confirm the precise model used to produce the 2008–2011 long-range movement dataset.
-            </p>
-          </div>
-
-          {/* Device identification */}
-          <div className="device-specs">
-            <h4 className="specs-title">Identification of the device</h4>
-            <p><strong>Device type:</strong> e-obs 160 g GPS–ACC tag with UHF communication</p>
-            <p><strong>Manufacturer:</strong> e-obs GmbH, Munich, Germany</p>
-            <p><strong>Model:</strong> Not named in the published research</p>
-            <p><strong>Tag mass:</strong> 160 g</p>
-            <p><strong>Fitted mass:</strong> Approximately 190 g, including the 30 g Teflon harness</p>
-            <p><strong>Deployment:</strong> Hebrew University and Israel Nature and Parks Authority vulture research, 2008–2011</p>
-            <p><strong>Attachment:</strong> Backpack configuration</p>
-            <p><strong>Sensors:</strong> GPS and tri-axial accelerometer</p>
-            <p><strong>GPS measurements:</strong> Latitude, longitude, elevation and ground speed</p>
-            <p><strong>Acceleration measurements:</strong> Movement along three axes, sampled at 3.3 Hz during short recording periods</p>
-            <p><strong>Communication:</strong> Individual UHF pinger and local UHF data download</p>
-            <p><strong>Data storage:</strong> Measurements stored onboard until downloaded by researchers</p>
-          </div>
-
-          {/* Image 2 – vulture movement diagram */}
-          <div className="image-block">
-            <img
-              src="/images/vulture_movement_diagram.png"
-              alt="Illustration of accelerometer axes: sway, surge and heave."
-              className="full-width-image"
-            />
-            <p className="small-text">
-              The illustration shows how the tracking device measures movement in three directions using an
-              accelerometer: side to side (sway), forwards and backwards (surge), and up and down (heave). The
-              graph shows how these acceleration signals change while the vulture is standing, running, eating,
-              passively flying and actively flying. It does not show the bird's GPS route; instead, it shows how
-              patterns of bodily movement can be interpreted as different behaviours. Acceleration was sampled
-              at 3.3 Hz along each axis.
-            </p>
-            <p className="small-text source">
-              <strong>Source:</strong> Adapted from Nathan, R., Spiegel, O., Fortmann-Roe, S., Harel, R.,
-              Wikelski, M. and Getz, W. M. (2012), "Using tri-axial acceleration data to identify behavioral modes
-              of free-ranging animals: general concepts and tools illustrated for griffon vultures," Journal of
-              Experimental Biology, 215(6), pp. 986–996, Figure 2. DOI: 10.1242/jeb.058602.
-            </p>
-          </div>
-
-          <p>
-            The tracker can be understood as a small programmable computer carried by the bird. It did not
-            function as a camera and did not continuously watch the animal. At scheduled times, it calculated
-            a GPS position, measured changes in the bird's bodily movement and stored those measurements
-            inside the device. Researchers later retrieved the records through a local UHF radio connection.
-            UHF stands for ultra-high frequency, a type of radio transmission that allowed the stored data to
-            be downloaded when researchers and their receiving equipment were within range of the tracker.
-            The tags followed different daytime schedules across the study period. Some recorded GPS
-            positions every ten minutes, while others recorded them every minute before the records were
-            reduced to ten-minute intervals for analysis. The route shown on the map is therefore not a
-            continuous journey observed from beginning to end. It is a reconstruction made by connecting
-            separate measurements collected according to the device's programming.
-          </p>
-          <p>
-            Understanding how the tracker worked is important because tracking data can appear neutral and
-            complete when it is actually shaped by technical and human decisions. Researchers decide which sensors
-            to include, how frequently measurements are taken, when the device is active and how missing records
-            are interpreted. These decisions determine which aspects of the bird's movement become visible and
-            which remain unrecorded between measurements. The duration and frequency of data collection were also
-            shaped by practical limitations involving battery life, onboard storage and how often researchers
-            could approach closely enough to download the data.
-          </p>
-          <p>
-            There is also an ethical imbalance in how this information is presented. The bird becomes highly
-            visible: its route, speed, pauses, feeding areas and movements through borders and infrastructure can
-            be examined in detail. By comparison, the instrument, its programming and the institutions collecting
-            and managing the data may remain less visible. Showing the tracker and explaining its functions makes
-            clear that the map is not a direct or complete representation of the bird's experience. It is the
-            bird's movement selected, measured and translated through a technical system designed and programmed
-            by people.
-          </p>
-          <p>
-            This raises wider questions about who is able to track, store and publish an animal's movements, what
-            kinds of knowledge are produced through that process and what risks arise when the detailed locations
-            of vulnerable animals are made public. Making the device visible does not resolve these questions, but
-            it allows viewers to understand how the data was produced and to read the map more critically.
-          </p>
-        </div>
-      </div>
-
-      <style jsx>{`
-        .container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 0 1rem;
+    <div className="bird-tracker" style={{ marginTop: "1rem" }}>
+      <style>{`
+        .bird-tracker input[type="range"] {
+          -webkit-appearance: none;
+          background: #444;
+          height: 3px;
+          border-radius: 2px;
         }
-        .section-title {
-          font-size: 1rem;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          color: #9afc97;
-          border-bottom: 0px solid rgba(154, 252, 151, 0.2);
-          padding-bottom: 0.4rem;
-          margin: 1.5rem 0 1rem 0;
-          font-weight: normal;
+        .bird-tracker input[type="range"]:focus {
+          outline: none;
         }
-        body.light-bg .section-title {
-          color: #1a4a1a;
-          border-bottom: 0px solid rgba(44, 110, 44, 0.2);
+        .bird-tracker input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: #3f3f3f;
+          cursor: pointer;
+          border: none;
         }
-        .info-section p {
-          font-size: 0.9rem;
-          line-height: 1.7;
-          margin: 0.8rem 0;
-          color: #ddd;
+        .bird-tracker input[type="range"]::-moz-range-thumb {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: #aaa;
+          cursor: pointer;
+          border: none;
         }
-        body.light-bg .info-section p {
-          color: #222;
+        .bird-tracker input[type="range"]::-ms-thumb {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: #aaa;
+          cursor: pointer;
+          border: none;
         }
-
-        .map-container {
-          margin-top: 2rem;
-          border: 1px solid #9afc97;
-          padding: 1rem;
-          background: rgba(0, 0, 0, 0.2);
-          overflow: visible;
-          height: auto;
-          min-height: 600px;
+        .bird-select {
+          padding: 0.2rem 0.5rem;
+          font-family: monospace;
+          max-width: 100%;
+          width: auto;
+          min-width: 120px;
+          word-break: break-word;
         }
-        body.light-bg .map-container {
-          border-color: #2c6e2c;
-          background: rgba(255, 255, 255, 0.8);
-        }
-
-        /* --- Tracker section styles --- */
-        .tracker-section {
-          margin-top: 2rem;
-          border: 1px solid #9afc97;
-          padding: 1.5rem;
-          background: rgba(0, 0, 0, 0.2);
-        }
-        body.light-bg .tracker-section {
-          border-color: #2c6e2c;
-          background: rgba(255, 255, 255, 0.8);
-        }
-        .tracker-section p {
-          font-size: 0.9rem;
-          line-height: 1.7;
-          margin: 0.8rem 0;
-          color: #ddd;
-        }
-        body.light-bg .tracker-section p {
-          color: #222;
-        }
-        .tracker-section .section-title {
-          margin-top: 0;
-        }
-
-        /* Full‑width images */
-        .image-block {
-          margin: 0 0 1.5rem 0;
-        }
-        .full-width-image {
-          width: 100%;
-          height: auto;
-          display: block;
-          border: 1px solid #9afc97;
-        }
-        body.light-bg .full-width-image {
-          border-color: #2c6e2c;
-        }
-        .image-caption {
-          margin-top: 0.3rem !important;
-          font-size: 0.7rem !important;
-          opacity: 0.7;
-          text-align: center;
-        }
-
-        .small-text {
-          font-size: 0.75rem !important;
-          line-height: 1.5 !important;
-          opacity: 0.7;
-        }
-        .small-text.source {
-          margin-top: 0.3rem !important;
-          font-size: 0.7rem !important;
-        }
-
-        /* Device specs */
-        .device-specs {
-          margin: 1.5rem 0;
-          border: 1px solid rgb(154, 252, 151);
-          padding: 1rem;
-        }
-        body.light-bg .device-specs {
-          border-color: rgba(44, 110, 44, 0.2);
-        }
-        .specs-title {
-          font-size: 0.85rem;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          color: #9afc97;
-          margin-bottom: 0.5rem;
-          font-weight: normal;
-          border-bottom: 0px solid rgba(154, 252, 151, 0.1);
-          padding-bottom: 0.3rem;
-        }
-        body.light-bg .specs-title {
-          color: #1a4a1a;
-          border-bottom: 1px solid rgba(44, 110, 44, 0.1);
-        }
-        .device-specs p {
-          font-size: 0.8rem !important;
-          line-height: 1.5 !important;
-          margin: 0.2rem 0 !important;
-        }
-        .device-specs p strong {
-          color: #9afc97;
-          opacity: 0.7;
-        }
-
-        @media (max-width: 600px) {
-          .container {
-            padding: 0 0.8rem;
-          }
-          .map-container {
-            padding: 0.5rem;
-            min-height: 500px;
-          }
-          .tracker-section {
-            padding: 1rem;
-          }
-          .device-specs {
-            padding: 0.5rem;
-          }
+        .bird-select option {
+          white-space: normal;
+          word-break: break-word;
+          padding: 0.2rem 0.5rem;
         }
       `}</style>
+
+      {/* Mode toggle, radar toggle, year slider */}
+      <div
+        style={{
+          marginBottom: "0.5rem",
+          display: "flex",
+          gap: "1rem",
+          alignItems: "center",
+          flexWrap: "wrap",
+        }}
+      >
+        <label style={{ fontFamily: "monospace" }}>
+          <input
+            type="checkbox"
+            checked={compareMode}
+            onChange={(e) => {
+              setCompareMode(e.target.checked);
+              if (e.target.checked) setIsPlaying(false);
+            }}
+          />{" "}
+          Compare Mode (show multiple birds)
+        </label>
+
+        <label style={{ fontFamily: "monospace" }}>
+          <input
+            type="checkbox"
+            checked={radarEnabled}
+            onChange={(e) => setRadarEnabled(e.target.checked)}
+          />{" "}
+          Show Radar Installations
+        </label>
+
+        {radarEnabled && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              fontFamily: "monospace",
+              fontSize: "0.8rem",
+            }}
+          >
+            <span>Radar year:</span>
+            <input
+              type="range"
+              min={minRadarYear}
+              max={maxRadarYear}
+              step={1}
+              value={radarYear}
+              onChange={(e) => setRadarYear(parseInt(e.target.value))}
+              style={{ width: "150px" }}
+            />
+            <span>{radarYear}</span>
+          </div>
+        )}
+
+        {/* Feeding sites and cameras toggles */}
+        <label style={{ fontFamily: "monospace" }}>
+          <input
+            type="checkbox"
+            checked={showFeedingSites}
+            onChange={(e) => setShowFeedingSites(e.target.checked)}
+          />{" "}
+          Show Feeding Sites
+        </label>
+
+        <label style={{ fontFamily: "monospace" }}>
+          <input
+            type="checkbox"
+            checked={showCameras}
+            onChange={(e) => setShowCameras(e.target.checked)}
+          />{" "}
+          Show Live Vulture Cams
+        </label>
+      </div>
+
+      {!compareMode ? (
+        // ----- Single Bird Animation Mode -----
+        <>
+          <div
+            style={{
+              marginBottom: "0.5rem",
+              display: "flex",
+              gap: "1rem",
+              alignItems: "center",
+            }}
+          >
+            <label htmlFor="bird-select" style={{ fontFamily: "monospace" }}>
+              Select bird:
+            </label>
+            <select
+              id="bird-select"
+              className="bird-select"
+              value={selectedBirdId || ""}
+              onChange={(e) => setSelectedBirdId(parseInt(e.target.value))}
+            >
+              {birdList.map((bird) => (
+                <option key={bird.id} value={bird.id}>
+                  {bird.species} (ID {bird.id}) – {bird.pointCount} fixes
+                </option>
+              ))}
+            </select>
+            <div
+              style={{
+                width: "20px",
+                height: "20px",
+                backgroundColor: currentColor,
+                borderRadius: "2px",
+              }}
+            />
+          </div>
+
+          <div className="map-wrapper" style={{ border: "1px solid #9afc97" }}>
+            <MapContainer
+              center={mapCenter}
+              zoom={mapZoom}
+              style={{ height: mapHeight + "px", width: "100%" }}
+              attributionControl={false}
+              zoomControl={true}
+            >
+              <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
+
+              <TileLayer
+                attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+                url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png"
+                opacity={labelOpacityRef.current}
+                ref={labelLayerRef}
+              />
+
+              {/* Radar markers */}
+              {visibleRadarPoints.map((radar, idx) => (
+                <CircleMarker
+                  key={`radar-${idx}`}
+                  center={[radar.lat, radar.lng]}
+                  radius={5}
+                  fillColor="#000000"
+                  color="#ffffff"
+                  weight={1.5}
+                  opacity={0.9}
+                  fillOpacity={0.7}
+                >
+                  <Popup>
+                    <strong>{radar.name}</strong>
+                    <br />
+                    <strong>Year installed:</strong> {radar.year}
+                    <br />
+                    <strong>Band Type:</strong> {radar.bandType}
+                    <br />
+                    <strong>Purpose:</strong> {radar.purpose}
+                    <br />
+                    <strong>Jurisdiction:</strong> {radar.jurisdiction}
+                    <br />
+                    <strong>Operator:</strong> {radar.operator}
+                    <br />
+                    <strong>Status:</strong> {radar.status}
+                    <br />
+                    {radar.source && radar.source !== "" && (
+                      <a href={radar.source} target="_blank" rel="noopener noreferrer">
+                        Source
+                      </a>
+                    )}
+                  </Popup>
+                </CircleMarker>
+              ))}
+
+              {/* Feeding sites markers - green */}
+              {visibleFeedingSites.map((site, idx) => (
+                <CircleMarker
+                  key={`feeding-${idx}`}
+                  center={[site.lat, site.lng]}
+                  radius={5}
+                  fillColor="#00ff00"
+                  color="#ffffff"
+                  weight={1.5}
+                  opacity={0.9}
+                  fillOpacity={0.7}
+                >
+                  <Popup>
+                    <strong>{site.name}</strong>
+                    <br />
+                    {site.date && (
+                      <><strong>Year:</strong> {site.date}<br /></>
+                    )}
+                    {site.description && (
+                      <><strong>Purpose:</strong> {site.description}<br /></>
+                    )}
+                    {site.jurisdiction && (
+                      <><strong>Jurisdiction:</strong> {site.jurisdiction}<br /></>
+                    )}
+                    {site.operator && (
+                      <><strong>Operator:</strong> {site.operator}<br /></>
+                    )}
+                    {site.status && (
+                      <><strong>Status:</strong> {site.status}<br /></>
+                    )}
+                  </Popup>
+                </CircleMarker>
+              ))}
+
+              {/* Camera markers - white (with iframe) */}
+              {visibleCameras.map((site, idx) => {
+                const iframeHeight = isMobile ? 150 : 200;
+                const popupMaxWidth = isMobile ? 280 : 420;
+                const popupMinWidth = isMobile ? 240 : 320;
+                return (
+                  <CircleMarker
+                    key={`camera-${idx}`}
+                    center={[site.lat, site.lng]}
+                    radius={5}
+                    fillColor="#ffffff"
+                    color="#ffffff"
+                    weight={1.5}
+                    opacity={0.9}
+                    fillOpacity={0.7}
+                  >
+                    <Popup maxWidth={popupMaxWidth} minWidth={popupMinWidth} maxHeight={500}>
+                      <strong>{site.name}</strong>
+                      <br />
+                      {site.date && (
+                        <><strong>Year:</strong> {site.date}<br /></>
+                      )}
+                      {site.description && (
+                        <><strong>Purpose:</strong> {site.description}<br /></>
+                      )}
+                      {site.jurisdiction && (
+                        <><strong>Jurisdiction:</strong> {site.jurisdiction}<br /></>
+                      )}
+                      {site.operator && (
+                        <><strong>Operator:</strong> {site.operator}<br /></>
+                      )}
+                      {site.status && (
+                        <><strong>Status:</strong> {site.status}<br /></>
+                      )}
+                      {site.cameraUrl && site.cameraUrl !== "" && (
+                        <>
+                          <div style={{ marginTop: "0.5rem" }}>
+                            <iframe
+                              src={site.cameraUrl}
+                              width="100%"
+                              height={iframeHeight}
+                              frameBorder="0"
+                              allowFullScreen
+                              allow="autoplay; fullscreen"
+                              style={{ border: "1px solid #ccc", borderRadius: "4px" }}
+                              title="Live camera stream"
+                              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                            />
+                          </div>
+                          <div style={{ marginTop: "0.3rem", fontSize: "0.65rem", opacity: 0.6 }}>
+                            <a href={site.cameraUrl} target="_blank" rel="noopener noreferrer">
+                              🔗 Open in new window ↗
+                            </a>
+                          </div>
+                        </>
+                      )}
+                    </Popup>
+                  </CircleMarker>
+                );
+              })}
+
+              {/* Single bird animation layers */}
+              <Polyline
+                positions={trail}
+                color={currentColor}
+                weight={0.8}
+                opacity={0.9}
+              />
+              {firstPoint && (
+                <CircleMarker
+                  center={[firstPoint.lat, firstPoint.lng]}
+                  radius={4}
+                  fillColor={currentColor}
+                  color={currentColor}
+                  weight={1}
+                  opacity={0.8}
+                  fillOpacity={1}
+                />
+              )}
+              <MapUpdater position={[currentPoint.lat, currentPoint.lng]} />
+            </MapContainer>
+          </div>
+
+          {/* Label opacity slider */}
+          <div
+            style={{
+              marginTop: "0.5rem",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.8rem",
+              fontFamily: "monospace",
+              fontSize: "0.8rem",
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <span>Labels opacity:</span>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              defaultValue={0.0}
+              onChange={(e) => {
+                const val = parseFloat(e.target.value);
+                labelOpacityRef.current = val;
+                if (labelLayerRef.current) labelLayerRef.current.setOpacity(val);
+              }}
+              style={{ width: "200px" }}
+            />
+            <span>{Math.round((labelOpacityRef.current || 0) * 100)}%</span>
+          </div>
+
+          <div
+            className="bird-controls"
+            style={{
+              marginTop: "0.5rem",
+              display: "flex",
+              gap: "1rem",
+              alignItems: "center",
+              flexWrap: "wrap",
+              fontFamily: "monospace",
+              fontSize: "0.8rem",
+            }}
+          >
+            <button
+              onClick={togglePlay}
+              className="color-btn"
+              style={{ padding: "0.2rem 0.8rem" }}
+            >
+              {isPlaying ? "Pause" : "Play"}
+            </button>
+            <button
+              onClick={reset}
+              className="color-btn"
+              style={{ padding: "0.2rem 0.8rem" }}
+            >
+              Reset
+            </button>
+            <div>
+              <span>Speed: </span>
+              <input
+                type="range"
+                min="1"
+                max="60"
+                step="1"
+                value={speedFactor}
+                onChange={(e) => setSpeedFactor(parseFloat(e.target.value))}
+                style={{ width: "120px" }}
+              />
+              <span style={{ marginLeft: "0.5rem" }}>{speedFactor}x</span>
+            </div>
+            <div>
+              {currentPoint.timestamp.toLocaleString()} | Speed:{" "}
+              {currentPoint.speed?.toFixed(1) || "?"} km/h | Heading:{" "}
+              {currentPoint.heading?.toFixed(0) || "?"}°
+            </div>
+            <div>
+              {currentIdx + 1} / {points.length} fixes
+            </div>
+          </div>
+        </>
+      ) : (
+        // ----- Compare Mode (Static Overlays) -----
+        <>
+          <div
+            style={{
+              marginBottom: "0.5rem",
+              display: "flex",
+              gap: "1rem",
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <button
+              onClick={selectAllBirds}
+              className="color-btn"
+              style={{ padding: "0.2rem 0.8rem" }}
+            >
+              Select All
+            </button>
+            <button
+              onClick={deselectAllBirds}
+              className="color-btn"
+              style={{ padding: "0.2rem 0.8rem" }}
+            >
+              Deselect All
+            </button>
+            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+              {birdList.map((bird) => (
+                <label
+                  key={bird.id}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                    fontFamily: "monospace",
+                    fontSize: "0.75rem",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={visibleBirds.has(bird.id)}
+                    onChange={() => toggleBirdVisibility(bird.id)}
+                  />
+                  <div
+                    style={{
+                      width: "12px",
+                      height: "12px",
+                      backgroundColor: birdColorMap[bird.id],
+                      borderRadius: "2px",
+                    }}
+                  />
+                  {bird.species} (ID {bird.id})
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="map-wrapper" style={{ border: "1px solid #9afc97" }}>
+            <MapContainer
+              center={mapCenter}
+              zoom={mapZoom}
+              style={{ height: mapHeight + "px", width: "100%" }}
+              attributionControl={false}
+              zoomControl={true}
+            >
+              <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
+
+              <TileLayer
+                attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+                url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png"
+                opacity={labelOpacityRef.current}
+                ref={labelLayerRef}
+              />
+
+              {/* Radar markers */}
+              {visibleRadarPoints.map((radar, idx) => (
+                <CircleMarker
+                  key={`radar-${idx}`}
+                  center={[radar.lat, radar.lng]}
+                  radius={5}
+                  fillColor="#000000"
+                  color="#ffffff"
+                  weight={1.5}
+                  opacity={0.9}
+                  fillOpacity={0.7}
+                >
+                  <Popup>
+                    <strong>{radar.name}</strong>
+                    <br />
+                    <strong>Year installed:</strong> {radar.year}
+                    <br />
+                    <strong>Band Type:</strong> {radar.bandType}
+                    <br />
+                    <strong>Purpose:</strong> {radar.purpose}
+                    <br />
+                    <strong>Jurisdiction:</strong> {radar.jurisdiction}
+                    <br />
+                    <strong>Operator:</strong> {radar.operator}
+                    <br />
+                    <strong>Status:</strong> {radar.status}
+                    <br />
+                    {radar.source && radar.source !== "" && (
+                      <a href={radar.source} target="_blank" rel="noopener noreferrer">
+                        Source
+                      </a>
+                    )}
+                  </Popup>
+                </CircleMarker>
+              ))}
+
+              {/* Feeding sites markers - green (Compare mode) */}
+              {visibleFeedingSites.map((site, idx) => (
+                <CircleMarker
+                  key={`feeding-${idx}`}
+                  center={[site.lat, site.lng]}
+                  radius={5}
+                  fillColor="#00ff00"
+                  color="#ffffff"
+                  weight={1.5}
+                  opacity={0.9}
+                  fillOpacity={0.7}
+                >
+                  <Popup>
+                    <strong>{site.name}</strong>
+                    <br />
+                    {site.date && (
+                      <><strong>Year:</strong> {site.date}<br /></>
+                    )}
+                    {site.description && (
+                      <><strong>Purpose:</strong> {site.description}<br /></>
+                    )}
+                    {site.jurisdiction && (
+                      <><strong>Jurisdiction:</strong> {site.jurisdiction}<br /></>
+                    )}
+                    {site.operator && (
+                      <><strong>Operator:</strong> {site.operator}<br /></>
+                    )}
+                    {site.status && (
+                      <><strong>Status:</strong> {site.status}<br /></>
+                    )}
+                  </Popup>
+                </CircleMarker>
+              ))}
+
+              {/* Camera markers - white (Compare mode, with iframe) */}
+              {visibleCameras.map((site, idx) => {
+                const iframeHeight = isMobile ? 150 : 200;
+                const popupMaxWidth = isMobile ? 280 : 420;
+                const popupMinWidth = isMobile ? 240 : 320;
+                return (
+                  <CircleMarker
+                    key={`camera-${idx}`}
+                    center={[site.lat, site.lng]}
+                    radius={5}
+                    fillColor="#ffffff"
+                    color="#ffffff"
+                    weight={1.5}
+                    opacity={0.9}
+                    fillOpacity={0.7}
+                  >
+                    <Popup maxWidth={popupMaxWidth} minWidth={popupMinWidth} maxHeight={500}>
+                      <strong>{site.name}</strong>
+                      <br />
+                      {site.date && (
+                        <><strong>Year:</strong> {site.date}<br /></>
+                      )}
+                      {site.description && (
+                        <><strong>Purpose:</strong> {site.description}<br /></>
+                      )}
+                      {site.jurisdiction && (
+                        <><strong>Jurisdiction:</strong> {site.jurisdiction}<br /></>
+                      )}
+                      {site.operator && (
+                        <><strong>Operator:</strong> {site.operator}<br /></>
+                      )}
+                      {site.status && (
+                        <><strong>Status:</strong> {site.status}<br /></>
+                      )}
+                      {site.cameraUrl && site.cameraUrl !== "" && (
+                        <>
+                          <div style={{ marginTop: "0.5rem" }}>
+                            <iframe
+                              src={site.cameraUrl}
+                              width="100%"
+                              height={iframeHeight}
+                              frameBorder="0"
+                              allowFullScreen
+                              allow="autoplay; fullscreen"
+                              style={{ border: "1px solid #ccc", borderRadius: "4px" }}
+                              title="Live camera stream"
+                              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                            />
+                          </div>
+                          <div style={{ marginTop: "0.3rem", fontSize: "0.65rem", opacity: 0.6 }}>
+                            <a href={site.cameraUrl} target="_blank" rel="noopener noreferrer">
+                              🔗 Open in new window ↗
+                            </a>
+                          </div>
+                        </>
+                      )}
+                    </Popup>
+                  </CircleMarker>
+                );
+              })}
+
+              {/* Compare mode overlays */}
+              {comparePolylines}
+              {compareStartMarkers}
+            </MapContainer>
+          </div>
+
+          {/* Label opacity slider */}
+          <div
+            style={{
+              marginTop: "0.5rem",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.8rem",
+              fontFamily: "monospace",
+              fontSize: "0.8rem",
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <span>Labels opacity:</span>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              defaultValue={0.0}
+              onChange={(e) => {
+                const val = parseFloat(e.target.value);
+                labelOpacityRef.current = val;
+                if (labelLayerRef.current) labelLayerRef.current.setOpacity(val);
+              }}
+              style={{ width: "200px" }}
+            />
+            <span>{Math.round((labelOpacityRef.current || 0) * 100)}%</span>
+          </div>
+
+          <div
+            style={{
+              marginTop: "0.5rem",
+              fontFamily: "monospace",
+              fontSize: "0.75rem",
+              textAlign: "center",
+            }}
+          >
+            Showing full tracks of selected birds. Small dots mark the first recorded
+            location.
+          </div>
+        </>
+      )}
     </div>
   );
 }
