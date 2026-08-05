@@ -427,6 +427,10 @@ export default function BirdMapPage() {
           .device-specs {
             padding: 0.5rem;
           }
+          .image-caption,
+          .small-text,
+          .small-text.source {
+            text-align: justify;
         }
       `}</style>
     </div>
