@@ -102,7 +102,7 @@ export default function BirdMapPage() {
           {/* Image 1 – GPS device */}
           <div className="image-block">
             <img
-              src="/images/gps_device_eobs.jpg"
+              src="/images/gps_device_eobs.jpeg"
               alt="Representative GPS tracking devices used in Hebrew University vulture research."
               className="full-width-image"
             />
@@ -155,16 +155,14 @@ export default function BirdMapPage() {
           </div>
 
           <p>
-            The tracker can be understood as a small programmable computer carried by the bird. It did not
-            function as a camera and did not continuously watch the animal. At scheduled times, it calculated
-            a GPS position, measured changes in the bird's bodily movement and stored those measurements
-            inside the device. Researchers later retrieved the records through a local UHF radio connection.
-            UHF stands for ultra-high frequency, a type of radio transmission that allowed the stored data to
-            be downloaded when researchers and their receiving equipment were within range of the tracker.
-            The tags followed different daytime schedules across the study period. Some recorded GPS
-            positions every ten minutes, while others recorded them every minute before the records were
-            reduced to ten-minute intervals for analysis. The route shown on the map is therefore not a
-            continuous journey observed from beginning to end. It is a reconstruction made by connecting
+            For someone without technical knowledge, the tracker can be understood as a small programmable
+            computer carried by the bird. It was not a camera and did not continuously watch the animal. At
+            scheduled times, it calculated a GPS position, measured changes in the bird's bodily movement and
+            stored those measurements inside the device. Researchers later retrieved the records through a
+            short-range UHF radio connection. The tags followed different daytime schedules across the study
+            period. Some recorded GPS positions every ten minutes, while others recorded them every minute before
+            the records were reduced to ten-minute intervals for analysis. The route shown on the map is therefore
+            not a continuous journey observed from beginning to end. It is a reconstruction made by connecting
             separate measurements collected according to the device's programming.
           </p>
           <p>
@@ -270,7 +268,7 @@ export default function BirdMapPage() {
           width: 100%;
           height: auto;
           display: block;
-          border: 0px solid #9afc97;
+          border: 1px solid #9afc97;
         }
         body.light-bg .full-width-image {
           border-color: #2c6e2c;
@@ -295,7 +293,7 @@ export default function BirdMapPage() {
         /* Device specs */
         .device-specs {
           margin: 1.5rem 0;
-          border: 1px solid rgb(154, 252, 151);
+          border: 1px solid rgba(154, 252, 151, 0.2);
           padding: 1rem;
         }
         body.light-bg .device-specs {
@@ -320,8 +318,12 @@ export default function BirdMapPage() {
           line-height: 1.5 !important;
           margin: 0.2rem 0 !important;
         }
+        /* ★ Updated: bold text matches the section title colour ★ */
         .device-specs p strong {
-          opacity: 0.7;
+          color: #9afc97;
+        }
+        body.light-bg .device-specs p strong {
+          color: #1a4a1a;
         }
 
         @media (max-width: 600px) {
