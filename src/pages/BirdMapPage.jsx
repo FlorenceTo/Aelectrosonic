@@ -308,7 +308,7 @@ export default function BirdMapPage() {
           color: #9afc97;
           margin-bottom: 0.5rem;
           font-weight: normal;
-          border-bottom: 1px solid rgba(154, 252, 151, 0.1);
+          border-bottom: 0px solid rgba(154, 252, 151, 0.1);
           padding-bottom: 0.3rem;
         }
         body.light-bg .specs-title {
@@ -321,6 +321,7 @@ export default function BirdMapPage() {
           margin: 0.2rem 0 !important;
         }
         .device-specs p strong {
+          color: #9afc97;
           opacity: 0.7;
         }
 
