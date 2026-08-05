@@ -190,7 +190,7 @@ export default function BirdTracker() {
 
   // Load feeding sites and cameras data
   useEffect(() => {
-    fetch("/data/feedingsites1.csv")
+    fetch("/data/feedingsites2.csv")
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.text();
@@ -370,12 +370,20 @@ export default function BirdTracker() {
   // Helper for responsive sizing
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
+  // Popup sizes - halved from original
+  const radarPopupMaxWidth = isMobile ? 140 : 210;
+  const radarPopupMinWidth = isMobile ? 120 : 160;
+  const feedingPopupMaxWidth = isMobile ? 140 : 210;
+  const feedingPopupMinWidth = isMobile ? 120 : 160;
+  const cameraPopupMaxWidth = isMobile ? 140 : 210;
+  const cameraPopupMinWidth = isMobile ? 120 : 160;
+
   // Helper to render a "Watch Live Stream" button for a site that has a cameraUrl
   const renderWatchButton = (cameraUrl) => {
     if (!cameraUrl || cameraUrl.trim() === "") return null;
     const videoId = getYouTubeId(cameraUrl);
     return (
-      <div style={{ marginTop: "0.5rem" }}>
+      <div style={{ marginTop: "0.5rem", border: "1px solid #9afc97", borderRadius: "4px", overflow: "hidden" }}>
         <a
           href={cameraUrl}
           target="_blank"
@@ -389,8 +397,6 @@ export default function BirdTracker() {
                 alt="Live stream thumbnail"
                 style={{
                   width: "100%",
-                  borderRadius: "4px",
-                  border: "1px solid #9afc97",
                   display: "block",
                 }}
               />
@@ -398,10 +404,7 @@ export default function BirdTracker() {
                 style={{
                   textAlign: "center",
                   padding: "0.4rem",
-                  marginTop: "0.3rem",
                   backgroundColor: "#1c1c1b",
-                  border: "1px solid #9afc97",
-                  borderRadius: "4px",
                   color: "#9afc97",
                   fontSize: "0.8rem",
                   transition: "background-color 0.2s ease",
@@ -422,8 +425,6 @@ export default function BirdTracker() {
                 textAlign: "center",
                 padding: "0.6rem",
                 backgroundColor: "#1c1c1b",
-                border: "1px solid #9afc97",
-                borderRadius: "4px",
                 color: "#9afc97",
                 fontSize: "0.85rem",
                 transition: "background-color 0.2s ease",
@@ -493,6 +494,18 @@ export default function BirdTracker() {
           word-break: break-word;
           padding: 0.2rem 0.5rem;
         }
+
+        .leaflet-popup-content {
+          font-size: 0.75rem;
+          overflow-wrap: break-word;
+          word-wrap: break-word;
+          word-break: break-word;
+        }
+
+        @media (max-width: 600px) {
+          .leaflet-popup-content {
+            font-size: 0.7rem;
+          }
       `}</style>
 
       {/* Mode toggle, radar toggle, year slider */}
@@ -635,7 +648,7 @@ export default function BirdTracker() {
                   opacity={0.9}
                   fillOpacity={0.7}
                 >
-                  <Popup>
+                  <Popup maxWidth={radarPopupMaxWidth} minWidth={radarPopupMinWidth}>
                     <strong>{radar.name}</strong>
                     <br />
                     <strong>Year installed:</strong> {radar.year}
@@ -671,7 +684,7 @@ export default function BirdTracker() {
                   opacity={0.9}
                   fillOpacity={0.7}
                 >
-                  <Popup>
+                  <Popup maxWidth={feedingPopupMaxWidth} minWidth={feedingPopupMinWidth}>
                     <strong>{site.name}</strong>
                     <br />
                     {site.date && (
@@ -689,57 +702,53 @@ export default function BirdTracker() {
                     {site.status && (
                       <><strong>Status:</strong> {site.status}<br /></>
                     )}
-
-                    {/* ★ ADD: Watch Live Stream button if cameraUrl exists */}
                     {renderWatchButton(site.cameraUrl)}
                   </Popup>
                 </CircleMarker>
               ))}
 
               {/* Camera markers - white */}
-              {visibleCameras.map((site, idx) => {
-                const popupMaxWidth = isMobile ? 140 : 210;
-                const popupMinWidth = isMobile ? 120 : 160;
-                return (
-                  <CircleMarker
-                    key={`camera-${idx}`}
-                    center={[site.lat, site.lng]}
-                    radius={5}
-                    fillColor="#ffffff"
-                    color="#000000"
-                    weight={1.5}
-                    opacity={0.9}
-                    fillOpacity={0.7}
+              {visibleCameras.map((site, idx) => (
+                <CircleMarker
+                  key={`camera-${idx}`}
+                  center={[site.lat, site.lng]}
+                  radius={5}
+                  fillColor="#ffffff"
+                  color="#000000"
+                  weight={1.5}
+                  opacity={0.9}
+                  fillOpacity={0.7}
+                >
+                  <Popup
+                    maxWidth={cameraPopupMaxWidth}
+                    minWidth={cameraPopupMinWidth}
+                    maxHeight={500}
                   >
-                    <Popup maxWidth={popupMaxWidth} minWidth={popupMinWidth} maxHeight={500}>
-                      <strong>{site.name}</strong>
-                      <br />
-                      {site.date && (
-                        <><strong>Year:</strong> {site.date}<br /></>
-                      )}
-                      {site.description && (
-                        <><strong>Purpose:</strong> {site.description}<br /></>
-                      )}
-                      {site.jurisdiction && (
-                        <><strong>Jurisdiction:</strong> {site.jurisdiction}<br /></>
-                      )}
-                      {site.operator && (
-                        <><strong>Operator:</strong> {site.operator}<br /></>
-                      )}
-                      {site.status && (
-                        <><strong>Status:</strong> {site.status}<br /></>
-                      )}
-
-                      {/* DEBUG: show Camera URL */}
-                      <div style={{ fontSize: "0.6rem", color: "#999", marginTop: "0.3rem" }}>
-                        Camera URL: {site.cameraUrl || "❌ NOT FOUND"}
-                      </div>
-
-                      {renderWatchButton(site.cameraUrl)}
-                    </Popup>
-                  </CircleMarker>
-                );
-              })}
+                    <strong>{site.name}</strong>
+                    <br />
+                    {site.date && (
+                      <><strong>Year:</strong> {site.date}<br /></>
+                    )}
+                    {site.description && (
+                      <><strong>Purpose:</strong> {site.description}<br /></>
+                    )}
+                    {site.jurisdiction && (
+                      <><strong>Jurisdiction:</strong> {site.jurisdiction}<br /></>
+                    )}
+                    {site.operator && (
+                      <><strong>Operator:</strong> {site.operator}<br /></>
+                    )}
+                    {site.status && (
+                      <><strong>Status:</strong> {site.status}<br /></>
+                    )}
+                    {/* DEBUG: show Camera URL */}
+                    <div style={{ fontSize: "0.6rem", color: "#999", marginTop: "0.3rem" }}>
+                      Camera URL: {site.cameraUrl || "❌ NOT FOUND"}
+                    </div>
+                    {renderWatchButton(site.cameraUrl)}
+                  </Popup>
+                </CircleMarker>
+              ))}
 
               {/* Single bird animation layers */}
               <Polyline
@@ -915,7 +924,7 @@ export default function BirdTracker() {
                 ref={labelLayerRef}
               />
 
-              {/* Radar markers */}
+              {/* Radar markers (Compare mode) */}
               {visibleRadarPoints.map((radar, idx) => (
                 <CircleMarker
                   key={`radar-${idx}`}
@@ -927,7 +936,7 @@ export default function BirdTracker() {
                   opacity={0.9}
                   fillOpacity={0.7}
                 >
-                  <Popup>
+                  <Popup maxWidth={radarPopupMaxWidth} minWidth={radarPopupMinWidth}>
                     <strong>{radar.name}</strong>
                     <br />
                     <strong>Year installed:</strong> {radar.year}
@@ -963,7 +972,7 @@ export default function BirdTracker() {
                   opacity={0.9}
                   fillOpacity={0.7}
                 >
-                  <Popup>
+                  <Popup maxWidth={feedingPopupMaxWidth} minWidth={feedingPopupMinWidth}>
                     <strong>{site.name}</strong>
                     <br />
                     {site.date && (
@@ -981,57 +990,53 @@ export default function BirdTracker() {
                     {site.status && (
                       <><strong>Status:</strong> {site.status}<br /></>
                     )}
-
-                    {/* ★ ADD: Watch Live Stream button if cameraUrl exists */}
                     {renderWatchButton(site.cameraUrl)}
                   </Popup>
                 </CircleMarker>
               ))}
 
               {/* Camera markers - white (Compare mode) */}
-              {visibleCameras.map((site, idx) => {
-                const popupMaxWidth = isMobile ? 280 : 420;
-                const popupMinWidth = isMobile ? 240 : 320;
-                return (
-                  <CircleMarker
-                    key={`camera-${idx}`}
-                    center={[site.lat, site.lng]}
-                    radius={5}
-                    fillColor="#ffffff"
-                    color="#000000"
-                    weight={1.5}
-                    opacity={0.9}
-                    fillOpacity={0.7}
+              {visibleCameras.map((site, idx) => (
+                <CircleMarker
+                  key={`camera-${idx}`}
+                  center={[site.lat, site.lng]}
+                  radius={5}
+                  fillColor="#ffffff"
+                  color="#000000"
+                  weight={1.5}
+                  opacity={0.9}
+                  fillOpacity={0.7}
+                >
+                  <Popup
+                    maxWidth={cameraPopupMaxWidth}
+                    minWidth={cameraPopupMinWidth}
+                    maxHeight={500}
                   >
-                    <Popup maxWidth={popupMaxWidth} minWidth={popupMinWidth} maxHeight={500}>
-                      <strong>{site.name}</strong>
-                      <br />
-                      {site.date && (
-                        <><strong>Year:</strong> {site.date}<br /></>
-                      )}
-                      {site.description && (
-                        <><strong>Purpose:</strong> {site.description}<br /></>
-                      )}
-                      {site.jurisdiction && (
-                        <><strong>Jurisdiction:</strong> {site.jurisdiction}<br /></>
-                      )}
-                      {site.operator && (
-                        <><strong>Operator:</strong> {site.operator}<br /></>
-                      )}
-                      {site.status && (
-                        <><strong>Status:</strong> {site.status}<br /></>
-                      )}
-
-                      {/* DEBUG: show Camera URL */}
-                      <div style={{ fontSize: "0.6rem", color: "#999", marginTop: "0.3rem" }}>
-                        Camera URL: {site.cameraUrl || "❌ NOT FOUND"}
-                      </div>
-
-                      {renderWatchButton(site.cameraUrl)}
-                    </Popup>
-                  </CircleMarker>
-                );
-              })}
+                    <strong>{site.name}</strong>
+                    <br />
+                    {site.date && (
+                      <><strong>Year:</strong> {site.date}<br /></>
+                    )}
+                    {site.description && (
+                      <><strong>Purpose:</strong> {site.description}<br /></>
+                    )}
+                    {site.jurisdiction && (
+                      <><strong>Jurisdiction:</strong> {site.jurisdiction}<br /></>
+                    )}
+                    {site.operator && (
+                      <><strong>Operator:</strong> {site.operator}<br /></>
+                    )}
+                    {site.status && (
+                      <><strong>Status:</strong> {site.status}<br /></>
+                    )}
+                    {/* DEBUG: show Camera URL */}
+                    <div style={{ fontSize: "0.6rem", color: "#999", marginTop: "0.3rem" }}>
+                      Camera URL: {site.cameraUrl || "❌ NOT FOUND"}
+                    </div>
+                    {renderWatchButton(site.cameraUrl)}
+                  </Popup>
+                </CircleMarker>
+              ))}
 
               {/* Compare mode overlays */}
               {comparePolylines}
