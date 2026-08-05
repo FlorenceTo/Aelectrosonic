@@ -218,7 +218,7 @@ export default function BirdTracker() {
             operator,
             status,
             jurisdiction,
-            dateInstalled,
+            date,
             type,
           };
 
@@ -587,8 +587,8 @@ export default function BirdTracker() {
                   <Popup>
                     <strong>{site.name}</strong>
                     <br />
-                    {site.dateInstalled && (
-                      <><strong>Year installed:</strong> {site.dateInstalled}<br /></>
+                    {site.date && (
+                      <><strong>Year installed:</strong> {site.date}<br /></>
                     )}
                     {site.description && (
                       <><strong>Purpose:</strong> {site.description}<br /></>
@@ -621,8 +621,8 @@ export default function BirdTracker() {
                   <Popup>
                     <strong>{site.name}</strong>
                     <br />
-                    {site.dateInstalled && (
-                      <><strong>Year installed:</strong> {site.dateInstalled}<br /></>
+                    {site.date && (
+                      <><strong>Year:</strong> {site.date}<br /></>
                     )}
                     {site.description && (
                       <><strong>Purpose:</strong> {site.description}<br /></>
@@ -865,8 +865,8 @@ export default function BirdTracker() {
                   <Popup>
                     <strong>{site.name}</strong>
                     <br />
-                    {site.dateInstalled && (
-                      <><strong>Year installed:</strong> {site.dateInstalled}<br /></>
+                    {site.date && (
+                      <><strong>Year installed:</strong> {site.date}<br /></>
                     )}
                     {site.description && (
                       <><strong>Purpose:</strong> {site.description}<br /></>
@@ -899,8 +899,8 @@ export default function BirdTracker() {
                   <Popup>
                     <strong>{site.name}</strong>
                     <br />
-                    {site.dateInstalled && (
-                      <><strong>Year installed:</strong> {site.dateInstalled}<br /></>
+                    {site.date && (
+                      <><strong>Year installed:</strong> {site.date}<br /></>
                     )}
                     {site.description && (
                       <><strong>Purpose:</strong> {site.description}<br /></>

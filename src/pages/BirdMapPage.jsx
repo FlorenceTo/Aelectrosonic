@@ -270,7 +270,7 @@ export default function BirdMapPage() {
           width: 100%;
           height: auto;
           display: block;
-          border: 1px solid #9afc97;
+          border: 0px solid #9afc97;
         }
         body.light-bg .full-width-image {
           border-color: #2c6e2c;
@@ -295,7 +295,7 @@ export default function BirdMapPage() {
         /* Device specs */
         .device-specs {
           margin: 1.5rem 0;
-          border: 1px solid rgba(154, 252, 151, 0.2);
+          border: 1px solid rgb(154, 252, 151);
           padding: 1rem;
         }
         body.light-bg .device-specs {
