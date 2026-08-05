@@ -49,15 +49,21 @@ export default function BirdMapPage() {
             politically or militarily sensitive territories, as well as relationships between wildlife, radar
             sites, roads, settlements, borders and other infrastructure.
           </p>
+
           <p>
             Making precise locations public can create risks. Sensitive habitats, vulnerable animals and
             important feeding or breeding sites may become easier to identify. The tracks can also reveal
-            conservation interventions, such as artificial feeding stations, that actively influence where
-            vultures travel and gather. When viewed alongside radar sites, the tracks raise further questions
-            about how animal navigation passes through landscapes organised by surveillance, communications
-            and military infrastructure. The map does not establish that radar caused a particular movement,
-            but it makes these spatial relationships visible.
+            conservation interventions, such as supplementary feeding stations. These are designated sites
+            where conservation workers place livestock carcasses intended to provide vultures with a reliable
+            source of food and reduce their exposure to poisoned animals or carcasses containing harmful
+            veterinary drugs. Although they are established to support the population, feeding stations can
+            also influence where vultures travel, gather and remain within the landscape. When viewed alongside
+            radar sites, the tracks raise further questions about how animal navigation passes through
+            landscapes organised by surveillance, communications and military infrastructure. The map does
+            not establish that radar caused a particular movement, but it makes these spatial relationships
+            visible.
           </p>
+
           <p>
             The map should therefore be read as both a record of vulture movement and a record of the conditions
             surrounding and shaping that movement. These conditions include terrain, food availability,
@@ -102,7 +108,7 @@ export default function BirdMapPage() {
           {/* Image 1 – GPS device */}
           <div className="image-block">
             <img
-              src="/images/gps_device_eobs.jpeg"
+              src="/images/gps_device_eobs.jpg"
               alt="Representative GPS tracking devices used in Hebrew University vulture research."
               className="full-width-image"
             />
@@ -133,12 +139,12 @@ export default function BirdMapPage() {
 
             {/* ★ New paragraph inside the specs box ★ */}
             <p className="small-text" style={{ marginTop: "0.8rem" }}>
-              <strong>Technical identification:</strong> The technical specifications recorded in the
-              Movebank data for this deployment match the <em>e-obs Bird Solar Cellular</em> tracker.
-              The physical interface – including the charging port and attachment points – corresponds
-              exactly to the device shown in the image. While the dataset does not include a product name,
-              the combination of mass (160 g), sensor configuration (GPS + accelerometer) and solar power
-              system indicates that this is the model deployed during the 2008–2011 study.
+              The technical specifications recorded in the Movebank data for this deployment match the
+              <em> e-obs Bird Solar Cellular</em> tracker. The physical interface – including the charging
+              port and attachment points – corresponds exactly to the device shown in the image. While the
+              dataset does not include a product name, the combination of mass (160 g), sensor configuration
+              (GPS + accelerometer) and solar power system indicates that this is the model deployed during
+              the 2008–2011 study.
             </p>
           </div>
 
@@ -166,15 +172,7 @@ export default function BirdMapPage() {
           </div>
 
           <p>
-            For someone without technical knowledge, the tracker can be understood as a small programmable
-            computer carried by the bird. It was not a camera and did not continuously watch the animal. At
-            scheduled times, it calculated a GPS position, measured changes in the bird's bodily movement and
-            stored those measurements inside the device. Researchers later retrieved the records through a
-            short-range UHF radio connection. The tags followed different daytime schedules across the study
-            period. Some recorded GPS positions every ten minutes, while others recorded them every minute before
-            the records were reduced to ten-minute intervals for analysis. The route shown on the map is therefore
-            not a continuous journey observed from beginning to end. It is a reconstruction made by connecting
-            separate measurements collected according to the device's programming.
+            The tracker can be understood as a small programmable computer carried by the bird. It was not a camera and did not continuously watch the animal. At scheduled times, it calculated a GPS position, measured changes in the bird's bodily movement and stored those measurements inside the device. Researchers later retrieved the records through a short-range UHF radio connection. The tags followed different daytime schedules across the study period. Some recorded GPS positions every ten minutes, while others recorded them every minute before the records were reduced to ten-minute intervals for analysis. The route shown on the map is therefore not a continuous journey observed from beginning to end. It is a reconstruction made by connecting separate measurements collected according to the device's programming.
           </p>
           <p>
             Understanding how the tracker worked is important because tracking data can appear neutral and

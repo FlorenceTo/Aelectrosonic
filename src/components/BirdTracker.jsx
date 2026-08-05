@@ -611,7 +611,7 @@ export default function BirdTracker() {
                 </CircleMarker>
               ))}
 
-              {/* Camera markers - white (mobile‑adaptive) */}
+              {/* Camera markers - white */}
               {visibleCameras.map((site, idx) => {
                 const iframeHeight = isMobile ? 150 : 200;
                 const popupMaxWidth = isMobile ? 280 : 420;
@@ -645,6 +645,12 @@ export default function BirdTracker() {
                       {site.status && (
                         <><strong>Status:</strong> {site.status}<br /></>
                       )}
+
+                      {/* DEBUG: show Camera URL */}
+                      <div style={{ fontSize: "0.6rem", color: "#999", marginTop: "0.3rem" }}>
+                        Camera URL: {site.cameraUrl || "❌ NOT FOUND"}
+                      </div>
+
                       {site.cameraUrl && site.cameraUrl !== "" && (
                         <>
                           <div style={{ marginTop: "0.5rem" }}>
