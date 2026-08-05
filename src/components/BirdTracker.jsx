@@ -209,6 +209,7 @@ export default function BirdTracker() {
           const status = row.Status || "";
           const jurisdiction = row.Jurisdiction || "";
           const date = row["Date"] || "";
+          const cameraUrl = row["CameraURL"] || "";
 
           const item = {
             lat,
@@ -220,6 +221,7 @@ export default function BirdTracker() {
             jurisdiction,
             date,
             type,
+            cameraUrl,
           };
 
           // Classify based on Type column
@@ -355,6 +357,9 @@ export default function BirdTracker() {
 
   // Dynamic map height based on mode
   const mapHeight = compareMode ? 320 : 400;
+
+  // Helper for responsive iframe height
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   return (
     <div className="bird-tracker" style={{ marginTop: "1rem" }}>
@@ -606,39 +611,66 @@ export default function BirdTracker() {
                 </CircleMarker>
               ))}
 
-              {/* Camera markers - white */}
-              {visibleCameras.map((site, idx) => (
-                <CircleMarker
-                  key={`camera-${idx}`}
-                  center={[site.lat, site.lng]}
-                  radius={5}
-                  fillColor="#ffffff"
-                  color="#ffffff"
-                  weight={1.5}
-                  opacity={0.9}
-                  fillOpacity={0.7}
-                >
-                  <Popup>
-                    <strong>{site.name}</strong>
-                    <br />
-                    {site.date && (
-                      <><strong>Year:</strong> {site.date}<br /></>
-                    )}
-                    {site.description && (
-                      <><strong>Purpose:</strong> {site.description}<br /></>
-                    )}
-                    {site.jurisdiction && (
-                      <><strong>Jurisdiction:</strong> {site.jurisdiction}<br /></>
-                    )}
-                    {site.operator && (
-                      <><strong>Operator:</strong> {site.operator}<br /></>
-                    )}
-                    {site.status && (
-                      <><strong>Status:</strong> {site.status}<br /></>
-                    )}
-                  </Popup>
-                </CircleMarker>
-              ))}
+              {/* Camera markers - white (mobile‑adaptive) */}
+              {visibleCameras.map((site, idx) => {
+                const iframeHeight = isMobile ? 150 : 200;
+                const popupMaxWidth = isMobile ? 280 : 420;
+                const popupMinWidth = isMobile ? 240 : 320;
+                return (
+                  <CircleMarker
+                    key={`camera-${idx}`}
+                    center={[site.lat, site.lng]}
+                    radius={5}
+                    fillColor="#ffffff"
+                    color="#ffffff"
+                    weight={1.5}
+                    opacity={0.9}
+                    fillOpacity={0.7}
+                  >
+                    <Popup maxWidth={popupMaxWidth} minWidth={popupMinWidth} maxHeight={500}>
+                      <strong>{site.name}</strong>
+                      <br />
+                      {site.date && (
+                        <><strong>Year:</strong> {site.date}<br /></>
+                      )}
+                      {site.description && (
+                        <><strong>Purpose:</strong> {site.description}<br /></>
+                      )}
+                      {site.jurisdiction && (
+                        <><strong>Jurisdiction:</strong> {site.jurisdiction}<br /></>
+                      )}
+                      {site.operator && (
+                        <><strong>Operator:</strong> {site.operator}<br /></>
+                      )}
+                      {site.status && (
+                        <><strong>Status:</strong> {site.status}<br /></>
+                      )}
+                      {site.cameraUrl && site.cameraUrl !== "" && (
+                        <>
+                          <div style={{ marginTop: "0.5rem" }}>
+                            <iframe
+                              src={site.cameraUrl}
+                              width="100%"
+                              height={iframeHeight}
+                              frameBorder="0"
+                              allowFullScreen
+                              allow="autoplay; fullscreen"
+                              style={{ border: "1px solid #ccc", borderRadius: "4px" }}
+                              title="Live camera stream"
+                              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                            />
+                          </div>
+                          <div style={{ marginTop: "0.3rem", fontSize: "0.65rem", opacity: 0.6 }}>
+                            <a href={site.cameraUrl} target="_blank" rel="noopener noreferrer">
+                              🔗 Open in new window ↗
+                            </a>
+                          </div>
+                        </>
+                      )}
+                    </Popup>
+                  </CircleMarker>
+                );
+              })}
 
               {/* Single bird animation layers */}
               <Polyline
@@ -884,39 +916,66 @@ export default function BirdTracker() {
                 </CircleMarker>
               ))}
 
-              {/* Camera markers - white (Compare mode) */}
-              {visibleCameras.map((site, idx) => (
-                <CircleMarker
-                  key={`camera-${idx}`}
-                  center={[site.lat, site.lng]}
-                  radius={5}
-                  fillColor="#ffffff"
-                  color="#ffffff"
-                  weight={1.5}
-                  opacity={0.9}
-                  fillOpacity={0.7}
-                >
-                  <Popup>
-                    <strong>{site.name}</strong>
-                    <br />
-                    {site.date && (
-                      <><strong>Year:</strong> {site.date}<br /></>
-                    )}
-                    {site.description && (
-                      <><strong>Purpose:</strong> {site.description}<br /></>
-                    )}
-                    {site.jurisdiction && (
-                      <><strong>Jurisdiction:</strong> {site.jurisdiction}<br /></>
-                    )}
-                    {site.operator && (
-                      <><strong>Operator:</strong> {site.operator}<br /></>
-                    )}
-                    {site.status && (
-                      <><strong>Status:</strong> {site.status}<br /></>
-                    )}
-                  </Popup>
-                </CircleMarker>
-              ))}
+              {/* Camera markers - white (mobile‑adaptive, Compare mode) */}
+              {visibleCameras.map((site, idx) => {
+                const iframeHeight = isMobile ? 150 : 200;
+                const popupMaxWidth = isMobile ? 280 : 420;
+                const popupMinWidth = isMobile ? 240 : 320;
+                return (
+                  <CircleMarker
+                    key={`camera-${idx}`}
+                    center={[site.lat, site.lng]}
+                    radius={5}
+                    fillColor="#ffffff"
+                    color="#ffffff"
+                    weight={1.5}
+                    opacity={0.9}
+                    fillOpacity={0.7}
+                  >
+                    <Popup maxWidth={popupMaxWidth} minWidth={popupMinWidth} maxHeight={500}>
+                      <strong>{site.name}</strong>
+                      <br />
+                      {site.date && (
+                        <><strong>Year:</strong> {site.date}<br /></>
+                      )}
+                      {site.description && (
+                        <><strong>Purpose:</strong> {site.description}<br /></>
+                      )}
+                      {site.jurisdiction && (
+                        <><strong>Jurisdiction:</strong> {site.jurisdiction}<br /></>
+                      )}
+                      {site.operator && (
+                        <><strong>Operator:</strong> {site.operator}<br /></>
+                      )}
+                      {site.status && (
+                        <><strong>Status:</strong> {site.status}<br /></>
+                      )}
+                      {site.cameraUrl && site.cameraUrl !== "" && (
+                        <>
+                          <div style={{ marginTop: "0.5rem" }}>
+                            <iframe
+                              src={site.cameraUrl}
+                              width="100%"
+                              height={iframeHeight}
+                              frameBorder="0"
+                              allowFullScreen
+                              allow="autoplay; fullscreen"
+                              style={{ border: "1px solid #ccc", borderRadius: "4px" }}
+                              title="Live camera stream"
+                              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                            />
+                          </div>
+                          <div style={{ marginTop: "0.3rem", fontSize: "0.65rem", opacity: 0.6 }}>
+                            <a href={site.cameraUrl} target="_blank" rel="noopener noreferrer">
+                              🔗 Open in new window ↗
+                            </a>
+                          </div>
+                        </>
+                      )}
+                    </Popup>
+                  </CircleMarker>
+                );
+              })}
 
               {/* Compare mode overlays */}
               {comparePolylines}
