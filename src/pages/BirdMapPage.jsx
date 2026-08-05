@@ -199,6 +199,53 @@ export default function BirdMapPage() {
             it allows viewers to understand how the data was produced and to read the map more critically.
           </p>
         </div>
+
+        {/* --- ★ NEW: Radar installations and live vulture cameras section ★ --- */}
+        <div className="radar-section">
+          <h3 className="section-title">Radar installations and live vulture cameras</h3>
+          <p>
+            This map plots documented radar installations, supplementary vulture-feeding sites and locations
+            associated with live conservation cameras. These systems are not components of a single coordinated
+            network, but each produces a different form of remote observation. Radar transmits radio-frequency
+            pulses and analyses the returning echoes to detect bodies moving through the air. Live cameras
+            continuously record activity at selected feeding or nesting sites, while GPS tags attached to
+            individual birds record successive locations and, depending on the device, altitude, ground speed
+            and acceleration. Together, these technologies produce different representations of the vulture as
+            a radar echo, a livestreamed image, a sequence of coordinates and a reconstructed flight path.
+          </p>
+          <p>
+            The MRL-5 at Latrun was originally a meteorological radar designed to detect weather. From the late
+            1990s it was adapted to distinguish birds from clouds, precipitation, insects and terrain, allowing
+            researchers to estimate the direction, altitude, speed and concentration of migration. Its data was
+            supplied to Israeli aviation services and the Israeli Air Force to reduce bird strikes and organise
+            flight activity during migration periods. The AN/TPY-2 in the Negev is a separate high-resolution
+            X-band military radar designed to detect and track ballistic missiles and other airborne objects.
+            The map does not suggest that these two radars belong to the same system. It places them together to
+            show how wildlife research, aviation safety and missile surveillance use related parts of the
+            electromagnetic spectrum and operate across the same airspace.
+          </p>
+          <p>
+            The map also marks supplementary feeding sites where livestock carcasses are placed to provide
+            vultures with a regular source of food intended to be free from poison and harmful veterinary drugs.
+            Live cameras have broadcast activity from the Hai-Bar Carmel feeding station, while other cameras
+            have monitored griffon-vulture nests in the Negev. A feeding site in the wider Dimona region is
+            located within the same broader landscape as the nuclear research complex, military training areas
+            and missile-surveillance infrastructure. This proximity does not prove that the feeding site,
+            cameras and military installations were planned or operated as one network. It shows that
+            conservation is organised within a landscape already structured by strategic infrastructure,
+            restricted access and military surveillance.
+          </p>
+          <p>
+            These systems also produce unequal forms of visibility and access. Cameras, radar and tracking
+            devices can help identify nesting activity, injured birds, poisoned carcasses and collision risks,
+            but the resulting images, coordinates and movement records remain controlled by the institutions
+            operating the equipment. Palestinian researchers do not have equal access to the permits, wireless
+            frequencies, tracking devices and databases required to conduct independent bird telemetry in the
+            occupied West Bank. The map therefore presents conservation not only as the protection of an
+            endangered species, but as a question of who possesses the technical and institutional authority
+            to sense, record and interpret animal movement.
+          </p>
+        </div>
       </div>
 
       <style jsx>{`
@@ -266,6 +313,30 @@ export default function BirdMapPage() {
           color: #222;
         }
         .tracker-section .section-title {
+          margin-top: 0;
+        }
+
+        /* --- ★ NEW: Radar section styles --- */
+        .radar-section {
+          margin-top: 2rem;
+          border: 1px solid #9afc97;
+          padding: 1.5rem;
+          background: rgba(0, 0, 0, 0.2);
+        }
+        body.light-bg .radar-section {
+          border-color: #2c6e2c;
+          background: rgba(255, 255, 255, 0.8);
+        }
+        .radar-section p {
+          font-size: 0.9rem;
+          line-height: 1.7;
+          margin: 0.8rem 0;
+          color: #ddd;
+        }
+        body.light-bg .radar-section p {
+          color: #222;
+        }
+        .radar-section .section-title {
           margin-top: 0;
         }
 
@@ -348,6 +419,9 @@ export default function BirdMapPage() {
             min-height: 500px;
           }
           .tracker-section {
+            padding: 1rem;
+          }
+          .radar-section {
             padding: 1rem;
           }
           .device-specs {
