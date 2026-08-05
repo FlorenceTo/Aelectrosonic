@@ -358,7 +358,7 @@ export default function BirdTracker() {
   // Dynamic map height based on mode
   const mapHeight = compareMode ? 320 : 400;
 
-  // Helper for responsive iframe height
+  // Helper for responsive iframe height (kept for consistency, but we use a button now)
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   return (
@@ -611,9 +611,8 @@ export default function BirdTracker() {
                 </CircleMarker>
               ))}
 
-              {/* Camera markers - white */}
+              {/* Camera markers - white (with clickable button instead of iframe) */}
               {visibleCameras.map((site, idx) => {
-                const iframeHeight = isMobile ? 150 : 200;
                 const popupMaxWidth = isMobile ? 280 : 420;
                 const popupMinWidth = isMobile ? 240 : 320;
                 return (
@@ -652,26 +651,33 @@ export default function BirdTracker() {
                       </div>
 
                       {site.cameraUrl && site.cameraUrl !== "" && (
-                        <>
-                          <div style={{ marginTop: "0.5rem" }}>
-                            <iframe
-                              src={site.cameraUrl}
-                              width="100%"
-                              height={iframeHeight}
-                              frameBorder="0"
-                              allowFullScreen
-                              allow="autoplay; fullscreen"
-                              style={{ border: "1px solid #ccc", borderRadius: "4px" }}
-                              title="Live camera stream"
-                              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-                            />
-                          </div>
-                          <div style={{ marginTop: "0.3rem", fontSize: "0.65rem", opacity: 0.6 }}>
-                            <a href={site.cameraUrl} target="_blank" rel="noopener noreferrer">
-                              🔗 Open in new window ↗
-                            </a>
-                          </div>
-                        </>
+                        <div style={{ marginTop: "0.5rem" }}>
+                          <a
+                            href={site.cameraUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: "block",
+                              padding: "0.6rem",
+                              textAlign: "center",
+                              backgroundColor: "rgba(154, 252, 151, 0.15)",
+                              border: "1px solid #9afc97",
+                              borderRadius: "4px",
+                              color: "#9afc97",
+                              textDecoration: "none",
+                              fontSize: "0.85rem",
+                              transition: "background-color 0.2s ease",
+                            }}
+                            onMouseEnter={(e) => e.target.style.backgroundColor = "rgba(154, 252, 151, 0.25)"}
+                            onMouseLeave={(e) => e.target.style.backgroundColor = "rgba(154, 252, 151, 0.15)"}
+                          >
+                            📹 Watch Live Stream
+                            <br />
+                            <span style={{ fontSize: "0.6rem", opacity: 0.6 }}>
+                              Opens in new window
+                            </span>
+                          </a>
+                        </div>
                       )}
                     </Popup>
                   </CircleMarker>
@@ -922,9 +928,8 @@ export default function BirdTracker() {
                 </CircleMarker>
               ))}
 
-              {/* Camera markers - white (mobile‑adaptive, Compare mode) */}
+              {/* Camera markers - white (Compare mode, with clickable button) */}
               {visibleCameras.map((site, idx) => {
-                const iframeHeight = isMobile ? 150 : 200;
                 const popupMaxWidth = isMobile ? 280 : 420;
                 const popupMinWidth = isMobile ? 240 : 320;
                 return (
@@ -956,27 +961,40 @@ export default function BirdTracker() {
                       {site.status && (
                         <><strong>Status:</strong> {site.status}<br /></>
                       )}
+
+                      {/* DEBUG: show Camera URL */}
+                      <div style={{ fontSize: "0.6rem", color: "#999", marginTop: "0.3rem" }}>
+                        Camera URL: {site.cameraUrl || "❌ NOT FOUND"}
+                      </div>
+
                       {site.cameraUrl && site.cameraUrl !== "" && (
-                        <>
-                          <div style={{ marginTop: "0.5rem" }}>
-                            <iframe
-                              src={site.cameraUrl}
-                              width="100%"
-                              height={iframeHeight}
-                              frameBorder="0"
-                              allowFullScreen
-                              allow="autoplay; fullscreen"
-                              style={{ border: "1px solid #ccc", borderRadius: "4px" }}
-                              title="Live camera stream"
-                              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-                            />
-                          </div>
-                          <div style={{ marginTop: "0.3rem", fontSize: "0.65rem", opacity: 0.6 }}>
-                            <a href={site.cameraUrl} target="_blank" rel="noopener noreferrer">
-                              🔗 Open in new window ↗
-                            </a>
-                          </div>
-                        </>
+                        <div style={{ marginTop: "0.5rem" }}>
+                          <a
+                            href={site.cameraUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: "block",
+                              padding: "0.6rem",
+                              textAlign: "center",
+                              backgroundColor: "rgba(154, 252, 151, 0.15)",
+                              border: "1px solid #9afc97",
+                              borderRadius: "4px",
+                              color: "#9afc97",
+                              textDecoration: "none",
+                              fontSize: "0.85rem",
+                              transition: "background-color 0.2s ease",
+                            }}
+                            onMouseEnter={(e) => e.target.style.backgroundColor = "rgba(154, 252, 151, 0.25)"}
+                            onMouseLeave={(e) => e.target.style.backgroundColor = "rgba(154, 252, 151, 0.15)"}
+                          >
+                            📹 Watch Live Stream
+                            <br />
+                            <span style={{ fontSize: "0.6rem", opacity: 0.6 }}>
+                              Opens in new window
+                            </span>
+                          </a>
+                        </div>
                       )}
                     </Popup>
                   </CircleMarker>
