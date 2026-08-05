@@ -321,7 +321,7 @@ export default function HomePage() {
           margin-top: 0;
           color: #9afc97;
           font-size: 1.4rem;
-          border-bottom: 1px solid rgba(154, 252, 151, 0.2);
+          border-bottom: 0px solid rgba(154, 252, 151, 0.2);
           padding-bottom: 0.5rem;
           display: flex;
           align-items: center;
