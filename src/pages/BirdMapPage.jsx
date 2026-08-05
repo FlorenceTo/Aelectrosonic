@@ -427,8 +427,7 @@ export default function BirdMapPage() {
           .device-specs {
             padding: 0.5rem;
           }
-          .image-caption,
-          .small-text {
+          .image-caption {
             text-align: justify;
         }
       `}</style>
