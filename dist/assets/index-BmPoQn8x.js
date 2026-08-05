@@ -4111,14 +4111,14 @@ uniform ${n} ${r} u_${i};
           text-transform: uppercase;
           letter-spacing: 1px;
           color: #9afc97;
-          border-bottom: 1px solid rgba(154, 252, 151, 0.2);
+          border-bottom: 0px solid rgba(154, 252, 151, 0.2);
           padding-bottom: 0.4rem;
           margin: 1.5rem 0 1rem 0;
           font-weight: normal;
         }
         body.light-bg .section-title {
           color: #1a4a1a;
-          border-bottom: 1px solid rgba(44, 110, 44, 0.2);
+          border-bottom: 0px solid rgba(44, 110, 44, 0.2);
         }
         .info-section p {
           font-size: 0.9rem;

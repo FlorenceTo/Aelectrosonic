@@ -113,11 +113,11 @@ export default function BirdMapPage() {
               className="full-width-image"
             />
             <p className="small-text">
-              According to Professor Ran Nathan from Hebrew University of Jerusalem (HUJI), the device shown
-              is the type that would have been carried by the griffon vulture recovered in Sudan. The
-              photograph shows the physical form of the tracker and its harness, but it is not a photograph
-              of the device recovered from the bird and does not confirm the precise model used to produce
-              the 2008–2011 long-range movement dataset.
+              According to Professor Ran Nathan from the Hebrew University of Jerusalem (HUJI), the device shown
+              is the type that would have been carried by the griffon vulture captured in Sudan in December 2012.
+              The photograph shows the physical form of the tracker and its harness, but it is not a photograph
+              of the device recovered from that bird and does not confirm the precise model used to produce the
+              2008–2011 long-range movement dataset.
             </p>
           </div>
 

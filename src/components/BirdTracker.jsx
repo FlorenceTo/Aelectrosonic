@@ -224,14 +224,19 @@ export default function BirdTracker() {
             cameraUrl,
           };
 
-          // Classify based on Type column
-          const isCamera = type.toLowerCase().includes("camera") ||
-                           type.toLowerCase().includes("cam") ||
-                           type.toLowerCase().includes("nest");
+          // ★ FALLBACK: If CameraURL is present, it's a camera
+          const hasCameraUrl = cameraUrl && cameraUrl.trim() !== "";
+          const isCameraByType = type.toLowerCase().includes("camera") ||
+                                 type.toLowerCase().includes("cam") ||
+                                 type.toLowerCase().includes("nest");
 
-          if (isCamera) {
+          // If it has a CameraURL OR is camera by Type, add to cameras
+          if (hasCameraUrl || isCameraByType) {
             camera.push(item);
-          } else {
+          }
+
+          // Only add to feeding sites if it's NOT a camera by Type
+          if (!isCameraByType) {
             feeding.push(item);
           }
         });
@@ -661,7 +666,7 @@ export default function BirdTracker() {
                               padding: "0.6rem",
                               textAlign: "center",
                               backgroundColor: "#1c1c1b",
-                              border: "0px solid #9afc97",
+                              border: "1px solid #9afc97",
                               borderRadius: "4px",
                               color: "#9afc97",
                               textDecoration: "none",
