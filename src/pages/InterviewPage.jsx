@@ -82,8 +82,6 @@ const interviews = [
       { speaker: "B", text: "I give a few talks every week, five or six talks. I do interviews like this one.", timestamp: "00:02:57,000 → 00:03:05,000" },
       { speaker: "B", text: "This is public relations. This is an area that we need to do more of, obviously, to send a message out.", timestamp: "00:03:05,000 → 00:03:18,000" },
       { speaker: "B", text: "And what's the message? The message is that we need human conservation, we need natural conservation.", timestamp: "00:03:18,000 → 00:03:28,000" },
-      { speaker: "A", text: "So looking back, what originally drew you to biology and biodiversity research?", timestamp: "00:03:28,000 → 00:03:33,000" },
-      { speaker: "B", text: "I'm sorry, what originally?", timestamp: "00:03:33,000 → 00:03:43,000" },
       { speaker: "A", text: "Looking back from your time in this work you're doing now, what drew you to biology and biodiversity research? What drove you to do this and what led you to commit to this work in Palestine specifically?", timestamp: "00:03:43,000 → 00:03:52,000" },
       { speaker: "B", text: "Well, I have been in love with nature since my childhood.", timestamp: "00:03:52,000 → 00:04:02,000" },
       { speaker: "B", text: "I used to go to the valleys around Bethlehem with my mother, my uncle.", timestamp: "00:04:02,000 → 00:04:10,000" },
