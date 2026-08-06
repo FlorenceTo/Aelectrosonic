@@ -4268,7 +4268,7 @@ uniform ${n} ${r} u_${i};
         .help-toggle-btn {
           background: transparent;
           border: 1px solid #9afc97;
-          border-radius: 20px;
+          border-radius: 0px;
           padding: 0.3rem 0.8rem;
           font-size: 0.7rem;
           font-family: monospace;
