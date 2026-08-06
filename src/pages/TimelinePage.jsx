@@ -175,7 +175,7 @@ export default function TimelinePage() {
   useEffect(() => {
     const fetchRadarData = async () => {
       try {
-        const response = await fetch("/data/radarlist.csv");
+        const response = await fetch("/data/radarlist.csv?v=2");
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const csvText = await response.text();
         Papa.parse(csvText, {
