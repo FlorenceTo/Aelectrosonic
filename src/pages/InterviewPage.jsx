@@ -860,13 +860,13 @@ export default function InterviewsPage() {
           gap: 0.5rem;
           margin-top: 1.5rem;
           flex-wrap: wrap;
-          border-bottom: 1px solid rgba(154, 252, 151, 0.3);
+          border-bottom: 0px solid rgba(154, 252, 151, 0.3);
           padding-bottom: 0.5rem;
         }
         .tab {
           background: transparent;
           border: none;
-          border-radius: 20px 20px 0 0;
+          border-radius: 0px 0px 0 0;
           padding: 0.4rem 1.2rem;
           font-size: 0.9rem;
           font-weight: 500;
@@ -902,7 +902,7 @@ export default function InterviewsPage() {
           background: rgba(0, 0, 0, 0.2);
           padding: 1.5rem;
           margin-top: 1rem;
-          border-radius: 0 0 8px 8px;
+          border-radius: 0 0 0px 0px;
         }
         .interview-header h3 {
           font-size: 1.4rem;
