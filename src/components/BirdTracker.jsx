@@ -132,7 +132,7 @@ export default function BirdTracker() {
 
   // Load radar data
   useEffect(() => {
-    fetch("/data/radarlist.csv")
+    fetch("/data/radarlist1.csv")
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.text();
