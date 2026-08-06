@@ -407,7 +407,7 @@ export default function BirdMapPage() {
         .device-specs .small-text {
           margin-top: 0.8rem;
           padding-top: 0.5rem;
-          border-top: 1px solid rgba(154, 252, 151, 0.1);
+          border-top: 0px solid rgba(154, 252, 151, 0.1);
         }
 
         @media (max-width: 600px) {
@@ -429,6 +429,7 @@ export default function BirdMapPage() {
           }
           .image-caption {
             text-align: justify;
+          }
         }
       `}</style>
     </div>
