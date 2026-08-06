@@ -860,7 +860,7 @@ export default function InterviewsPage() {
           gap: 0.5rem;
           margin-top: 1.5rem;
           flex-wrap: wrap;
-          border-bottom: 1px solid rgba(154, 252, 151, 0.3);
+          border-bottom: 0px solid rgba(154, 252, 151, 0.3);
           padding-bottom: 0.5rem;
         }
         .tab {

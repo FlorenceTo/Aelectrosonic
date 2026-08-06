@@ -732,8 +732,9 @@ body.light-bg .js-plotly-plot .plotly .xgrid .grid {
   }
 
   .map-container {
+    margin-top: 2.5rem;
     min-height: 500px;
-    padding: 0.5rem;
+    padding: 0.5rem; 
   }
 
   .research-section {
