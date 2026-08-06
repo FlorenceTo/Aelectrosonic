@@ -175,7 +175,7 @@ export default function TimelinePage() {
   useEffect(() => {
     const fetchRadarData = async () => {
       try {
-        const response = await fetch("/data/radarlist.csv?v=2");
+        const response = await fetch("/data/radarlist1.csv");
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const csvText = await response.text();
         Papa.parse(csvText, {
@@ -249,7 +249,7 @@ export default function TimelinePage() {
           error: (err) => setError("Radar CSV parse error: " + err.message),
         });
       } catch (err) {
-        setError("Failed to load radarlist.csv: " + err.message);
+        setError("Failed to load radarlist1.csv: " + err.message);
       }
     };
     fetchRadarData();
