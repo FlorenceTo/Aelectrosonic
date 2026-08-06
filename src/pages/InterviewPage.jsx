@@ -341,7 +341,7 @@ const interviews = [
     ],
   },
 
-   // -------- INTERVIEW 2: Anton Khalilieh (full transcript) --------
+  // -------- INTERVIEW 2: Anton Khalilieh (full transcript) --------
   {
     id: 2,
     title: "Interviewee: C",
@@ -432,7 +432,7 @@ const interviews = [
     ],
   },
 
-  // -------- INTERVIEW 3 (replace with your own transcript) --------
+  // -------- INTERVIEW 3 (Simon Awad) --------
   {
     id: 3,
     title: "Interviewee: D",
@@ -522,8 +522,7 @@ const interviews = [
     ],
   },
 
-
-   // -------- INTERVIEW 4: Yossi Leshem (NEW) --------
+  // -------- INTERVIEW 4: Yossi Leshem (NEW) --------
   {
     id: 4,
     title: "Interviewee: E",
@@ -771,7 +770,6 @@ const interviews = [
 
 export default function InterviewsPage() {
   const [theme, setTheme] = useState("dark");
-  const [showTimestamps, setShowTimestamps] = useState(false);
   const [activeInterviewId, setActiveInterviewId] = useState(interviews[0].id);
 
   useEffect(() => {
@@ -787,20 +785,8 @@ export default function InterviewsPage() {
   const activeInterview = interviews.find((i) => i.id === activeInterviewId);
   const currentInterview = activeInterview || interviews[0];
 
-  // ---- Clean timestamps: extract start time if it contains " → " ----
-  const cleanTimestamp = (ts) => {
-    if (ts.includes(" → ")) {
-      return ts.split(" → ")[0]; // take first part
-    }
-    return ts; // already clean
-  };
-
-  const transcriptWithCleanTimestamps = currentInterview.transcript.map((entry) => ({
-    ...entry,
-    timestamp: cleanTimestamp(entry.timestamp),
-  }));
-
-  const mergedTranscript = mergeTranscript(transcriptWithCleanTimestamps);
+  // Merge consecutive same‑speaker entries – timestamps are kept internally but never displayed
+  const mergedTranscript = mergeTranscript(currentInterview.transcript);
 
   return (
     <div>
@@ -808,30 +794,33 @@ export default function InterviewsPage() {
       <div className="container">
         <h2 className="no-underline">Interviews</h2>
         <p>
-        The interviews centre on Palestinians whose ecological work is shaped by occupation, 
-        displacement, and restricted mobility. Their practices include farming, walking, bird 
-        ringing, environmental education, and close observation of seasonal and multispecies 
-        change. They describe knowledge formed through returning to particular places, noticing 
-        what has altered, and remembering what was present before access was restricted or 
-        habitats were damaged. Their work is not only ecological, it is a form of resistance 
-        against erasure, preserving Palestinian heritage, memory, and multispecies life.
-      </p>
-      <p>
-        A separate conversation is with an Israeli ornithologist involved in establishing radar 
-        monitoring of bird migration and developing technologies used to record bird movement. 
-        His work also contributed to aircraft operations and logistical systems intended to 
-        reduce collisions between birds and military aircraft. I include this interview because 
-        it illustrates how ornithological knowledge can become instrumentalised within military 
-        and aviation systems.
-      </p>
-      <p>
-        Read alongside one another, these accounts show how ecological knowledge is shaped by 
-        radically different conditions of authority, access, and mobility, and what this reveals 
-        about the politics of observing life.
-      </p>
-      <p className="ethos-note-small">
-        To protect participants from surveillance, facial recognition tracking, and data scanning, names are not used unless participants explicitly gave permission and stated their name during the conversation. This reflects a commitment to ethical research practice under conditions where visibility can carry risk.
-    </p>
+          The interviews centre on Palestinians whose ecological work is shaped by occupation,
+          displacement, and restricted mobility. Their practices include farming, walking, bird
+          ringing, environmental education, and close observation of seasonal and multispecies
+          change. They describe knowledge formed through returning to particular places, noticing
+          what has altered, and remembering what was present before access was restricted or
+          habitats were damaged. Their work is not only ecological, it is a form of resistance
+          against erasure, preserving Palestinian heritage, memory, and multispecies life.
+        </p>
+        <p>
+          A separate conversation is with an Israeli ornithologist involved in establishing radar
+          monitoring of bird migration and developing technologies used to record bird movement.
+          His work also contributed to aircraft operations and logistical systems intended to
+          reduce collisions between birds and military aircraft. I include this interview because
+          it illustrates how ornithological knowledge can become instrumentalised within military
+          and aviation systems.
+        </p>
+        <p>
+          Read alongside one another, these accounts show how ecological knowledge is shaped by
+          radically different conditions of authority, access, and mobility, and what this reveals
+          about the politics of observing life.
+        </p>
+        <p className="ethos-note-small">
+          To protect participants from surveillance, facial recognition tracking, and data scanning,
+          names are not used unless participants explicitly gave permission and stated their name
+          during the conversation. This reflects a commitment to ethical research practice under
+          conditions where visibility can carry risk.
+        </p>
 
         {/* ---- Tabs ---- */}
         <div className="tabs">
@@ -852,22 +841,11 @@ export default function InterviewsPage() {
             <h3>{currentInterview.title}</h3>
             <p className="interview-meta">{currentInterview.meta}</p>
             <p className="interview-date">{currentInterview.date}</p>
-            <button
-              className="timestamp-toggle"
-              onClick={() => setShowTimestamps(!showTimestamps)}
-            >
-              {showTimestamps ? "Hide timestamps" : "Show timestamps"}
-            </button>
           </div>
           <div className="transcript">
             {mergedTranscript.map((block, idx) => (
               <div key={idx} className={`transcript-line ${block.speaker === "B" ? "b" : "a"}`}>
                 <div className="speaker-name">{block.speaker}</div>
-                {showTimestamps && (
-                  <div className="timestamp">
-                    {block.timestampStart} → {block.timestampEnd}
-                  </div>
-                )}
                 <div className="speaker-text">{block.text}</div>
               </div>
             ))}
@@ -875,7 +853,7 @@ export default function InterviewsPage() {
         </div>
       </div>
 
-      {/* ---- Styles (same as before) ---- */}
+      {/* ---- Styles ---- */}
       <style jsx>{`
         .tabs {
           display: flex;
@@ -940,17 +918,6 @@ export default function InterviewsPage() {
           font-family: monospace;
           margin-bottom: 1rem;
         }
-        .timestamp-toggle {
-          background: transparent;
-          border: 1px solid #9afc97;
-          border-radius: 20px;
-          padding: 0.2rem 0.8rem;
-          font-size: 0.7rem;
-          font-family: monospace;
-          cursor: pointer;
-          color: inherit;
-          margin-bottom: 1rem;
-        }
         .transcript {
           margin-top: 1rem;
           max-height: 70vh;
@@ -973,12 +940,6 @@ export default function InterviewsPage() {
         .transcript-line.b .speaker-name {
           color: #ffaa44;
         }
-        .timestamp {
-          font-size: 0.7rem;
-          font-family: monospace;
-          opacity: 0.6;
-          margin-bottom: 0.2rem;
-        }
         .speaker-text {
           font-size: 0.85rem;
           line-height: 1.4;
@@ -991,45 +952,34 @@ export default function InterviewsPage() {
         body.light-bg .speaker-text {
           color: #000;
         }
-        body.light-bg .timestamp-toggle {
-          border-color: #2c6e2c;
-          color: #2c6e2c;
-        }
-      @media (max-width: 768px) {
-        .speaker-text {
-          font-size: 0.75rem;
-        }
-        .transcript {
-          max-height: 60vh;
-        }
-        .tabs {
-          gap: 0.3rem;
-        }
-        .tab {
-          font-size: 0.75rem;
-          padding: 0.3rem 0.8rem;
+        @media (max-width: 768px) {
+          .speaker-text {
+            font-size: 0.75rem;
+          }
+          .transcript {
+            max-height: 60vh;
+          }
+          .tabs {
+            gap: 0.3rem;
+          }
+          .tab {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.8rem;
+          }
+          .ethos-note-small {
+            font-size: 0.7rem;
+          }
         }
         .ethos-note-small {
-          font-size: 0.7rem;
+          font-size: 0.8rem;
+          font-style: italic;
+          opacity: 0.75;
+          margin-top: 0.5rem;
+          line-height: 1.5;
         }
-      }
-
-      /* ---- NEW: ethical note styles (outside media query) ---- */
-      .ethos-note-small {
-        font-size: 0.8rem;
-        font-style: italic;
-        opacity: 0.75;
-        margin-top: 0.5rem;
-        line-height: 1.5;
-      }
-      body.light-bg .ethos-note-small {
-        color: #333;
-      }
-          @media (max-width: 768px) {
-            .ethos-note-small {
-              font-size: 0.7rem;
-            }
-          }
+        body.light-bg .ethos-note-small {
+          color: #333;
+        }
       `}</style>
     </div>
   );

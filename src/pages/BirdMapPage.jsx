@@ -6,7 +6,10 @@ export default function BirdMapPage() {
   return (
     <div>
       <Header />
-      <div className="container" style={{ marginTop: "2rem", paddingBottom: "4rem" }}>
+      <div
+        className="container container--reading"
+        style={{ marginTop: "2rem", paddingBottom: "4rem" }}
+      >
         <h2 style={{ borderBottom: "none", marginBottom: "0.25rem", paddingBottom: 0 }}>
           Bird Movement Tracker
         </h2>
@@ -79,8 +82,7 @@ export default function BirdMapPage() {
         </div>
 
         {/* --- About the tracking device section --- */}
-        <div className="tracker-section">
-          {/* Full‑width image above the title – live nest cam */}
+        <div className="research-section">
           <div className="image-block">
             <img
               src="/images/live_nest_cam_vulture.jpg"
@@ -105,7 +107,6 @@ export default function BirdMapPage() {
             functions, but do not name a specific commercial model.
           </p>
 
-          {/* Image 1 – GPS device */}
           <div className="image-block">
             <img
               src="/images/gps_device_eobs.jpg"
@@ -121,7 +122,6 @@ export default function BirdMapPage() {
             </p>
           </div>
 
-          {/* Device identification – now includes the extra identification text inside */}
           <div className="device-specs">
             <h4 className="specs-title">Identification of the device</h4>
             <p><strong>Device type:</strong> e-obs 160 g GPS–ACC tag with UHF communication</p>
@@ -137,7 +137,6 @@ export default function BirdMapPage() {
             <p><strong>Communication:</strong> Individual UHF pinger and local UHF data download</p>
             <p><strong>Data storage:</strong> Measurements stored onboard until downloaded by researchers</p>
 
-            {/* ★ New paragraph inside the specs box ★ */}
             <p className="small-text" style={{ marginTop: "0.8rem" }}>
               The technical specifications recorded in the Movebank data for this deployment match the
               <em> e-obs Bird Solar Cellular</em> tracker. The physical interface – including the charging
@@ -148,7 +147,6 @@ export default function BirdMapPage() {
             </p>
           </div>
 
-          {/* Image 2 – vulture movement diagram */}
           <div className="image-block">
             <img
               src="/images/vulture_movement_diagram.png"
@@ -200,8 +198,8 @@ export default function BirdMapPage() {
           </p>
         </div>
 
-        {/* --- ★ NEW: Radar installations and live vulture cameras section ★ --- */}
-        <div className="radar-section">
+        {/* --- Radar installations and live vulture cameras section --- */}
+        <div className="research-section">
           <h3 className="section-title">Radar installations and live vulture cameras</h3>
           <p>
             This map plots documented radar installations, supplementary vulture-feeding sites and locations
@@ -247,191 +245,6 @@ export default function BirdMapPage() {
           </p>
         </div>
       </div>
-
-      <style jsx>{`
-        .container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 0 1rem;
-        }
-        .section-title {
-          font-size: 1rem;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          color: #9afc97;
-          border-bottom: 0px solid rgba(154, 252, 151, 0.2);
-          padding-bottom: 0.4rem;
-          margin: 1.5rem 0 1rem 0;
-          font-weight: normal;
-        }
-        body.light-bg .section-title {
-          color: #1a4a1a;
-          border-bottom: 0px solid rgba(44, 110, 44, 0.2);
-        }
-        .info-section p {
-          font-size: 0.9rem;
-          line-height: 1.7;
-          margin: 0.8rem 0;
-          color: #ddd;
-        }
-        body.light-bg .info-section p {
-          color: #222;
-        }
-
-        .map-container {
-          margin-top: 2rem;
-          border: 1px solid #9afc97;
-          padding: 1rem;
-          background: rgba(0, 0, 0, 0.2);
-          overflow: visible;
-          height: auto;
-          min-height: 600px;
-        }
-        body.light-bg .map-container {
-          border-color: #2c6e2c;
-          background: rgba(255, 255, 255, 0.8);
-        }
-
-        /* --- Tracker section styles --- */
-        .tracker-section {
-          margin-top: 2rem;
-          border: 1px solid #9afc97;
-          padding: 1.5rem;
-          background: rgba(0, 0, 0, 0.2);
-        }
-        body.light-bg .tracker-section {
-          border-color: #2c6e2c;
-          background: rgba(255, 255, 255, 0.8);
-        }
-        .tracker-section p {
-          font-size: 0.9rem;
-          line-height: 1.7;
-          margin: 0.8rem 0;
-          color: #ddd;
-        }
-        body.light-bg .tracker-section p {
-          color: #222;
-        }
-        .tracker-section .section-title {
-          margin-top: 0;
-        }
-
-        /* --- ★ NEW: Radar section styles --- */
-        .radar-section {
-          margin-top: 2rem;
-          border: 1px solid #9afc97;
-          padding: 1.5rem;
-          background: rgba(0, 0, 0, 0.2);
-        }
-        body.light-bg .radar-section {
-          border-color: #2c6e2c;
-          background: rgba(255, 255, 255, 0.8);
-        }
-        .radar-section p {
-          font-size: 0.9rem;
-          line-height: 1.7;
-          margin: 0.8rem 0;
-          color: #ddd;
-        }
-        body.light-bg .radar-section p {
-          color: #222;
-        }
-        .radar-section .section-title {
-          margin-top: 0;
-        }
-
-        /* Full‑width images */
-        .image-block {
-          margin: 0 0 1.5rem 0;
-        }
-        .full-width-image {
-          width: 100%;
-          height: auto;
-          display: block;
-          border: 1px solid #9afc97;
-        }
-        body.light-bg .full-width-image {
-          border-color: #2c6e2c;
-        }
-        .image-caption {
-          margin-top: 0.3rem !important;
-          font-size: 0.7rem !important;
-          opacity: 0.7;
-          text-align: center;
-        }
-
-        .small-text {
-          font-size: 0.75rem !important;
-          line-height: 1.5 !important;
-          opacity: 0.7;
-        }
-        .small-text.source {
-          margin-top: 0.3rem !important;
-          font-size: 0.7rem !important;
-        }
-
-        /* Device specs */
-        .device-specs {
-          margin: 1.5rem 0;
-          border: 1px solid rgba(154, 252, 151, 0.2);
-          padding: 1rem;
-        }
-        body.light-bg .device-specs {
-          border-color: rgba(44, 110, 44, 0.2);
-        }
-        .specs-title {
-          font-size: 0.85rem;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          color: #9afc97;
-          margin-bottom: 0.5rem;
-          font-weight: normal;
-          border-bottom: none;
-          padding-bottom: 0.3rem;
-        }
-        body.light-bg .specs-title {
-          color: #1a4a1a;
-        }
-        .device-specs p {
-          font-size: 0.8rem !important;
-          line-height: 1.5 !important;
-          margin: 0.2rem 0 !important;
-        }
-        .device-specs p strong {
-          color: #9afc97;
-        }
-        body.light-bg .device-specs p strong {
-          color: #1a4a1a;
-        }
-        /* Additional spacing for the extra identification paragraph inside specs */
-        .device-specs .small-text {
-          margin-top: 0.8rem;
-          padding-top: 0.5rem;
-          border-top: 0px solid rgba(154, 252, 151, 0.1);
-        }
-
-        @media (max-width: 600px) {
-          .container {
-            padding: 0 0.8rem;
-          }
-          .map-container {
-            padding: 0.5rem;
-            min-height: 500px;
-          }
-          .tracker-section {
-            padding: 1rem;
-          }
-          .radar-section {
-            padding: 1rem;
-          }
-          .device-specs {
-            padding: 0.5rem;
-          }
-          .image-caption {
-            text-align: justify;
-          }
-        }
-      `}</style>
     </div>
   );
 }
