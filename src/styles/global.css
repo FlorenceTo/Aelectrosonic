@@ -4,103 +4,262 @@
 @import "@fontsource/inter/600.css";
 @import "@fontsource/inter/700.css";
 
+/* =========================================================
+   Shared theme values
+   ========================================================= */
+
+:root {
+  --site-accent: #9afc97;
+  --site-accent-muted: rgba(154, 252, 151, 0.2);
+  --site-accent-faint: rgba(154, 252, 151, 0.1);
+
+  --site-text: rgba(255, 255, 255, 0.85);
+  --site-heading: rgba(255, 255, 255, 0.9);
+  --site-text-muted: rgba(255, 255, 255, 0.7);
+  --site-text-faint: rgba(255, 255, 255, 0.5);
+
+  --site-divider: rgba(255, 255, 255, 0.2);
+
+  --site-panel-background: rgba(0, 0, 0, 0.2);
+  --site-panel-background-hover: rgba(0, 0, 0, 0.3);
+  --site-panel-background-strong: rgba(0, 0, 0, 0.3);
+
+  --site-map-background: #30342f;
+  --site-picker-background: rgba(28, 28, 27, 0.95);
+}
+
+/* =========================================================
+   Reset and document defaults
+   ========================================================= */
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background: #adadad; /* default grey; will be changed by JS color picker */
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  color: rgba(255, 255, 255, 0.85);
+  background: #adadad;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--site-text);
   line-height: 1.4;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* ---- Checkbox accent colour - matches site green ---- */
+/* Checkbox accent colour */
 input[type="checkbox"] {
-  accent-color: #9afc97;
+  accent-color: var(--site-accent);
 }
 
-/* Container */
+/* =========================================================
+   Main containers
+   ========================================================= */
+
 .container {
+  width: 100%;
   max-width: 1400px;
   margin: 2rem auto;
-  padding: 0 1rem 1rem 1rem;
+  padding: 0 1rem 1rem;
 }
 
-/* Headings */
-h1, h2, h3 {
+/* Narrower container for long-form research pages */
+.container--reading {
+  max-width: 1200px;
+}
+
+/* Container used by the interactive terrain page */
+.interference-container {
+  max-width: 1400px;
+  margin-top: 0.5rem;
+  padding: 0 0.5rem 1rem;
+}
+
+/* =========================================================
+   General typography
+   ========================================================= */
+
+h1,
+h2,
+h3 {
   font-weight: 500;
   letter-spacing: -0.02em;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--site-heading);
 }
-h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); margin-bottom: 0.5rem; margin-top: 0.5rem; }
-h2 { font-size: clamp(1.4rem, 4vw, 1.8rem); margin-bottom: 2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.2); padding-bottom: 0.5rem; }
-h3 { font-size: 1.25rem; margin-bottom: 0.25rem; }
 
-/* Paragraphs */
+h1 {
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+h2 {
+  font-size: clamp(1.4rem, 4vw, 1.8rem);
+  margin-bottom: 2rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--site-divider);
+}
+
+h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.25rem;
+}
+
 p {
   margin-bottom: 1rem;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--site-text);
 }
 
-/* Links – default (dark mode) */
-a {
-  color: #9afc97;
-  text-decoration: none;
-  border-bottom: 1px dotted #9afc97;
-  transition: opacity 0.2s ease, border-color 0.2s ease;
+/* Main page title without the default h2 divider */
+.page-title {
+  margin-bottom: 0.25rem;
+  padding-bottom: 0;
+  border-bottom: none;
 }
+
+/* Short line beneath a page title */
+.page-subtitle {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+/* Remove underline from a specific heading */
+.no-underline {
+  border-bottom: none !important;
+}
+
+/* =========================================================
+   Links
+   ========================================================= */
+
+a {
+  color: var(--site-accent);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--site-accent);
+  transition:
+    opacity 0.2s ease,
+    border-color 0.2s ease;
+}
+
 a:hover {
   opacity: 0.7;
-  border-bottom-color: #9afc97;
+  border-bottom-color: var(--site-accent);
 }
 
-/* ---- Header (transparent, inherits body background) ---- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+iframe:focus-visible {
+  outline: 2px solid var(--site-accent);
+  outline-offset: 3px;
+}
+
+/* Back link */
+.back-link {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+}
+
+/* =========================================================
+   Header
+   ========================================================= */
+
 .site-header {
   position: sticky;
   top: 0;
-  background: transparent;
-  padding: 0.8rem 1.3rem;
   z-index: 10;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.8rem 1.3rem;
+  background: transparent;
+  border-bottom: 1px solid var(--site-divider);
 }
+
 .nav-links {
   display: flex;
   justify-content: space-between;
   max-width: 1400px;
   margin: 0 auto;
 }
+
 .nav-links a {
-  border-bottom: none;
-  color: inherit;  /* inherits body color (white in dark mode) */
+  color: inherit;
   font-size: 0.9rem;
   font-weight: 500;
+  border-bottom: none;
 }
+
 .nav-links a:hover {
   opacity: 0.7;
   border-bottom: none;
 }
 
-/* Archive cards */
-.archive-card {
-  border: 1px solid #9afc97;
-  padding: 1.25rem;
-  background: rgba(0, 0, 0, 0.2);
-  transition: background 0.2s ease;
+/* =========================================================
+   Shared research-page typography
+   ========================================================= */
+
+.section-title {
+  margin: 1.5rem 0 1rem;
+  padding-bottom: 0.4rem;
+  color: var(--site-accent);
+  font-size: 1rem;
+  font-weight: normal;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+
+  /*
+    Disabled for now.
+    Retained in case section dividers are reintroduced.
+  */
+  border-bottom: 0 solid var(--site-accent-muted);
 }
-.archive-card:hover { background: rgba(0, 0, 0, 0.3); }
-.archive-card h3 { color: rgba(255, 255, 255, 0.9); }
-.archive-card p { font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin: 0.5rem 0; }
-.archive-card small { font-size: 0.7rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; letter-spacing: 0.5px; }
 
-/* Map wrapper */
-.map-wrapper { margin: 2rem 0; border: 1px solid #9afc97; background: #30342f; }
+.info-section p {
+  margin: 0.8rem 0;
+  color: var(--site-text);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
 
-/* Archive grid */
+/* Shared bordered section for research text */
+.research-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 1px solid var(--site-accent);
+  background: var(--site-panel-background);
+}
+
+.research-section .section-title {
+  margin-top: 0;
+}
+
+.research-section p {
+  margin: 0.8rem 0;
+  color: var(--site-text);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+/* Longer research text on the terrain page */
+.terrain-research-section {
+  margin-bottom: 2rem;
+}
+
+.terrain-research-section p {
+  max-width: 1100px;
+  line-height: 1.65;
+}
+
+/* =========================================================
+   Archive cards and grids
+   ========================================================= */
+
 .archive-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -108,173 +267,305 @@ a:hover {
   margin-top: 1.5rem;
 }
 
-/* Back link */
-.back-link { display: inline-block; margin-bottom: 1.5rem; font-size: 0.85rem; }
-
-/* ---- Light background mode (when body has class 'light-bg') ---- */
-body.light-bg {
-  background: #f5f3ef;
-  color: rgba(0, 0, 0, 0.85);
-}
-body.light-bg h1, 
-body.light-bg h2, 
-body.light-bg h3, 
-body.light-bg p {
-  color: rgba(0, 0, 0, 0.85);
-}
-body.light-bg h2 {
-  border-bottom-color: rgba(0, 0, 0, 0.2);
-}
-body.light-bg a {
-  color: #2c6e2c;
-  border-bottom-color: #2c6e2c;
-}
-body.light-bg .site-header {
-  border-bottom-color: rgba(0, 0, 0, 0.2);
-}
-body.light-bg .archive-card {
-  border-color: #2c6e2c;
-  background: rgba(255, 255, 255, 0.8);
-}
-body.light-bg .archive-card h3,
-body.light-bg .archive-card p,
-body.light-bg .archive-card small {
-  color: rgba(0, 0, 0, 0.7);
-}
-body.light-bg .map-wrapper {
-  border-color: #2c6e2c;
+.archive-card {
+  padding: 1.25rem;
+  border: 1px solid var(--site-accent);
+  background: var(--site-panel-background);
+  transition: background 0.2s ease;
 }
 
-/* ---- Checkbox accent colour in light mode ---- */
-body.light-bg input[type="checkbox"] {
-  accent-color: #2c6e2c;
+.archive-card:hover {
+  background: var(--site-panel-background-hover);
 }
 
-/* Remove underline from specific heading */
-.no-underline {
-  border-bottom: none !important;
+.archive-card h3 {
+  color: var(--site-heading);
 }
 
-/* ---- Color buttons (same as invisiblesignals) ---- */
-.color-btn {
-  background: transparent;
-  border: 1px solid #9afc97;
-  border-radius: 20px;
-  padding: 0.2rem 0.6rem;
+.archive-card p {
+  margin: 0.5rem 0;
+  color: var(--site-text-muted);
+  font-size: 0.85rem;
+}
+
+.archive-card small {
+  color: var(--site-text-faint);
   font-size: 0.7rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   General map wrappers
+   ========================================================= */
+
+.map-wrapper {
+  margin: 2rem 0;
+  border: 1px solid var(--site-accent);
+  background: var(--site-map-background);
+}
+
+/* Bird Map page map container */
+.map-container {
+  height: auto;
+  min-height: 600px;
+  margin-top: 2rem;
+  padding: 1rem;
+  overflow: visible;
+  border: 1px solid var(--site-accent);
+  background: var(--site-panel-background);
+}
+
+/* =========================================================
+   Research images and captions
+   ========================================================= */
+
+.image-block {
+  margin: 0 0 1.5rem;
+}
+
+.full-width-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--site-accent);
+}
+
+.image-caption {
+  margin-top: 0.3rem !important;
+  font-size: 0.7rem !important;
+  line-height: 1.5 !important;
+  text-align: center;
+  opacity: 0.7;
+}
+
+.small-text {
+  font-size: 0.75rem !important;
+  line-height: 1.5 !important;
+  opacity: 0.7;
+}
+
+.small-text.source {
+  margin-top: 0.3rem !important;
+  font-size: 0.7rem !important;
+}
+
+/* =========================================================
+   Technical specification boxes
+   ========================================================= */
+
+.device-specs {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border: 1px solid var(--site-accent-muted);
+}
+
+.specs-title {
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.3rem;
+  color: var(--site-accent);
+  font-size: 0.85rem;
+  font-weight: normal;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-bottom: none;
+}
+
+.device-specs p {
+  margin: 0.2rem 0 !important;
+  font-size: 0.8rem !important;
+  line-height: 1.5 !important;
+}
+
+.device-specs p strong {
+  color: var(--site-accent);
+}
+
+.device-specs .small-text {
+  margin-top: 0.8rem;
+  padding-top: 0.5rem;
+
+  /*
+    Disabled for now.
+    Retained in case the internal divider is reintroduced.
+  */
+  border-top: 0 solid var(--site-accent-faint);
+}
+
+/* =========================================================
+   Interference page layout
+   ========================================================= */
+
+.interference-layout {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.terrain-col {
+  flex: 2 1 680px;
+  min-width: 0;
+}
+
+.description-col {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+.terrain-frame,
+.description-panel {
+  height: calc(100vh - 80px);
+  height: calc(100dvh - 80px);
+  border: 1px solid var(--site-accent);
+}
+
+.terrain-frame {
+  position: relative;
+  overflow: hidden;
+  background: #111;
+}
+
+.terrain-iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.description-panel {
+  padding: 1rem;
+  overflow-y: auto;
+  background: var(--site-panel-background-strong);
+}
+
+.description-panel h3 {
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+}
+
+.description-panel p {
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.interaction-note {
+  margin-bottom: 0;
+  font-size: 0.85rem !important;
+  opacity: 0.7;
+}
+
+.webgl-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  color: #ff4a4a;
+  font-family: monospace;
+  font-size: 1rem;
+  text-align: center;
+}
+
+/* =========================================================
+   Colour buttons
+   ========================================================= */
+
+.color-btn {
+  padding: 0.2rem 0.6rem;
   color: inherit;
   font-family: monospace;
-}
-body.light-bg .color-btn {
-  border-color: #2c6e2c;
-  color: #2c2c2c;
+  font-size: 0.7rem;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--site-accent);
+  border-radius: 20px;
+  transition: all 0.2s ease;
 }
 
-/* ---- Plotly overrides for theme ---- */
+/* =========================================================
+   Plotly theme overrides
+   ========================================================= */
+
 .js-plotly-plot .plotly .main-svg {
   background: transparent !important;
 }
+
 .js-plotly-plot .plotly .legendtext,
 .js-plotly-plot .plotly .xtick text,
 .js-plotly-plot .plotly .ytick text,
 .js-plotly-plot .plotly .annotation-text {
   fill: currentColor !important;
 }
-body.light-bg .js-plotly-plot .plotly .legendtext,
-body.light-bg .js-plotly-plot .plotly .xtick text,
-body.light-bg .js-plotly-plot .plotly .ytick text,
-body.light-bg .js-plotly-plot .plotly .annotation-text {
-  fill: #1a1a1a !important;
-}
-/* Ensure Plotly grid lines are visible in light mode */
-body.light-bg .js-plotly-plot .plotly .gridlayer .grid {
-  stroke: #999 !important;
-}
-body.light-bg .js-plotly-plot .plotly .ygrid .grid {
-  stroke: #999 !important;
-}
-body.light-bg .js-plotly-plot .plotly .xgrid .grid {
-  stroke: #999 !important;
-}
 
+/* Timeline links */
 #timeline-info a {
-  color: #9afc97;
+  color: var(--site-accent);
   text-decoration: underline;
 }
-body.light-bg #timeline-info a {
-  color: #2c6e2c;
-}
 
-@media (max-width: 640px) {
-  .container { padding: 0 0.8rem 0.8rem 0.8rem; }
-  .site-header { padding: 0.6rem 0.8rem; }
-  .archive-grid { gap: 1rem; }
-}
+/* =========================================================
+   Custom colour picker
+   ========================================================= */
 
-/* Ultra‑compact custom color picker panel */
 .picker-panel {
-  font-size: 0.6rem !important;       /* half of typical browser default */
-  padding: 0.3rem !important;         /* minimal inner spacing */
-  gap: 0.3rem !important;             /* tiny gap between rows */
-  min-width: 120px !important;       /* much narrower panel */
-  background: rgba(28, 28, 27, 0.95);
+  min-width: 120px !important;
+  padding: 0.3rem !important;
+  gap: 0.3rem !important;
+  font-size: 0.6rem !important;
+  background: var(--site-picker-background);
   backdrop-filter: blur(4px);
-  border: 1px solid #9afc97;
-  border-radius: 8px;                /* slight rounding, optional */
+  border: 1px solid var(--site-accent);
+  border-radius: 8px;
 }
 
-/* Each row: colour and opacity */
 .color-input-group {
-  gap: 1rem !important;
   justify-content: space-between;
+  gap: 1rem !important;
   margin: 0;
 }
+
 .color-input-group label {
   font-size: 0.5rem !important;
   letter-spacing: 0.4px;
   opacity: 0.8;
 }
+
 .color-input-group input[type="color"] {
   width: 28px !important;
   height: 18px !important;
-  padding: 0.2;
-  border: 1px solid #9afc97;
-  border-radius: 1px;
+  padding: 0.2rem;
   background: #1c1c1b;
+  border: 1px solid var(--site-accent);
+  border-radius: 1px;
 }
+
 .color-input-group input[type="range"] {
   flex: 1;
   height: 2px !important;
   margin: 0;
 }
+
 .rgba-value {
+  margin-top: 0.2rem;
+  color: var(--site-accent);
+  font-family: monospace;
   font-size: 0.5rem !important;
   text-align: center;
-  margin-top: 0.2rem;
-  font-family: monospace;
-  color: #9afc97;
 }
 
-/* Light mode adjustments */
-body.light-bg .picker-panel {
-  background: rgba(245, 243, 239, 0.95);
-  border-color: #2c6e2c;
-}
-body.light-bg .color-input-group input[type="color"] {
-  background: #f5f3ef;
-  border-color: #2c6e2c;
-}
-body.light-bg .rgba-value {
-  color: #2c6e2c;
-}
-/* Osm */
-  .toner-blend-layer {
+/* =========================================================
+   OSM layers
+   ========================================================= */
+
+.toner-blend-layer {
   mix-blend-mode: normal;
 }
 
-/* Wave grid and cards */
+/* =========================================================
+   Electromagnetic wave grid and cards
+   ========================================================= */
+
 .wave-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -283,9 +574,9 @@ body.light-bg .rgba-value {
 }
 
 .wave-card {
-  border: 1px solid #9afc97;
   padding: 1rem;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--site-panel-background);
+  border: 1px solid var(--site-accent);
   border-radius: 0;
   transition: background 0.2s ease;
 }
@@ -294,27 +585,12 @@ body.light-bg .rgba-value {
   width: 100%;
   height: 110px;
   margin: 0.5rem 0;
-  
 }
 
-/* Light mode adjustments */
-body.light-bg .wave-card {
-  border-color: #2c6e2c;
-  background: rgba(255, 255, 255, 0.8);
-}
+/* =========================================================
+   Sound archive
+   ========================================================= */
 
-/* Responsive: on smaller screens, switch to 2 columns then 1 */
-@media (max-width: 900px) {
-  .wave-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media (max-width: 600px) {
-  .wave-grid {
-    grid-template-columns: 1fr;
-  }
-}
-/* Sound archive styles */
 .audio-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -327,50 +603,164 @@ body.light-bg .wave-card {
   flex-direction: column;
 }
 
-.audio-card h3{
-  font-size: 1.1rem;   /* adjust to your preference */
+.audio-card h3 {
   margin-bottom: 0.5rem;
+  font-size: 1.1rem;
 }
 
 .audio-description {
-  font-size: 0.4rem;
   margin: 0.5rem 0;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-body.light-bg .audio-description {
-  color: rgba(0, 0, 0, 0.7);
+  color: var(--site-text-muted);
+  font-size: 0.5rem;
 }
 
 .audio-meta {
-  font-size: 0.7rem;
-  color: #141414;
   margin: 0.5rem 0;
+  color: #141414;
+  font-size: 0.7rem;
 }
 
 .audio-play-btn {
-  background: transparent;
-  border: 1px solid #9afc97;
-  border-radius: 20px;
-  padding: 0.4rem 1rem;
-  font-size: 0.7rem;
-  font-family: monospace;
-  cursor: pointer;
-  color: inherit;
-  margin-top: 0.6rem;
   align-self: flex-start;
-  transition: background 0.2s;
+  margin-top: 0.6rem;
+  padding: 0.4rem 1rem;
+  color: inherit;
+  font-family: monospace;
+  font-size: 0.7rem;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--site-accent);
+  border-radius: 20px;
+  transition: background 0.2s ease;
 }
 
 .audio-play-btn:hover {
-  background: rgba(154, 252, 151, 0.2);
-}
-
-body.light-bg .audio-play-btn {
-  border-color: #2c6e2c;
-  color: #2c6e2c;
+  background: var(--site-accent-muted);
 }
 
 .audio-card .spectrogram-container {
   margin: 0.5rem 0;
+}
+
+/* =========================================================
+   Light background mode
+   ========================================================= */
+
+body.light-bg {
+  --site-accent: #2c6e2c;
+  --site-accent-muted: rgba(44, 110, 44, 0.2);
+  --site-accent-faint: rgba(44, 110, 44, 0.1);
+
+  --site-text: rgba(0, 0, 0, 0.85);
+  --site-heading: rgba(0, 0, 0, 0.85);
+  --site-text-muted: rgba(0, 0, 0, 0.7);
+  --site-text-faint: rgba(0, 0, 0, 0.5);
+
+  --site-divider: rgba(0, 0, 0, 0.2);
+
+  --site-panel-background: rgba(255, 255, 255, 0.8);
+  --site-panel-background-hover: rgba(255, 255, 255, 0.95);
+  --site-panel-background-strong: rgba(255, 255, 255, 0.8);
+
+  --site-map-background: rgba(255, 255, 255, 0.8);
+  --site-picker-background: rgba(245, 243, 239, 0.95);
+
+  background: #f5f3ef;
+  color: var(--site-text);
+}
+
+body.light-bg .color-input-group input[type="color"] {
+  background: #f5f3ef;
+}
+
+body.light-bg .js-plotly-plot .plotly .legendtext,
+body.light-bg .js-plotly-plot .plotly .xtick text,
+body.light-bg .js-plotly-plot .plotly .ytick text,
+body.light-bg .js-plotly-plot .plotly .annotation-text {
+  fill: #1a1a1a !important;
+}
+
+/* Ensure Plotly grid lines remain visible in light mode */
+body.light-bg .js-plotly-plot .plotly .gridlayer .grid,
+body.light-bg .js-plotly-plot .plotly .ygrid .grid,
+body.light-bg .js-plotly-plot .plotly .xgrid .grid {
+  stroke: #999 !important;
+}
+
+/* =========================================================
+   Responsive layouts
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .wave-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .interference-layout {
+    flex-direction: column;
+  }
+
+  .terrain-frame {
+    height: 70vh;
+    height: 70dvh;
+    min-height: 480px;
+  }
+
+  .description-panel {
+    height: auto;
+    overflow-y: visible;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 0 0.8rem 0.8rem;
+  }
+
+  .interference-container {
+    margin-top: 0.5rem;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+  }
+
+  .site-header {
+    padding: 0.6rem 0.8rem;
+  }
+
+  .archive-grid {
+    gap: 1rem;
+  }
+
+  .map-container {
+    min-height: 500px;
+    padding: 0.5rem;
+  }
+
+  .research-section {
+    padding: 1rem;
+  }
+
+  .device-specs {
+    padding: 0.5rem;
+  }
+
+  .image-caption {
+    text-align: justify;
+  }
+
+  .terrain-frame {
+    height: 60vh;
+    height: 60dvh;
+    min-height: 420px;
+  }
+}
+
+@media (max-width: 600px) {
+  .wave-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .audio-grid {
+    grid-template-columns: 1fr;
+  }
 }
