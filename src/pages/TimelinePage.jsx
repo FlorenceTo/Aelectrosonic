@@ -930,7 +930,7 @@ export default function TimelinePage() {
                 ...containerStyle,
                 marginTop: "0.5rem",
                 width: "100%",
-                ...(isMobile && { height: "280px", overflowY: "auto" }),
+                ...(isMobile && { height: "220px", overflowY: "auto" }),
               }}
             >
               {clickedInfo ? (
