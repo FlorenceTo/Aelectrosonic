@@ -60,18 +60,10 @@ export default function InterferencePage() {
             </div>
           </div>
 
-          {/* Right column: description text */}
+          {/* Right column: description text – now using a class for consistent styling */}
           <div className="description-col" style={{ flex: "1", minWidth: "200px" }}>
-            <div
-              style={{
-                border: "1px solid #9afc97",
-                padding: "1rem",
-                height: "calc(100vh - 80px)",
-                overflowY: "auto",
-                backgroundColor: "rgba(0,0,0,0.3)",
-              }}
-            >
-              <h3 style={{ marginTop: 0, marginBottom: "0.8rem" }}>Interference as an investigative condition</h3>
+            <div className="description-panel-text">
+              <h3>Interference as an investigative condition</h3>
               <p>
                 This interactive terrain visualises the raw GPS tracking data of a single Griffon Vulture moving across the Negev Desert and the area surrounding the Dead Sea. The longer movement record shown in the Vulture Map comes from a dataset published through the Movebank Data Repository. In contrast, the data used in this model had not been made public or processed into the cleaned long-range movement record. The model preserves missing positions, interruptions and irregular spatial connections that would normally be removed during data processing. By translating the raw GPS coordinates into a three-dimensional terrain, it becomes possible to compare the recorded trajectory with the surrounding topography and examine where the track remains geographically coherent and where it becomes interrupted, displaced or unstable.
               </p>
@@ -81,13 +73,53 @@ export default function InterferencePage() {
               <p>
                 Move through the model to explore the scale, distribution and spatial clustering of these interruptions.
               </p>
-              <p style={{ fontSize: "0.85rem", opacity: 0.7 }}>
+              <p className="interaction-note">
                 Interaction: drag to rotate, scroll to zoom, right‑click to pan.
               </p>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Page‑specific styles – only for the description panel */}
+      <style jsx>{`
+        .description-panel-text {
+          border: 1px solid #9afc97;
+          padding: 1rem;
+          height: calc(100vh - 80px);
+          overflow-y: auto;
+          background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .description-panel-text h3 {
+          margin-top: 0;
+          margin-bottom: 0.8rem;
+          font-size: 1rem;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          color: var(--site-accent);
+          font-weight: normal;
+        }
+
+        .description-panel-text p {
+          font-size: 0.9rem;
+          line-height: 1.7;
+          margin: 0.8rem 0;
+          color: var(--site-text);
+        }
+
+        .description-panel-text .interaction-note {
+          font-size: 0.85rem;
+          opacity: 0.7;
+          margin-bottom: 0;
+        }
+
+        /* Light mode is automatically handled via CSS variables */
+        body.light-bg .description-panel-text {
+          background-color: rgba(255, 255, 255, 0.8);
+          border-color: var(--site-accent);
+        }
+      `}</style>
     </div>
   );
 }
