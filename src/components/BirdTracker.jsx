@@ -37,13 +37,6 @@ function MapUpdater({ position }) {
   return null;
 }
 
-// Helper: extract YouTube video ID from URL
-function getYouTubeId(url) {
-  if (!url) return "";
-  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?]+)/);
-  return match ? match[1] : "";
-}
-
 export default function BirdTracker() {
   // Bird data state
   const [allPointsByBird, setAllPointsByBird] = useState({});
@@ -381,69 +374,38 @@ export default function BirdTracker() {
   // Helper to render a "Watch Live Stream" button for a site that has a cameraUrl
   const renderWatchButton = (cameraUrl) => {
     if (!cameraUrl || cameraUrl.trim() === "") return null;
-    const videoId = getYouTubeId(cameraUrl);
     return (
-      <div style={{ marginTop: "0.5rem", border: "1px solid #9afc97", borderRadius: "4px", overflow: "hidden" }}>
+      <div style={{ marginTop: "0.5rem" }}>
         <a
           href={cameraUrl}
           target="_blank"
           rel="noopener noreferrer"
           style={{ display: "block", textDecoration: "none" }}
         >
-          {videoId ? (
-            <>
-              <img
-                src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`}
-                alt="Live stream thumbnail"
-                style={{
-                  width: "100%",
-                  display: "block",
-                }}
-              />
-              <div
-                style={{
-                  textAlign: "center",
-                  padding: "0.4rem",
-                  backgroundColor: "#1c1c1b",
-                  color: "#9afc97",
-                  fontSize: "0.8rem",
-                  transition: "background-color 0.2s ease",
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = "#2a2a2a"}
-                onMouseLeave={(e) => e.target.style.backgroundColor = "#1c1c1b"}
-              >
-                Watch Live Stream
-                <br />
-                <span style={{ fontSize: "0.6rem", opacity: 0.6 }}>
-                  Opens in new window
-                </span>
-              </div>
-            </>
-          ) : (
-            <div
-              style={{
-                textAlign: "center",
-                padding: "0.6rem",
-                backgroundColor: "#1c1c1b",
-                color: "#9afc97",
-                fontSize: "0.85rem",
-                transition: "background-color 0.2s ease",
-              }}
-              onMouseEnter={(e) => e.target.style.backgroundColor = "#2a2a2a"}
-              onMouseLeave={(e) => e.target.style.backgroundColor = "#1c1c1b"}
-            >
-              Watch Live Stream
-              <br />
-              <span style={{ fontSize: "0.6rem", opacity: 0.6 }}>
-                Opens in new window
-              </span>
-            </div>
-          )}
+          <div
+            style={{
+              textAlign: "center",
+              padding: "0.5rem",
+              backgroundColor: "#1c1c1b",
+              border: "1px solid #9afc97",
+              borderRadius: "4px",
+              color: "#9afc97",
+              fontSize: "0.8rem",
+              transition: "background-color 0.2s ease",
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = "#2a2a2a"}
+            onMouseLeave={(e) => e.target.style.backgroundColor = "#1c1c1b"}
+          >
+            Watch Live Stream
+            <br />
+            <span style={{ fontSize: "0.6rem", opacity: 0.6 }}>
+              Opens in new window
+            </span>
+          </div>
         </a>
       </div>
     );
   };
-
   return (
     <div className="bird-tracker" style={{ marginTop: "1rem" }}>
       <style>{`
@@ -506,6 +468,7 @@ export default function BirdTracker() {
           .leaflet-popup-content {
             font-size: 0.5rem;
           }
+        }
       `}</style>
 
       {/* Mode toggle, radar toggle, year slider */}
@@ -1026,10 +989,7 @@ export default function BirdTracker() {
                     {site.status && (
                       <><strong>Status:</strong> {site.status}<br /></>
                     )}
-                    {/* DEBUG: show Camera URL */}
-                    <div style={{ fontSize: "0.6rem", color: "#999", marginTop: "0.3rem" }}>
-                      Camera URL: {site.cameraUrl || "❌ NOT FOUND"}
-                    </div>
+
                     {renderWatchButton(site.cameraUrl)}
                   </Popup>
                 </CircleMarker>
