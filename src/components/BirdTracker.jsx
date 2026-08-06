@@ -190,7 +190,7 @@ export default function BirdTracker() {
 
   // Load feeding sites and cameras data
   useEffect(() => {
-    fetch("/data/feedingsites3.csv")
+    fetch("/data/feedingsites4.csv")
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.text();
@@ -741,7 +741,7 @@ export default function BirdTracker() {
                     {site.status && (
                       <><strong>Status:</strong> {site.status}<br /></>
                     )}
-                    
+
                     {renderWatchButton(site.cameraUrl)}
                   </Popup>
                 </CircleMarker>
