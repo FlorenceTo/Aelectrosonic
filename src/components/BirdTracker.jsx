@@ -741,10 +741,7 @@ export default function BirdTracker() {
                     {site.status && (
                       <><strong>Status:</strong> {site.status}<br /></>
                     )}
-                    {/* DEBUG: show Camera URL */}
-                    <div style={{ fontSize: "0.6rem", color: "#999", marginTop: "0.3rem" }}>
-                      Camera URL: {site.cameraUrl || "❌ NOT FOUND"}
-                    </div>
+                    
                     {renderWatchButton(site.cameraUrl)}
                   </Popup>
                 </CircleMarker>
