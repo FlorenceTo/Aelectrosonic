@@ -689,6 +689,14 @@ body.light-bg .js-plotly-plot .plotly .xgrid .grid {
 }
 
 /* =========================================================
+   Grey background mode
+   ========================================================= */
+
+body.grey-bg .color-input-group input[type="color"] {
+  background: #878787;  /* match the grey mode background */
+}
+
+/* =========================================================
    Responsive layouts
    ========================================================= */
 

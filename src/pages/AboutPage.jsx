@@ -47,15 +47,14 @@ export default function AboutPage() {
           <figure style={{ margin: "0 0 1.5rem 0", padding: 0, textAlign: "center" }}>
             <img
               src="/images/sense_diagram.jpg"
-              alt="Diagram tracing sensing infrastructures: altitude, signals, instruments and translations"
               style={{
                 width: "100%",
-                maxWidth: "700px",
+                maxWidth: "100%",
                 height: "auto",
                 display: "block",
                 margin: "0 auto",
                 border: `1px solid ${borderColor}`,
-                borderRadius: "4px",
+                borderRadius: "0px",
               }}
             />
             <figcaption
@@ -66,7 +65,6 @@ export default function AboutPage() {
                 fontStyle: "italic",
               }}
             >
-              Tracing sensing infrastructures: altitude, signals and the partial forms of environmental data.
             </figcaption>
           </figure>
 

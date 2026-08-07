@@ -20,8 +20,8 @@ export default function Header() {
 
   // Preset colors (Grey, Light, Dark)
   const presets = [
-    { name: "Grey", bg: "#adadad", light: false },
-    { name: "Light", bg: "#f5f3ef", light: true },
+    { name: "Grey", bg: "#878787", light: false },
+    { name: "Light", bg: "#f0ede8ec", light: true },
     { name: "Dark", bg: "#1c1c1b", light: false }
   ];
   const [presetIndex, setPresetIndex] = useState(0);
@@ -49,7 +49,7 @@ export default function Header() {
       const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
       return { hex, opacity: a };
     }
-    return { hex: "#adadad", opacity: 1 };
+    return { hex: "#878787", opacity: 1 };
   };
 
   // Apply background and toggle 'light-bg' class, also save to localStorage
