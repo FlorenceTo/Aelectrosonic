@@ -60,8 +60,8 @@ export default function InterferencePage() {
             </div>
           </div>
 
-          {/* Right column: description text – now using a class for consistent styling */}
-          <div className="description-col" style={{ flex: "1", minWidth: "200px" }}>
+          {/* Right column: description text */}
+          <div className="description-col" style={{ flex: "1", minWidth: "250px" }}>
             <div className="description-panel-text">
               <h3>Interference as an investigative condition</h3>
               <p>
@@ -78,6 +78,17 @@ export default function InterferencePage() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* ========== NEW SECTION: Raw GPS Terrain Model ========== */}
+        <div className="research-section" style={{ marginTop: "2rem" }}>
+          <h3 className="section-title">Raw GPS Terrain Model</h3>
+          <p>
+            The raw GPS data used to generate this terrain was not originally intended for public interpretation. Recorded between 22 November 2024 and 22 February 2025, the dataset spans a period of sustained military operations across Gaza and the surrounding region. It formed part of a processing pipeline in which movement data was cleaned before publication. Missing positions, duplicated coordinates and irregular trajectories are commonly removed so that a coherent movement path can be reconstructed. This model examines what those interruptions may reveal before they disappear from the record. The raw coordinates were translated into a three-dimensional terrain so that the recorded trajectory could be compared with the surrounding landscape. The terrain provides a spatial reference for evaluating the positions. Sections of the track that follow valleys, escarpments and changes in elevation remain geographically coherent with the landscape. Elsewhere, the trajectory becomes discontinuous, displaced or disappears entirely. These moments are preserved as part of the conditions through which the bird's movement became measurable.
+          </p>
+          <p>
+            The decision to retain these interruptions emerged from a broader concern with wildlife telemetry in conflict environments. Most people have encountered GNSS spoofing without realising it: a phone map may suddenly place them at an airport, in another city or direct them along an impossible route because the device has received false positioning signals. In wildlife telemetry, the same phenomenon can relocate a bird hundreds of kilometres from its actual position or interrupt the continuity of its recorded movement. The Nature Communications article <em>GNSS spoofing in conflict zones disrupts wildlife tracking and hampers research and conservation efforts</em> documents numerous examples of tracked birds being repeatedly relocated to international airports across conflict-affected regions. Several clusters of interruption within this dataset occur in close proximity to the Dimona Radar Facility, including the United States-operated AN/TPY-2 X-band ballistic-missile early-warning radar and the Israeli-operated ELM-2083 L-band aerostat radar for detecting low-altitude aircraft. Their proximity situates these interruptions within an environment characterised by intensive military sensing. The model approaches these interruptions as objects of inquiry and as records of the operational conditions through which wildlife telemetry functions. It shifts the focus from reconstructing movement to examining the infrastructures that make movement measurable, bringing biological movement, satellite navigation, topography and terrestrial sensing systems into the same field of analysis.
+          </p>
         </div>
       </div>
 
