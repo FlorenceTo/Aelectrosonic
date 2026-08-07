@@ -43,12 +43,39 @@ export default function AboutPage() {
             boxSizing: "border-box",
           }}
         >
+          {/* ---------- Diagram ---------- */}
+          <figure style={{ margin: "0 0 1.5rem 0", padding: 0, textAlign: "center" }}>
+            <img
+              src="/images/sense_diagram.jpg"
+              alt="Diagram tracing sensing infrastructures: altitude, signals, instruments and translations"
+              style={{
+                width: "100%",
+                maxWidth: "700px",
+                height: "auto",
+                display: "block",
+                margin: "0 auto",
+                border: `1px solid ${borderColor}`,
+                borderRadius: "4px",
+              }}
+            />
+            <figcaption
+              style={{
+                fontSize: "0.8em",
+                marginTop: "0.5rem",
+                opacity: 0.8,
+                fontStyle: "italic",
+              }}
+            >
+              Tracing sensing infrastructures: altitude, signals and the partial forms of environmental data.
+            </figcaption>
+          </figure>
+
           <p className="gradient-text" style={paragraphStyle}>
-  This research began from the partial and absent forms through which an environment becomes perceptible. What appears through a microphone, tracking device, map or spectrogram is never the environment in full. It is formed through a relation between a living body, a technical instrument, the conditions in which a measurement takes place and the person interpreting what has been recorded. A bird becomes a coordinate. Electromagnetic activity becomes sound. Separate measurements become a route. A missing position may be classified as an error, yet its disappearance also marks the point at which a technical relation has failed to produce what was expected. These translations make movement and infrastructure available for study while changing the conditions through which they first became known. During fieldwork in Palestine, I often became aware of systems that were present but not visible. A mobile phone could hold a strong connection where no telecommunications tower could be seen. A directional microphone could bring the sound of a distant bird or aircraft closer before either came into view. A wideband receiver could render electromagnetic activity audible, but only within the limits of its frequency range and sensitivity. What became perceptible depended on the instrument, its placement and the conditions surrounding it.
+            This research began from the partial and absent forms through which an environment becomes perceptible. What appears through a microphone, tracking device, map or spectrogram is never the environment in full. It is formed through a relation between a living body, a technical instrument, the conditions in which a measurement takes place and the person interpreting what has been recorded. A bird becomes a coordinate. Electromagnetic activity becomes sound. Separate measurements become a route. A missing position may be classified as an error, yet its disappearance also marks the point at which a technical relation has failed to produce what was expected. These translations make movement and infrastructure available for study while changing the conditions through which they first became known. During fieldwork in Palestine, I often became aware of systems that were present but not visible. A mobile phone could hold a strong connection where no telecommunications tower could be seen. A directional microphone could bring the sound of a distant bird or aircraft closer before either came into view. A wideband receiver could render electromagnetic activity audible, but only within the limits of its frequency range and sensitivity. What became perceptible depended on the instrument, its placement and the conditions surrounding it.
           </p>
 
           <p className="gradient-text" style={paragraphStyle}>
-            The website was guided by the intention to make research methods and contextual information more accessible to Palestinian scientists, biologists and ornithologists producing knowledge under occupation. This includes researchers who resist collaborations in which Israeli institutions become the compulsory technological providers, permit holders or validators of work conducted in Palestine, while Palestinians are positioned primarily as local hosts rather than equal producers and owners of knowledge. Israeli procedures for wireless experiments require an Israeli identity number or registered company, and foreign applicants must apply through an Israeli citizen or company. In the occupied West Bank, the Israeli Civil Administration separately regulates activities involving certain wireless devices, including their importation, purchase, possession, development and integration. These rules do not establish that every passive GPS logger is prohibited, but they show how transmitting wildlife tags can become dependent on Israeli licensing, institutional approval or an Israeli intermediary. The conditions of research are further shaped by restricted access to land. Palestine lies along a major bird-migration corridor, yet the habitats through which birds pass cannot be observed equally by those living within them. Checkpoints, road gates, settlements, firing zones, closed military areas and repeated military incursions fragment movement across the West Bank. These restrictions are not confined to Area C. Area A remains part of the occupied West Bank despite the administrative responsibilities assigned to the Palestinian Authority, and Israeli forces continue to enter Palestinian cities, villages and refugee camps, conduct raids, close roads and restrict movement. The division of the West Bank into Areas A, B and C does not describe the actual conditions under which Palestinians move, conduct fieldwork or maintain access to ecological sites.
+            This research archive was guided by the intention to make research methods, technical knowledge and contextual information more accessible to Palestinian ornithologists, conservationists, field researchers and others producing ecological knowledge and working to protect bird life and its habitats under occupation. This includes researchers who resist collaborations in which Israeli institutions become the compulsory technological providers, permit holders or validators of work conducted in Palestine, while Palestinians are positioned primarily as local hosts rather than equal producers and owners of knowledge. Israeli procedures for wireless experiments require an Israeli identity number or registered company, and foreign applicants must apply through an Israeli citizen or company. In the occupied West Bank, the Israeli Civil Administration separately regulates activities involving certain wireless devices, including their importation, purchase, possession, development and integration. These rules do not establish that every passive GPS logger is prohibited, but they show how transmitting wildlife tags can become dependent on Israeli licensing, institutional approval or an Israeli intermediary. The conditions of research are further shaped by restricted access to land. Palestine lies along a major bird-migration corridor, yet the habitats through which birds pass cannot be observed equally by those living within them. Checkpoints, road gates, settlements, firing zones, closed military areas and repeated military incursions fragment movement across the West Bank. These restrictions are not confined to Area C. Area A remains part of the occupied West Bank despite the administrative responsibilities assigned to the Palestinian Authority, and Israeli forces continue to enter Palestinian cities, villages and refugee camps, conduct raids, close roads and restrict movement. The division of the West Bank into Areas A, B and C does not describe the actual conditions under which Palestinians move, conduct fieldwork or maintain access to ecological sites.
           </p>
 
           <p className="gradient-text" style={paragraphStyle}>
