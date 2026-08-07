@@ -794,13 +794,7 @@ export default function InterviewsPage() {
       <div className="container">
         <h2 className="no-underline">Interviews</h2>
         <p>
-          The interviews centre on Palestinians whose ecological work is shaped by occupation,
-          displacement, and restricted mobility. Their practices include farming, walking, bird
-          ringing, environmental education, and close observation of seasonal and multispecies
-          change. They describe knowledge formed through returning to particular places, noticing
-          what has altered, and remembering what was present before access was restricted or
-          habitats were damaged. Their work is not only ecological, it is a form of resistance
-          against erasure, preserving Palestinian heritage, memory, and multispecies life.
+          The interviews centre on Palestinian ornithologists, biologists, environmental educators and others who care for and protect the land and its ecosystems. Their knowledge also includes Indigenous knowledge passed through families and generations, formed through long relationships with particular landscapes, plants, animals and seasonal changes. Their practices include farming, walking, bird ringing, environmental education and close observation of multispecies life. They describe knowledge formed through returning to particular places, noticing what has altered and remembering what was present before access was restricted or habitats were damaged. This knowledge is shaped by occupation, displacement and restricted mobility, but also by heritage, familiarity, care and repeated observation. Their work is not only ecological; it is also a form of resistance against erasure, preserving Palestinian heritage, memory, Indigenous knowledge and multispecies life.
         </p>
         <p>
           A separate conversation is with an Israeli ornithologist involved in establishing radar
